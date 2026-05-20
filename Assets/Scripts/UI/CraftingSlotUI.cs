@@ -8,7 +8,9 @@ namespace ProjectER.UI
 {
     /// <summary>
     /// 조합 가능 슬롯 하나 — 결과물명 + 재료 목록 + 제작 버튼
+    /// SetActive 대신 CanvasGroup alpha로 표시/숨김 — VLG 레이아웃 안정성 유지
     /// </summary>
+    [RequireComponent(typeof(CanvasGroup))]
     public class CraftingSlotUI : MonoBehaviour
     {
         [SerializeField] private Text   _resultNameText;
@@ -17,21 +19,34 @@ namespace ProjectER.UI
 
         private RecipeData         _currentRecipe;
         private Action<RecipeData> _onCraft;
+        private CanvasGroup        _canvasGroup;
 
         private void Awake()
         {
-            _craftButton?.onClick.AddListener(HandleCraftClick);
+            _canvasGroup = GetComponent<CanvasGroup>();
+            if (_craftButton != null)
+                _craftButton.onClick.AddListener(HandleCraftClick);
         }
 
         private void OnDestroy()
         {
-            _craftButton?.onClick.RemoveListener(HandleCraftClick);
+            if (_craftButton != null)
+                _craftButton.onClick.RemoveListener(HandleCraftClick);
         }
 
         public void Show(RecipeData recipe, Action<RecipeData> onCraft)
         {
+            if (_canvasGroup == null)
+                _canvasGroup = GetComponent<CanvasGroup>();
+
             _currentRecipe = recipe;
             _onCraft       = onCraft;
+
+            if (_resultNameText == null || _ingredientsText == null)
+            {
+                Debug.LogError($"[CraftingSlotUI] {gameObject.name} — Text 참조가 null입니다. 빌더를 다시 실행하세요.");
+                return;
+            }
 
             _resultNameText.text = recipe.ResultItem.DisplayName;
 
@@ -44,13 +59,20 @@ namespace ProjectER.UI
             }
             _ingredientsText.text = sb.ToString();
 
-            gameObject.SetActive(true);
+            _canvasGroup.alpha          = 1f;
+            _canvasGroup.interactable   = true;
+            _canvasGroup.blocksRaycasts = true;
         }
 
         public void Hide()
         {
-            _currentRecipe = null;
-            gameObject.SetActive(false);
+            if (_canvasGroup == null)
+                _canvasGroup = GetComponent<CanvasGroup>();
+
+            _currentRecipe              = null;
+            _canvasGroup.alpha          = 0f;
+            _canvasGroup.interactable   = false;
+            _canvasGroup.blocksRaycasts = false;
         }
 
         private void HandleCraftClick() => _onCraft?.Invoke(_currentRecipe);

@@ -20,6 +20,19 @@ namespace ProjectER.UI
 
         private void OnEnable()
         {
+            if (_craftingSystem == null || _inventorySystem == null)
+            {
+                Debug.LogError($"[CraftingUI] 연결 누락 — " +
+                               $"CraftingSystem={_craftingSystem != null}, " +
+                               $"InventorySystem={_inventorySystem != null}");
+                return;
+            }
+            if (_slots == null || _slots.Length == 0)
+            {
+                Debug.LogError("[CraftingUI] 슬롯 배열이 비어있습니다.");
+                return;
+            }
+
             _inventorySystem.OnBagSlotChanged   += HandleInventoryChanged;
             _inventorySystem.OnEquipmentChanged += HandleEquipmentChanged;
             RefreshSlots();
@@ -27,6 +40,7 @@ namespace ProjectER.UI
 
         private void OnDisable()
         {
+            if (_inventorySystem == null) return;
             _inventorySystem.OnBagSlotChanged   -= HandleInventoryChanged;
             _inventorySystem.OnEquipmentChanged -= HandleEquipmentChanged;
         }
@@ -37,6 +51,8 @@ namespace ProjectER.UI
         private void RefreshSlots()
         {
             _craftingSystem.GetCraftableRecipes(_craftableBuffer, _slots.Length);
+            Debug.Log($"[CraftingUI] RefreshSlots — 조합 가능 {_craftableBuffer.Count}개");
+
             for (int i = 0; i < _slots.Length; i++)
             {
                 if (i < _craftableBuffer.Count)

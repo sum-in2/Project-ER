@@ -57,12 +57,26 @@ namespace ProjectER.Crafting
         public void GetCraftableRecipes(List<RecipeData> results, int maxCount = 5)
         {
             results.Clear();
+
+            if (_recipeDatabase == null)
+            {
+                Debug.LogError("[CraftingSystem] RecipeDatabase가 연결되지 않았습니다.");
+                return;
+            }
+            if (_inventorySystem == null)
+            {
+                Debug.LogError("[CraftingSystem] InventorySystem이 연결되지 않았습니다.");
+                return;
+            }
+
             foreach (RecipeData recipe in _recipeDatabase.Recipes)
             {
                 if (results.Count >= maxCount) break;
                 if (CanCraft(recipe))
                     results.Add(recipe);
             }
+
+            Debug.Log($"[CraftingSystem] 조합 가능 레시피 {results.Count}개 / 전체 {_recipeDatabase.Recipes.Count}개");
         }
     }
 }

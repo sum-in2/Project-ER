@@ -85,13 +85,14 @@ namespace ProjectER.Editor
             InventoryTestPanel testPanel = matSection.AddComponent<InventoryTestPanel>();
 
             // ── 조합 섹션 ─────────────────────────────────────────────
-            GameObject craftSection         = BuildSection(root.transform, "CraftingSection", 205f, "조합 가능");
-            VerticalLayoutGroup craftVL     = craftSection.AddComponent<VerticalLayoutGroup>();
-            craftVL.spacing                 = 4f;
-            craftVL.padding                 = new RectOffset(6, 6, 30, 6);
-            craftVL.childForceExpandWidth   = true;
-            craftVL.childForceExpandHeight  = false;
-            CraftingSlotUI[] craftSlotUIs   = new CraftingSlotUI[5];
+            // VLG를 직접 적용 — 장비 섹션과 동일 패턴, 슬롯은 CanvasGroup alpha로 표시/숨김
+            GameObject craftSection       = BuildSection(root.transform, "CraftingSection", 205f, "조합 가능");
+            VerticalLayoutGroup craftVL   = craftSection.AddComponent<VerticalLayoutGroup>();
+            craftVL.spacing               = 4f;
+            craftVL.padding               = new RectOffset(6, 6, 30, 6);
+            craftVL.childForceExpandWidth  = true;
+            craftVL.childForceExpandHeight = false;
+            CraftingSlotUI[] craftSlotUIs = new CraftingSlotUI[5];
             for (int i = 0; i < 5; i++)
                 craftSlotUIs[i] = BuildCraftingSlot(craftSection.transform, i);
             CraftingUI craftingUI = craftSection.AddComponent<CraftingUI>();
@@ -135,9 +136,11 @@ namespace ProjectER.Editor
 
         private static GameObject BuildPanel(Transform parent, string name, Color color)
         {
-            GameObject go = new GameObject(name);
+            GameObject go  = new GameObject(name);
             go.transform.SetParent(parent, false);
-            go.AddComponent<Image>().color = color;
+            Image img      = go.AddComponent<Image>();
+            img.sprite     = null;
+            img.color      = color;
             return go;
         }
 
@@ -248,7 +251,8 @@ namespace ProjectER.Editor
             GameObject go   = new GameObject($"CraftingSlot_{index}");
             go.transform.SetParent(parent, false);
             go.AddComponent<Image>().color = CraftSlotColor;
-            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 64f);
+            // CraftingSection width(205) - VLG padding(6+6) = 193
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(193f, 64f);
 
             VerticalLayoutGroup vl   = go.AddComponent<VerticalLayoutGroup>();
             vl.padding               = new RectOffset(6, 6, 4, 4);
@@ -268,7 +272,7 @@ namespace ProjectER.Editor
             cb.highlightedColor = new Color(0.28f, 0.68f, 0.28f);
             cb.pressedColor     = new Color(0.1f, 0.28f, 0.1f);
             craftBtn.colors   = cb;
-            btnGo.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 20f);
+            btnGo.GetComponent<RectTransform>().sizeDelta = new Vector2(181f, 20f);
 
             Text btnLabel     = CreateChild<Text>(btnGo.transform, "Label");
             btnLabel.text     = "제작";
@@ -281,6 +285,12 @@ namespace ProjectER.Editor
             blr.offsetMin     = Vector2.zero;
             blr.offsetMax     = Vector2.zero;
 
+            // CanvasGroup을 먼저 추가 — CraftingSlotUI.Awake에서 GetComponent로 참조
+            CanvasGroup cg      = go.AddComponent<CanvasGroup>();
+            cg.alpha            = 0f;
+            cg.interactable     = false;
+            cg.blocksRaycasts   = false;
+
             CraftingSlotUI slotUI = go.AddComponent<CraftingSlotUI>();
             SerializedObject so   = new SerializedObject(slotUI);
             so.FindProperty("_resultNameText").objectReferenceValue  = resultName;
@@ -288,7 +298,6 @@ namespace ProjectER.Editor
             so.FindProperty("_craftButton").objectReferenceValue     = craftBtn;
             so.ApplyModifiedProperties();
 
-            go.SetActive(false); // CraftingSlotUI.Show() 가 활성화
             return slotUI;
         }
 
@@ -299,7 +308,8 @@ namespace ProjectER.Editor
             t.fontStyle    = style;
             t.color        = color;
             t.alignment    = TextAnchor.MiddleLeft;
-            t.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, fontSize + 4f);
+            // CraftingSlot width(193) - slot VLG padding(6+6) = 181
+            t.GetComponent<RectTransform>().sizeDelta = new Vector2(181f, fontSize + 4f);
             return t;
         }
 
