@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 836576dab54085b49b25ba9032a7fdb4, type: 3}
+  m_Name: RecipeDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.RecipeDatabase
+  _recipes:
+  - {fileID: 11400000, guid: 53058a7af056b8a499781b68ef140c7c, type: 2}
+  - {fileID: 11400000, guid: b84926c5b9a75d14981b9ccd76b15226, type: 2}
+  - {fileID: 11400000, guid: e9a16e9f75c91d44299f762f03762a9a, type: 2}
+  - {fileID: 11400000, guid: d9a9b9f6affd7c742a30fa07ead22c4b, type: 2}
+  - {fileID: 11400000, guid: 4a7ef414af4c7534a9f10f3bc0e2c511, type: 2}
+  - {fileID: 11400000, guid: c2f715984d563e24dbb5f6588563db1b, type: 2}

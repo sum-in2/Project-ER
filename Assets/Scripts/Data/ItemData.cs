@@ -32,7 +32,6 @@ namespace ProjectER.Data
         // ── 소비 효과 (소비 아이템 전용) ────────────────────────────
         [Header("소비 효과 (소비 아이템 전용)")]
         [SerializeField] private float _hpRestore;
-        [SerializeField] private float _spRestore;  // 스태미나/SP
 
         // ── 프로퍼티 ──────────────────────────────────────────────────
         public string Id => _id;
@@ -51,7 +50,6 @@ namespace ProjectER.Data
         public float AttackSpeedBonus => _attackSpeedBonus;
 
         public float HpRestore => _hpRestore;
-        public float SpRestore => _spRestore;
 
 #if UNITY_EDITOR
         // Inspector에서 Id가 비어있으면 에셋 이름을 자동으로 채워줌
