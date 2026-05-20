@@ -122,6 +122,15 @@ CharacterBase (MonoBehaviour + IDamageable):
 - InventorySlot: 아이템 참조 + 수량
 
 이벤트: ScriptableObject 이벤트 채널 방식 권장
+
+아이템 분류:
+- 장비
+-- 무기, 옷, 머리, 팔, 신발
+--- 무기는 확장 가능하게 해야함 / 종류 많음
+- 음식
+- 재료
+- 소비 / 사용가능 아이템
+
 ```
 
 ### 크래프팅 시스템
@@ -144,6 +153,7 @@ CraftingSystem:
 
 ### 코드 생성 시
 
+1. var 변수형 금지
 2. 새 클래스 작성 전 인터페이스 설계 먼저 제안
 3. MonoBehaviour 생성 시 생명주기 스텁(`Awake`, `OnEnable`, `OnDisable`, `OnDestroy`) 포함
 4. GC 할당 가능성 있는 코드엔 `// ⚠️ GC 주의` 코멘트 추가
@@ -160,6 +170,7 @@ CraftingSystem:
 - 코드 내 주석: 한국어
 - 설명 텍스트: 한국어
 - 변수/클래스/메서드명: 영어
+- 텍스트에 이모티콘 사용 금지
 
 ---
 
