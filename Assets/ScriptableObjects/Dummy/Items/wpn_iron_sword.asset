@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: wpn_iron_sword
   _displayName: "\uCCA0 \uAC80"
   _description: 
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 67fb51d6a4fc5d64e879102fe877141c, type: 3}
   _itemType: 3
   _isStackable: 0
   _maxStack: 1

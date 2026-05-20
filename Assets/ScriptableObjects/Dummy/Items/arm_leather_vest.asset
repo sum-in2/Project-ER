@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: arm_leather_vest
   _displayName: "\uAC00\uC8FD \uC870\uB07C"
   _description: 
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: dabad88bc508f5f46b9f89cf1696a5ce, type: 3}
   _itemType: 4
   _isStackable: 0
   _maxStack: 1

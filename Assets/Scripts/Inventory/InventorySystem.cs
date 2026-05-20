@@ -24,10 +24,21 @@ namespace ProjectER.Inventory
         // 장비 슬롯 변경 이벤트 (슬롯 타입, 장착된 아이템 — 해제 시 null)
         public event Action<EquipmentSlotType, ItemData> OnEquipmentChanged;
 
-        public IReadOnlyList<InventorySlot> BagSlots => _bagSlots;
-
-        private void Awake()
+        public IReadOnlyList<InventorySlot> BagSlots
         {
+            get
+            {
+                if (_bagSlots == null) InitializeCollections();
+                return _bagSlots;
+            }
+        }
+
+        private void Awake() => InitializeCollections();
+
+        private void InitializeCollections()
+        {
+            if (_bagSlots != null) return;
+
             _bagSlots = new InventorySlot[BagSize];
             for (int i = 0; i < BagSize; i++)
                 _bagSlots[i] = new InventorySlot();
@@ -56,7 +67,7 @@ namespace ProjectER.Inventory
                     if (slot.Amount >= item.MaxStack) continue;
 
                     int addable = item.MaxStack - slot.Amount;
-                    int toAdd   = Math.Min(addable, amount);
+                    int toAdd = Math.Min(addable, amount);
                     slot.AddAmount(toAdd);
                     amount -= toAdd;
                     OnBagSlotChanged?.Invoke(i, slot);
@@ -185,6 +196,7 @@ namespace ProjectER.Inventory
         /// </summary>
         public ItemData GetEquippedItem(EquipmentSlotType slotType)
         {
+            if (_equipmentSlots == null) InitializeCollections();
             return _equipmentSlots[slotType];
         }
 
@@ -194,12 +206,12 @@ namespace ProjectER.Inventory
         {
             switch (itemType)
             {
-                case ItemType.Weapon:  slotType = EquipmentSlotType.Weapon;  return true;
-                case ItemType.Chest:   slotType = EquipmentSlotType.Chest;   return true;
-                case ItemType.Helmet:  slotType = EquipmentSlotType.Helmet;  return true;
-                case ItemType.Arms:    slotType = EquipmentSlotType.Arms;    return true;
-                case ItemType.Shoes:   slotType = EquipmentSlotType.Shoes;   return true;
-                default:               slotType = default;                   return false;
+                case ItemType.Weapon: slotType = EquipmentSlotType.Weapon; return true;
+                case ItemType.Chest: slotType = EquipmentSlotType.Chest; return true;
+                case ItemType.Helmet: slotType = EquipmentSlotType.Helmet; return true;
+                case ItemType.Arms: slotType = EquipmentSlotType.Arms; return true;
+                case ItemType.Shoes: slotType = EquipmentSlotType.Shoes; return true;
+                default: slotType = default; return false;
             }
         }
     }

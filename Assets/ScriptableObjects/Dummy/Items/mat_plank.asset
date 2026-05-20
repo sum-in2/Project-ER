@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: mat_plank
   _displayName: "\uBAA9\uC7AC \uD310\uC790"
   _description: 
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 729587447fcd94149b43501e6e0348be, type: 3}
   _itemType: 1
   _isStackable: 1
   _maxStack: 10
