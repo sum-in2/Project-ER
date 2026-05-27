@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(\\(Get-ChildItem -Path \"d:\\\\Programming\\\\GitHubClone\\\\Project-ER\\\\Assets\\\\Scripts\" -Force | Measure-Object\\).Count)"
+      "PowerShell(\\(Get-ChildItem -Path \"d:\\\\Programming\\\\GitHubClone\\\\Project-ER\\\\Assets\\\\Scripts\" -Force | Measure-Object\\).Count)",
+      "Bash(powershell -Command \"Get-Content 'Assets/Resources/Data/BSER/ItemWeapon.json' | Select-Object -First 50\")",
+      "Bash(powershell -Command \"Get-Content 'Assets/Resources/Data/BSER/ItemArmor.json' | Select-Object -First 50\")",
+      "Bash(powershell -Command \"Get-Content 'Assets/Resources/Data/BSER/ItemWeapon.json' | Select-Object -First 100 | Select-Object -Last 60\")",
+      "Bash(powershell -Command \"Get-Content 'Assets/Resources/Data/BSER/ItemArmor.json' | Select-Object -First 100 | Select-Object -Last 60\")"
     ]
   }
 }

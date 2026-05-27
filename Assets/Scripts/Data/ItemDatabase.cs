@@ -14,6 +14,7 @@ namespace ProjectER.Data
 
         // GC 주의: 런타임 캐시 — Initialize() 한 번만 호출
         private Dictionary<string, ItemData> _cache;
+        private Dictionary<int, ItemData>    _codeCache; // BSER 코드 기반 조회용
 
         public IReadOnlyList<ItemData> Items => _items;
 
@@ -22,30 +23,47 @@ namespace ProjectER.Data
         /// </summary>
         public void Initialize()
         {
-            _cache = new Dictionary<string, ItemData>(_items.Count);
+            _cache     = new Dictionary<string, ItemData>(_items.Count);
+            _codeCache = new Dictionary<int, ItemData>(_items.Count);
+
             foreach (ItemData item in _items)
             {
                 if (item == null) continue;
 
                 if (!_cache.TryAdd(item.Id, item))
                     Debug.LogWarning($"[ItemDatabase] 중복 ID 발견: {item.Id}", this);
+
+                if (item.BserCode != 0 && !_codeCache.TryAdd(item.BserCode, item))
+                    Debug.LogWarning($"[ItemDatabase] 중복 BSER 코드 발견: {item.BserCode}", this);
             }
         }
 
         /// <summary>
-        /// ID로 아이템 조회. 없으면 null 반환.
+        /// string ID로 아이템 조회. 없으면 null 반환.
         /// </summary>
         public ItemData GetById(string id)
         {
-            if (_cache == null)
-            {
-                // GC 주의: 초기화 없이 조회 시 자동 초기화 (경고 포함)
-                Debug.LogWarning("[ItemDatabase] Initialize()가 호출되지 않았습니다. 자동 초기화합니다.");
-                Initialize();
-            }
-
+            EnsureInitialized();
             _cache.TryGetValue(id, out ItemData result);
             return result;
+        }
+
+        /// <summary>
+        /// BSER 아이템 코드(int)로 아이템 조회. 없으면 null 반환.
+        /// </summary>
+        public ItemData GetByCode(int bserCode)
+        {
+            EnsureInitialized();
+            _codeCache.TryGetValue(bserCode, out ItemData result);
+            return result;
+        }
+
+        private void EnsureInitialized()
+        {
+            if (_cache != null) return;
+            // GC 주의: 초기화 없이 조회 시 자동 초기화 (경고 포함)
+            Debug.LogWarning("[ItemDatabase] Initialize()가 호출되지 않았습니다. 자동 초기화합니다.");
+            Initialize();
         }
 
         /// <summary>
@@ -67,7 +85,8 @@ namespace ProjectER.Data
         private void OnValidate()
         {
             // 에디터에서 변경 시 캐시 무효화
-            _cache = null;
+            _cache     = null;
+            _codeCache = null;
         }
 #endif
     }

@@ -21,6 +21,9 @@ namespace ProjectER.Data
         Shoes,          // 방어구 (신발)
 
         // 소비 / 사용 가능 아이템
-        Consumable,     // 즉시 사용 아이템 (포션 등)
+        Consumable,     // 즉시 사용 아이템 (포션 등) — BSER consumableType: Bounty, GadgetEnergy
+
+        // 특수
+        Special,        // BSER itemType: "Special"
     }
 }

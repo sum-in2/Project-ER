@@ -1,0 +1,2602 @@
+[
+  {
+    "groupCode": 101,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 101,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 101,
+    "mode": "1,2,3,5,6",
+    "itemCode": "205101",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 102,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 102,
+    "mode": "1,2,3,5,6",
+    "itemCode": 502207,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 103,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 2,
+    "max": 2,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 103,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 104,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 112,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 105,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 105,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 109,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 109,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 109,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 109,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 115,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 115,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 115,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.9,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 115,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.9,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 106,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 106,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 106,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1.1,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.1,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.1,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 0.5,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 108,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1.25,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.25,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.25,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 0.5,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 116,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 110,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 111,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 107,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401401",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 107,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 107,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 107,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 107,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504301,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 301,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 301,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 301,
+    "mode": "1,2,3,5,6",
+    "itemCode": "205101",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 301,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 301,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 302,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 302,
+    "mode": "1,2,3,5,6",
+    "itemCode": 502207,
+    "min": 2,
+    "max": 2,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 302,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 302,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 303,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 2,
+    "max": 2,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 303,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 303,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 303,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 304,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 304,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 304,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 310,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 310,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 310,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 305,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 305,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 305,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 305,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 309,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 901,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 306,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 306,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 306,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 306,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 306,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 0.5,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 308,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 0.5,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 902,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301324,
+    "min": 2,
+    "max": 2,
+    "probability": 100,
+    "dropType": "Probability",
+    "areaCode": 120
+  },
+  {
+    "groupCode": 201,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301250,
+    "min": 6,
+    "max": 6,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "205101",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": "503106",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 401,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301316,
+    "min": 3,
+    "max": 3,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 402,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 402,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 402,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 402,
+    "mode": "1,2,3,5,6",
+    "itemCode": "503106",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 403,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 2,
+    "max": 2,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 403,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 403,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 403,
+    "mode": "1,2,3,5,6",
+    "itemCode": "503106",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 2.2,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 405,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "301111",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "306001",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1.6,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 0.5,
+    "dropType": "PityProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 406,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 202,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 202,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 202,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 203,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401403",
+    "min": 1,
+    "max": 1,
+    "probability": 5,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 203,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 203,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 203,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 10,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 204,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504601,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 204,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504602,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 204,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504603,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 204,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504604,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 205,
+    "mode": "2,3,6",
+    "itemCode": "503103",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 205,
+    "mode": "1,5",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1001,
+    "mode": 4,
+    "itemCode": "201411",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1001,
+    "mode": 4,
+    "itemCode": "203504",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1001,
+    "mode": 4,
+    "itemCode": "203509",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1001,
+    "mode": 4,
+    "itemCode": "204413",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1001,
+    "mode": 4,
+    "itemCode": "204502",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1002,
+    "mode": 4,
+    "itemCode": "201411",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1002,
+    "mode": 4,
+    "itemCode": "203504",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1002,
+    "mode": 4,
+    "itemCode": "203509",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1002,
+    "mode": 4,
+    "itemCode": "204413",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1002,
+    "mode": 4,
+    "itemCode": "204502",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1003,
+    "mode": 4,
+    "itemCode": "201411",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1003,
+    "mode": 4,
+    "itemCode": "203509",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1003,
+    "mode": 4,
+    "itemCode": "203504",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1003,
+    "mode": 4,
+    "itemCode": "204413",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1003,
+    "mode": 4,
+    "itemCode": "204502",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1004,
+    "mode": 4,
+    "itemCode": "201411",
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1004,
+    "mode": 4,
+    "itemCode": 203509,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1004,
+    "mode": 4,
+    "itemCode": 203504,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1004,
+    "mode": 4,
+    "itemCode": 204413,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 1004,
+    "mode": 4,
+    "itemCode": 204502,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2012,
+    "mode": "2,3,6",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2012,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2013,
+    "mode": "2,3,6",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2013,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2013,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2014,
+    "mode": "2,3,6",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2014,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2014,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2015,
+    "mode": "2,3,6",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2015,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "2,3,6",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "2,3,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "2,3,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2017,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2017,
+    "mode": "1,2,3,5,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2017,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2017,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "2,3,6",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2003,
+    "mode": "2,3,6",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2003,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2003,
+    "mode": "2,3,6",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "2,3,6",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "2,3,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "2,3,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "2,3,6",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "2,3,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "2,3,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "2,3,6",
+    "itemCode": 504605,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "2,3,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "2,3,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "2,3,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2007,
+    "mode": "1,2,3,5,6",
+    "itemCode": 504605,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2007,
+    "mode": "1,2,3,5,6",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2007,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2007,
+    "mode": "1,2,3,5,6",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2011,
+    "mode": "1,5",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2011,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2012,
+    "mode": "1,5",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2012,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2012,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2014,
+    "mode": "1,5",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2014,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2015,
+    "mode": "1,5",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2015,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "1,5",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "1,5",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "1,5",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2016,
+    "mode": "1,5",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2001,
+    "mode": "1,5",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2001,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "1,5",
+    "itemCode": 504405,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2002,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "1,5",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "1,5",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "1,5",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "1,5",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2004,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "1,5",
+    "itemCode": 504501,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "1,5",
+    "itemCode": 303503,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "1,5",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "1,5",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2005,
+    "mode": "1,5",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "1,5",
+    "itemCode": 504605,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "1,5",
+    "itemCode": 302312,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "1,5",
+    "itemCode": 301305,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 2006,
+    "mode": "1,5",
+    "itemCode": 301329,
+    "min": 1,
+    "max": 1,
+    "probability": 20,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 111111,
+    "mode": "1,2,3,5,6",
+    "itemCode": 502208,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 111112,
+    "mode": "1,2,3,5,6",
+    "itemCode": 502308,
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 111112,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401405",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 111112,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401406",
+    "min": 1,
+    "max": 1,
+    "probability": 2,
+    "dropType": "UniqueDropProbability",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200001,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401110",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200002,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401208",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200002,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401209",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200002,
+    "mode": "1,2,3,5,6",
+    "itemCode": "401304",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200002,
+    "mode": "1,2,3,5,6",
+    "itemCode": "999999",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 200002,
+    "mode": "1,2,3,5,6",
+    "itemCode": "303503",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3008,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504301",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3009,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504301",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3011,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504301",
+    "min": 1,
+    "max": 1,
+    "probability": 7,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3011,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504405",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3013,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504301",
+    "min": 1,
+    "max": 1,
+    "probability": 5,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3013,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504405",
+    "min": 1,
+    "max": 1,
+    "probability": 5,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3014,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504301",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3014,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504405",
+    "min": 1,
+    "max": 1,
+    "probability": 7,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3015,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504405",
+    "min": 1,
+    "max": 1,
+    "probability": 3,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 3015,
+    "mode": "1,2,3,5,6",
+    "itemCode": "504501",
+    "min": 1,
+    "max": 1,
+    "probability": 7,
+    "dropType": "Random",
+    "areaCode": 0
+  },
+  {
+    "groupCode": 5001,
+    "mode": "1,3,5",
+    "itemCode": "303510",
+    "min": 1,
+    "max": 1,
+    "probability": 1,
+    "dropType": "Exclusive",
+    "areaCode": 0
+  }
+]
