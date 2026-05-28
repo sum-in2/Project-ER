@@ -287,9 +287,11 @@ namespace ProjectER.Editor
 
         private static void WireTestPanel(InventoryTestPanel panel, InventorySystem inventory, Transform buttonContainer)
         {
-            // BSER 기본 재료 전체 (manufacturableType == 1, ItemMisc.json 기준 37종)
+            // BSER 기본 획득 아이템 전체 (manufacturableType == 1)
+            // — 기본 재료(ItemMisc) 37종 + 기본 무기 22종 + 기본 방어구 15종
             string[] bserAssetNames =
             {
+                // ── 기본 재료 (ItemMisc, 37종) ──────────────────────────
                 "mat_101101",  // Scissors
                 "mat_101102",  // Fountain Pen
                 "mat_105102",  // Pickaxe
@@ -327,6 +329,49 @@ namespace ProjectER.Editor
                 "mat_401406",  // Dawnlight Shard
                 "mat_502104",  // Piano Wire
                 "mat_502401",  // Thread
+
+                // ── 기본 무기 (ItemWeapon, manufacturableType==1, 22종) ─
+                // 상위 무기 제작 재료로도 사용됨 — 가방에 있어야 조합 가능
+                "wpn_101104",  // Kitchen Knife
+                "wpn_102101",  // Rusty Sword
+                "wpn_103201",  // Twin Blades
+                "wpn_104101",  // Hammer
+                "wpn_105103",  // Hatchet
+                "wpn_107101",  // Short Spear
+                "wpn_108102",  // Short Rod
+                "wpn_108103",  // Bamboo
+                "wpn_109101",  // Whip
+                "wpn_110102",  // Cotton Gloves
+                "wpn_112105",  // Baseball
+                "wpn_113101",  // Razor
+                "wpn_114101",  // Bow
+                "wpn_115101",  // Short Crossbow
+                "wpn_116101",  // Walther PPK
+                "wpn_117101",  // Fedorova
+                "wpn_118101",  // Long Rifle
+                "wpn_119101",  // Steel Chain
+                "wpn_120101",  // Needle
+                "wpn_121101",  // Starter Guitar
+                "wpn_122101",  // Lens
+                "wpn_130101",  // Glass Bead
+
+                // ── 기본 방어구 (ItemArmor, manufacturableType==1, 15종) ─
+                // 상위 방어구 제작 재료로도 사용됨 — 가방에 있어야 조합 가능
+                "arm_201101",  // Hairband
+                "arm_201102",  // Hat
+                "arm_201104",  // Bike Helmet
+                "arm_201201",  // Mask
+                "arm_202101",  // Windbreaker
+                "arm_202103",  // Monk's Robe
+                "arm_202105",  // Wetsuit
+                "arm_202106",  // Shirt
+                "arm_203101",  // Watch
+                "arm_203102",  // Bandage
+                "arm_203104",  // Bracelet
+                "arm_204101",  // Slippers
+                "arm_204102",  // Running Shoes
+                "arm_204103",  // Tights
+                "arm_204205",  // Clogs
             };
             const string itemPath = "Assets/ScriptableObjects/Items/BSER";
 
@@ -340,7 +385,7 @@ namespace ProjectER.Editor
             {
                 ItemData item = AssetDatabase.LoadAssetAtPath<ItemData>($"{itemPath}/{bserAssetNames[i]}.asset");
                 if (item == null)
-                    Debug.LogWarning($"[InventoryTestUIBuilder] 아이템 없음: {bserAssetNames[i]} — Import BSER Items 먼저 실행하세요.");
+                    Debug.LogWarning($"[InventoryTestUIBuilder] 아이템 SO 없음: {bserAssetNames[i]} — ProjectER > Import BSER Items 먼저 실행하세요.");
                 itemsProp.GetArrayElementAtIndex(i).objectReferenceValue = item;
             }
             so.ApplyModifiedProperties();
