@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92b3fdbe349151d408cc24df0be160b6, type: 3}
+  m_Name: wpn_101401
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.ItemData
+  _bserCode: 101401
+  _isCompletedItem: 1
+  _manufacturableType: 0
+  _id: 101401
+  _displayName: "\uCE74\uB978\uC6EC\uB09C"
+  _description: 
+  _icon: {fileID: 21300000, guid: 572c637c25747ec4e82560358cc94495, type: 3}
+  _itemType: 3
+  _weaponType: 1
+  _isStackable: 0
+  _maxStack: 1
+  _attackPower: 58
+  _defense: 0
+  _maxHpBonus: 0
+  _moveSpeedBonus: 0
+  _attackSpeedBonus: 0.2
+  _skillAmp: 0
+  _cooldownReduction: 10
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0
+  _lifeSteal: 0
+  _hpRegenRatio: 0
+  _penetrationDefense: 0
+  _hpRestore: 0

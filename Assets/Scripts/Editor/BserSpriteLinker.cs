@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using ProjectER.Data;
@@ -8,152 +10,216 @@ namespace ProjectER.Editor
     /// BSER 아이템 스프라이트 자동 연결 도구
     /// 메뉴: ProjectER > Link BSER Sprites
     ///
-    /// 스프라이트 파일 배치 규칙:
-    ///   SpritePath/{code}.png  (예: Assets/Resources/Data/BSER/images/item/101201.png)
+    /// 이미지 폴더 규칙:
+    ///   Assets/Resources/Image/Item/**/{넘버링}. {영어이름}.png
     ///
-    /// BserItemImporter 실행 후 사용
+    /// 사전 조건:
+    ///   1. Import BSER Items 실행 완료
+    ///   2. Assets/Resources/Data/BSER/l10n_English.json 배치 완료
+    ///      (bser_api.py --mode l10n 으로 생성 후 복사)
+    ///   3. Assets/Resources/Data/BSER/sprite_corrections.json (선택, 팬킷 오타 보정)
     /// </summary>
     public static class BserSpriteLinker
     {
-        // BSER 이미지 리소스를 배치할 경로 — BSER_DATA_CONTEXT.md 기준
-        private const string SpritePath = "Assets/Resources/Data/BSER/images/item";
+        private const string L10nPath        = "Assets/Resources/Data/BSER/l10n_English.json";
+        private const string CorrectionsPath = "Assets/Resources/Data/BSER/sprite_corrections.json";
+        private const string ImageRoot       = "Assets/Resources/Image/Item";
+        private const string ItemPath        = "Assets/ScriptableObjects/Items/BSER";
 
-        // 임포트된 BSER ItemData SO 경로
-        private const string ItemPath = "Assets/ScriptableObjects/Items/BSER";
+        // "001. Kitchen Knife" → "Kitchen Knife"
+        private static readonly Regex PrefixPattern = new Regex(@"^\d+\.\s*");
+        // Hunter_s Pot → Hunter's Pot (소유격 패턴만)
+        private static readonly Regex ApostrophePattern = new Regex(@"(?<=\w)_s(?=\s|$)");
+        // <color=yellow>text</color> → text
+        private static readonly Regex HtmlTagPattern = new Regex(@"<[^>]+>");
+        // JSON {"code": "name"} 파싱
+        private static readonly Regex JsonPairPattern = new Regex(@"""(\d+)""\s*:\s*""((?:[^""\\]|\\.)*)""");
+        // JSON {"key": "value"} 파싱 (보정 맵용)
+        private static readonly Regex JsonStrPairPattern = new Regex(@"""([^""\\]+)""\s*:\s*""([^""\\]+)""");
 
-        private static readonly string[] Extensions = { ".png", ".jpg", ".jpeg", ".tga" };
+        // 비아이템 폴더 제외 (스킬 아이콘, 무기 타입 그룹 아이콘)
+        private static readonly string[] ExcludedFolders =
+        {
+            "★Weapon Skill",
+            "00. Weapon Group",
+        };
+
+        // ── 진입점 ───────────────────────────────────────────────────
 
         [MenuItem("ProjectER/Link BSER Sprites")]
-        public static void LinkSprites()
+        public static void LinkSprites() => RunLink(force: false);
+
+        [MenuItem("ProjectER/Link BSER Sprites (Force Relink)")]
+        public static void LinkSpritesForce() => RunLink(force: true);
+
+        // ── 메인 로직 ─────────────────────────────────────────────────
+
+        private static void RunLink(bool force)
         {
-            if (!AssetDatabase.IsValidFolder(SpritePath))
+            // 대소문자 무시 매칭 (Bread In Tears ↔ Bread in Tears)
+            Dictionary<string, int> nameToCode = LoadL10nReverseMap();
+            if (nameToCode == null) return;
+
+            Dictionary<string, string> corrections = LoadCorrections();
+
+            Dictionary<int, ItemData> codeToItem = LoadItemDataMap();
+            if (codeToItem.Count == 0)
             {
-                Debug.LogError(
-                    $"[BserSpriteLinker] 스프라이트 폴더 없음: {SpritePath}\n" +
-                    $"BSER 이미지 리소스를 해당 경로에 배치한 뒤 다시 실행하세요.");
+                Debug.LogWarning("[BserSpriteLinker] BSER ItemData 없음. Import BSER Items를 먼저 실행하세요.");
                 return;
             }
 
-            string[] itemGuids = AssetDatabase.FindAssets("t:ItemData", new[] { ItemPath });
-            if (itemGuids.Length == 0)
+            if (!AssetDatabase.IsValidFolder(ImageRoot))
             {
-                Debug.LogWarning("[BserSpriteLinker] BSER ItemData가 없습니다. Import BSER Items를 먼저 실행하세요.");
+                Debug.LogError($"[BserSpriteLinker] 이미지 폴더 없음: {ImageRoot}");
                 return;
             }
 
-            int linked  = 0;
-            int skipped = 0; // 이미 아이콘 있는 경우
-            int missing = 0;
+            string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { ImageRoot });
+            int linked = 0, skipped = 0, missing = 0, noItem = 0;
 
-            foreach (string guid in itemGuids)
+            foreach (string guid in guids)
             {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                ItemData itemData = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
-                if (itemData == null) continue;
+                string spritePath = AssetDatabase.GUIDToAssetPath(guid);
 
-                // 이미 아이콘이 연결돼 있으면 스킵
-                if (itemData.Icon != null)
+                bool excluded = false;
+                foreach (string folder in ExcludedFolders)
+                    if (spritePath.Contains(folder)) { excluded = true; break; }
+                if (excluded) continue;
+
+                string rawName   = System.IO.Path.GetFileNameWithoutExtension(spritePath);
+                string cleanName = ApostrophePattern.Replace(PrefixPattern.Replace(rawName, ""), "'s");
+
+                if (!TryResolveCode(cleanName, nameToCode, corrections, out int code))
+                {
+                    missing++;
+                    Debug.LogWarning($"[BserSpriteLinker] l10n 매칭 실패: '{cleanName}'  ({spritePath})");
+                    continue;
+                }
+
+                if (!codeToItem.TryGetValue(code, out ItemData itemData))
+                {
+                    noItem++;
+                    Debug.LogWarning($"[BserSpriteLinker] ItemData 없음: code={code}  name='{cleanName}'");
+                    continue;
+                }
+
+                if (!force && itemData.Icon != null)
                 {
                     skipped++;
                     continue;
                 }
 
-                // BserCode 우선, 없으면 Id(코드 문자열)로 fallback
-                string codeStr = itemData.BserCode != 0
-                    ? itemData.BserCode.ToString()
-                    : itemData.Id;
+                EnsureSpriteImport(spritePath);
 
-                Sprite sprite = FindAndConvertSprite(codeStr);
-                if (sprite != null)
-                {
-                    SerializedObject so = new SerializedObject(itemData);
-                    so.FindProperty("_icon").objectReferenceValue = sprite;
-                    so.ApplyModifiedProperties();
-                    linked++;
-                }
-                else
-                {
-                    Debug.LogWarning($"[BserSpriteLinker] 스프라이트 없음: {SpritePath}/{codeStr}.*");
-                    missing++;
-                }
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                if (sprite == null) { noItem++; continue; }
+
+                SerializedObject so = new SerializedObject(itemData);
+                so.FindProperty("_icon").objectReferenceValue = sprite;
+                so.ApplyModifiedProperties();
+                linked++;
             }
 
             AssetDatabase.SaveAssets();
+            string label = force ? "강제 재연결" : "연결";
             Debug.Log(
-                $"[BserSpriteLinker] 완료 — " +
-                $"연결 {linked}개 / 스킵(기존 아이콘) {skipped}개 / 누락 {missing}개");
+                $"[BserSpriteLinker] {label} 완료 — " +
+                $"연결 {linked}  스킵 {skipped}  l10n미매칭 {missing}  ItemData없음 {noItem}");
         }
 
-        /// <summary>
-        /// 이미 아이콘이 연결된 아이템도 포함해 전체 재연결
-        /// 메뉴: ProjectER > Link BSER Sprites (Force Relink)
-        /// </summary>
-        [MenuItem("ProjectER/Link BSER Sprites (Force Relink)")]
-        public static void LinkSpritesForce()
+        // ── 이름 → 코드 해석 (3단계 폴백) ───────────────────────────
+
+        private static bool TryResolveCode(
+            string cleanName,
+            Dictionary<string, int> nameToCode,
+            Dictionary<string, string> corrections,
+            out int code)
         {
-            if (!AssetDatabase.IsValidFolder(SpritePath))
+            // 1단계: 직접 매칭 (대소문자 무시)
+            if (nameToCode.TryGetValue(cleanName, out code)) return true;
+
+            // 2단계: _ → 공백 변환 (Long_Sword → Long Sword, 후행 _ 제거)
+            string spaceVariant = cleanName.Replace('_', ' ').Trim();
+            if (nameToCode.TryGetValue(spaceVariant, out code)) return true;
+
+            // 3단계: 수동 오타 보정 맵 적용
+            if (corrections.TryGetValue(cleanName, out string corrected) &&
+                nameToCode.TryGetValue(corrected, out code)) return true;
+
+            code = 0;
+            return false;
+        }
+
+        // ── l10n 역방향 맵 (대소문자 무시) ───────────────────────────
+
+        private static Dictionary<string, int> LoadL10nReverseMap()
+        {
+            TextAsset json = AssetDatabase.LoadAssetAtPath<TextAsset>(L10nPath);
+            if (json == null)
             {
                 Debug.LogError(
-                    $"[BserSpriteLinker] 스프라이트 폴더 없음: {SpritePath}");
-                return;
+                    $"[BserSpriteLinker] l10n 파일 없음: {L10nPath}\n" +
+                    "bser_api.py --mode l10n 실행 후 해당 경로에 배치하세요.");
+                return null;
             }
 
-            string[] itemGuids = AssetDatabase.FindAssets("t:ItemData", new[] { ItemPath });
-            int linked  = 0;
-            int missing = 0;
-
-            foreach (string guid in itemGuids)
+            // 대소문자 무시 딕셔너리로 빌드
+            Dictionary<string, int> result = new(System.StringComparer.OrdinalIgnoreCase);
+            foreach (Match m in JsonPairPattern.Matches(json.text))
             {
-                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                ItemData itemData = AssetDatabase.LoadAssetAtPath<ItemData>(assetPath);
-                if (itemData == null) continue;
-
-                string codeStr = itemData.BserCode != 0
-                    ? itemData.BserCode.ToString()
-                    : itemData.Id;
-
-                Sprite sprite = FindAndConvertSprite(codeStr);
-                if (sprite != null)
-                {
-                    SerializedObject so = new SerializedObject(itemData);
-                    so.FindProperty("_icon").objectReferenceValue = sprite;
-                    so.ApplyModifiedProperties();
-                    linked++;
-                }
-                else
-                {
-                    missing++;
-                }
+                int    code = int.Parse(m.Groups[1].Value);
+                string name = HtmlTagPattern.Replace(m.Groups[2].Value, "").Trim();
+                if (!string.IsNullOrEmpty(name))
+                    result[name] = code;
             }
 
-            AssetDatabase.SaveAssets();
-            Debug.Log($"[BserSpriteLinker] 강제 재연결 완료 — 연결 {linked}개 / 누락 {missing}개");
+            Debug.Log($"[BserSpriteLinker] l10n 로드 완료 — {result.Count}개");
+            return result;
         }
 
-        // ── 내부 유틸 ─────────────────────────────────────────────────
+        // ── 오타 보정 맵 로드 ─────────────────────────────────────────
 
-        private static Sprite FindAndConvertSprite(string codeStr)
+        private static Dictionary<string, string> LoadCorrections()
         {
-            foreach (string ext in Extensions)
+            Dictionary<string, string> result = new(System.StringComparer.OrdinalIgnoreCase);
+            TextAsset json = AssetDatabase.LoadAssetAtPath<TextAsset>(CorrectionsPath);
+            if (json == null) return result;
+
+            foreach (Match m in JsonStrPairPattern.Matches(json.text))
+                result[m.Groups[1].Value] = m.Groups[2].Value;
+
+            Debug.Log($"[BserSpriteLinker] 오타 보정 로드 — {result.Count}개");
+            return result;
+        }
+
+        // ── ItemData 코드 맵 구축 ──────────────────────────────────────
+
+        private static Dictionary<int, ItemData> LoadItemDataMap()
+        {
+            Dictionary<int, ItemData> map = new();
+            string[] guids = AssetDatabase.FindAssets("t:ItemData", new[] { ItemPath });
+            foreach (string guid in guids)
             {
-                string path = $"{SpritePath}/{codeStr}{ext}";
-
-                Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-                if (tex == null) continue;
-
-                // Sprite 타입이 아니면 자동 변환 후 재임포트
-                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (importer != null && importer.textureType != TextureImporterType.Sprite)
-                {
-                    importer.textureType      = TextureImporterType.Sprite;
-                    importer.spriteImportMode = SpriteImportMode.Single;
-                    importer.SaveAndReimport();
-                }
-
-                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                if (sprite != null) return sprite;
+                string   path = AssetDatabase.GUIDToAssetPath(guid);
+                ItemData item = AssetDatabase.LoadAssetAtPath<ItemData>(path);
+                if (item != null && item.BserCode != 0)
+                    map[item.BserCode] = item;
             }
-            return null;
+            return map;
+        }
+
+        // ── 텍스처 → Sprite 임포트 보장 ──────────────────────────────
+
+        private static void EnsureSpriteImport(string path)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null) return;
+            if (importer.textureType == TextureImporterType.Sprite) return;
+
+            importer.textureType      = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.SaveAndReimport();
         }
     }
 }
