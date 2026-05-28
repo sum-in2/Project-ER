@@ -1,0 +1,15 @@
+{
+  "items": [
+    { "id": "mat_wood",         "displayName": "나무",      "itemType": "Material",  "stackable": true,  "maxStack": 20 },
+    { "id": "mat_stone",        "displayName": "돌",        "itemType": "Material",  "stackable": true,  "maxStack": 20 },
+    { "id": "mat_leather",      "displayName": "가죽",      "itemType": "Material",  "stackable": true,  "maxStack": 20 },
+    { "id": "mat_iron_ore",     "displayName": "철광석",    "itemType": "Material",  "stackable": true,  "maxStack": 20 },
+    { "id": "mat_fiber",        "displayName": "섬유",      "itemType": "Material",  "stackable": true,  "maxStack": 20 },
+    { "id": "mat_iron_ingot",   "displayName": "철 주괴",   "itemType": "Material",  "stackable": true,  "maxStack": 10 },
+    { "id": "mat_hard_leather", "displayName": "강화 가죽", "itemType": "Material",  "stackable": true,  "maxStack": 10 },
+    { "id": "mat_plank",        "displayName": "목재 판자", "itemType": "Material",  "stackable": true,  "maxStack": 10 },
+    { "id": "wpn_iron_sword",   "displayName": "철 검",     "itemType": "Weapon",    "attackPower": 20 },
+    { "id": "arm_leather_vest", "displayName": "가죽 조끼", "itemType": "Chest",     "defense": 10, "maxHpBonus": 30 },
+    { "id": "arm_iron_helmet",  "displayName": "철 투구",   "itemType": "Helmet",    "defense": 8,  "maxHpBonus": 20 }
+  ]
+}

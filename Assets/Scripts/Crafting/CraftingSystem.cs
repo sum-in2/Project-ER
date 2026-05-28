@@ -54,7 +54,7 @@ namespace ProjectER.Crafting
         /// 현재 인벤토리로 제작 가능한 레시피를 results에 채움.
         /// ⚠️ GC 주의: results 리스트는 호출자가 제공 — 내부에서 Clear 후 채움
         /// </summary>
-        public void GetCraftableRecipes(List<RecipeData> results, int maxCount = 5)
+        public void GetCraftableRecipes(List<RecipeData> results, int maxCount = int.MaxValue)
         {
             results.Clear();
 

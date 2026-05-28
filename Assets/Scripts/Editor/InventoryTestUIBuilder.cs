@@ -12,14 +12,13 @@ namespace ProjectER.Editor
     /// <summary>
     /// 인벤토리 + 크래프팅 테스트 UI 자동 생성
     /// 메뉴: ProjectER > Build Inventory Test UI
-    /// 실행 전 Generate Dummy Items / Generate Dummy Recipes 먼저 실행 필요
+    /// 실행 전 Import BSER Items 먼저 실행 필요
     /// </summary>
     public static class InventoryTestUIBuilder
     {
         private static readonly Color PanelColor     = new Color(0.12f, 0.12f, 0.12f, 0.95f);
         private static readonly Color SlotColor      = new Color(0.28f, 0.28f, 0.28f, 1f);
         private static readonly Color EquipSlotColor = new Color(0.22f, 0.28f, 0.35f, 1f);
-        private static readonly Color CraftSlotColor = new Color(0.15f, 0.22f, 0.15f, 1f);
 
         [MenuItem("ProjectER/Build Inventory Test UI")]
         public static void Build()
@@ -42,6 +41,7 @@ namespace ProjectER.Editor
             HorizontalLayoutGroup hl = root.AddComponent<HorizontalLayoutGroup>();
             hl.spacing               = 8f;
             hl.padding               = new RectOffset(8, 8, 8, 8);
+            hl.childControlHeight     = true;   // 자식 높이를 레이아웃이 직접 제어 (RectMask2D 클리핑 오류 방지)
             hl.childForceExpandHeight = true;
             hl.childForceExpandWidth  = false;
             hl.childAlignment         = TextAnchor.UpperLeft;
@@ -66,45 +66,25 @@ namespace ProjectER.Editor
                 equipSlotUIs[i] = BuildEquipRow(equipSection.transform, equipLabels[i], EquipSlotColor);
 
             // ── 재료 획득 섹션 ────────────────────────────────────────
-            GameObject matSection        = BuildSection(root.transform, "MaterialSection", 155f, "재료 획득");
-            // 버튼 전용 컨테이너 — Image 먼저 추가해 RectTransform 확보 후 투명 처리
-            GameObject matContainer      = new GameObject("ButtonContainer");
-            matContainer.transform.SetParent(matSection.transform, false);
-            Image matContainerBg         = matContainer.AddComponent<Image>();
-            matContainerBg.color         = Color.clear;
-            matContainerBg.raycastTarget = false;
-            RectTransform matContainerRt = matContainer.GetComponent<RectTransform>();
-            matContainerRt.anchorMin     = new Vector2(0f, 0f);
-            matContainerRt.anchorMax     = new Vector2(1f, 1f);
-            matContainerRt.offsetMin     = new Vector2(6f, 6f);
-            matContainerRt.offsetMax     = new Vector2(-6f, -30f);
-            VerticalLayoutGroup matVL    = matContainer.AddComponent<VerticalLayoutGroup>();
-            matVL.spacing                = 4f;
-            matVL.childForceExpandWidth  = true;
-            matVL.childForceExpandHeight = false;
+            // 버튼 수가 섹션 높이를 초과할 수 있으므로 스크롤뷰 사용
+            GameObject matSection    = BuildSection(root.transform, "MaterialSection", 155f, "재료 획득");
+            Transform  matContent    = BuildScrollView(matSection.transform);
             InventoryTestPanel testPanel = matSection.AddComponent<InventoryTestPanel>();
 
             // ── 조합 섹션 ─────────────────────────────────────────────
-            // VLG를 직접 적용 — 장비 섹션과 동일 패턴, 슬롯은 CanvasGroup alpha로 표시/숨김
-            GameObject craftSection       = BuildSection(root.transform, "CraftingSection", 205f, "조합 가능");
-            VerticalLayoutGroup craftVL   = craftSection.AddComponent<VerticalLayoutGroup>();
-            craftVL.spacing               = 4f;
-            craftVL.padding               = new RectOffset(6, 6, 30, 6);
-            craftVL.childForceExpandWidth  = true;
-            craftVL.childForceExpandHeight = false;
-            CraftingSlotUI[] craftSlotUIs = new CraftingSlotUI[5];
-            for (int i = 0; i < 5; i++)
-                craftSlotUIs[i] = BuildCraftingSlot(craftSection.transform, i);
-            CraftingUI craftingUI = craftSection.AddComponent<CraftingUI>();
+            // 스크롤뷰 — CraftingUI가 슬롯을 동적으로 생성하므로 컨테이너만 준비
+            GameObject craftSection = BuildSection(root.transform, "CraftingSection", 205f, "조합 가능");
+            Transform  craftContent = BuildScrollView(craftSection.transform);
+            CraftingUI craftingUI   = craftSection.AddComponent<CraftingUI>();
 
             // ── InventoryUI ───────────────────────────────────────────
             InventoryUI inventoryUI = root.AddComponent<InventoryUI>();
 
             // ── 레퍼런스 연결 ─────────────────────────────────────────
             WireInventoryUI(inventoryUI, inventory, bagSlotUIs, equipSlotUIs);
-            WireTestPanel(testPanel, inventory, matContainer.transform);
+            WireTestPanel(testPanel, inventory, matContent);
             WireCraftingSystem(crafting, inventory);
-            WireCraftingUI(craftingUI, crafting, inventory, craftSlotUIs);
+            WireCraftingUI(craftingUI, crafting, inventory, craftContent);
 
             Debug.Log("[InventoryTestUIBuilder] 완료. " +
                       "Generate Dummy Items / Recipes가 없으면 Inspector에서 직접 할당하세요.");
@@ -246,71 +226,43 @@ namespace ProjectER.Editor
             return BuildSlot(row.transform, $"EquipSlot_{label}", bgColor);
         }
 
-        private static CraftingSlotUI BuildCraftingSlot(Transform parent, int index)
+        private static Transform BuildScrollView(Transform parent)
         {
-            GameObject go   = new GameObject($"CraftingSlot_{index}");
-            go.transform.SetParent(parent, false);
-            go.AddComponent<Image>().color = CraftSlotColor;
-            // CraftingSection width(205) - VLG padding(6+6) = 193
-            go.GetComponent<RectTransform>().sizeDelta = new Vector2(193f, 64f);
+            // 스크롤 뷰 루트 — 타이틀 높이(28px) 아래 영역을 채움, RectMask2D로 클리핑
+            GameObject scrollGo = new GameObject("CraftScrollView");
+            scrollGo.transform.SetParent(parent, false);
+            scrollGo.AddComponent<Image>().color = Color.clear;
+            scrollGo.AddComponent<RectMask2D>();
+            RectTransform scrollRt = scrollGo.GetComponent<RectTransform>();
+            scrollRt.anchorMin    = new Vector2(0f, 0f);
+            scrollRt.anchorMax    = new Vector2(1f, 1f);
+            scrollRt.offsetMin    = new Vector2(4f,  4f);
+            scrollRt.offsetMax    = new Vector2(-4f, -28f);
 
-            VerticalLayoutGroup vl   = go.AddComponent<VerticalLayoutGroup>();
-            vl.padding               = new RectOffset(6, 6, 4, 4);
-            vl.spacing               = 2f;
-            vl.childForceExpandWidth  = true;
-            vl.childForceExpandHeight = false;
+            // 컨텐츠 — 슬롯이 추가될수록 아래로 늘어남
+            GameObject contentGo = new GameObject("Content");
+            contentGo.transform.SetParent(scrollGo.transform, false);
+            contentGo.AddComponent<Image>().color = Color.clear;
+            VerticalLayoutGroup vlg = contentGo.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing               = 4f;
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+            ContentSizeFitter csf = contentGo.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            RectTransform contentRt = contentGo.GetComponent<RectTransform>();
+            contentRt.anchorMin = new Vector2(0f, 1f);
+            contentRt.anchorMax = new Vector2(1f, 1f);
+            contentRt.pivot     = new Vector2(0.5f, 1f);
+            contentRt.sizeDelta = Vector2.zero;
 
-            Text resultName   = BuildLabel(go.transform, "ResultName",   13, FontStyle.Bold,   Color.white);
-            Text ingredients  = BuildLabel(go.transform, "Ingredients",  11, FontStyle.Normal, new Color(0.72f, 0.85f, 0.72f));
+            ScrollRect sr        = scrollGo.AddComponent<ScrollRect>();
+            sr.content           = contentRt;
+            sr.horizontal        = false;
+            sr.vertical          = true;
+            sr.scrollSensitivity = 20f;
+            sr.movementType      = ScrollRect.MovementType.Clamped;
 
-            // 제작 버튼
-            GameObject btnGo  = new GameObject("CraftButton");
-            btnGo.transform.SetParent(go.transform, false);
-            btnGo.AddComponent<Image>().color = new Color(0.18f, 0.48f, 0.18f);
-            Button craftBtn   = btnGo.AddComponent<Button>();
-            ColorBlock cb     = craftBtn.colors;
-            cb.highlightedColor = new Color(0.28f, 0.68f, 0.28f);
-            cb.pressedColor     = new Color(0.1f, 0.28f, 0.1f);
-            craftBtn.colors   = cb;
-            btnGo.GetComponent<RectTransform>().sizeDelta = new Vector2(181f, 20f);
-
-            Text btnLabel     = CreateChild<Text>(btnGo.transform, "Label");
-            btnLabel.text     = "제작";
-            btnLabel.alignment = TextAnchor.MiddleCenter;
-            btnLabel.fontSize = 12;
-            btnLabel.color    = Color.white;
-            RectTransform blr = btnLabel.GetComponent<RectTransform>();
-            blr.anchorMin     = Vector2.zero;
-            blr.anchorMax     = Vector2.one;
-            blr.offsetMin     = Vector2.zero;
-            blr.offsetMax     = Vector2.zero;
-
-            // CanvasGroup을 먼저 추가 — CraftingSlotUI.Awake에서 GetComponent로 참조
-            CanvasGroup cg      = go.AddComponent<CanvasGroup>();
-            cg.alpha            = 0f;
-            cg.interactable     = false;
-            cg.blocksRaycasts   = false;
-
-            CraftingSlotUI slotUI = go.AddComponent<CraftingSlotUI>();
-            SerializedObject so   = new SerializedObject(slotUI);
-            so.FindProperty("_resultNameText").objectReferenceValue  = resultName;
-            so.FindProperty("_ingredientsText").objectReferenceValue = ingredients;
-            so.FindProperty("_craftButton").objectReferenceValue     = craftBtn;
-            so.ApplyModifiedProperties();
-
-            return slotUI;
-        }
-
-        private static Text BuildLabel(Transform parent, string name, int fontSize, FontStyle style, Color color)
-        {
-            Text t         = CreateChild<Text>(parent, name);
-            t.fontSize     = fontSize;
-            t.fontStyle    = style;
-            t.color        = color;
-            t.alignment    = TextAnchor.MiddleLeft;
-            // CraftingSlot width(193) - slot VLG padding(6+6) = 181
-            t.GetComponent<RectTransform>().sizeDelta = new Vector2(181f, fontSize + 4f);
-            return t;
+            return contentRt.transform;
         }
 
         private static T CreateChild<T>(Transform parent, string name) where T : Component
@@ -335,20 +287,60 @@ namespace ProjectER.Editor
 
         private static void WireTestPanel(InventoryTestPanel panel, InventorySystem inventory, Transform buttonContainer)
         {
-            string[] baseMatIds = { "mat_wood", "mat_stone", "mat_leather", "mat_iron_ore", "mat_fiber" };
-            const string itemPath = "Assets/ScriptableObjects/Dummy/Items";
+            // BSER 기본 재료 전체 (manufacturableType == 1, ItemMisc.json 기준 37종)
+            string[] bserAssetNames =
+            {
+                "mat_101101",  // Scissors
+                "mat_101102",  // Fountain Pen
+                "mat_105102",  // Pickaxe
+                "mat_108101",  // Branch
+                "mat_112101",  // Stone
+                "mat_112103",  // Iron Ball
+                "mat_112104",  // Glass Bottle
+                "mat_113102",  // Playing Cards
+                "mat_113104",  // Chalk
+                "mat_205101",  // Feather
+                "mat_205102",  // Flower
+                "mat_205103",  // Ribbon
+                "mat_205109",  // Cross
+                "mat_205110",  // Binoculars
+                "mat_205303",  // Magazine
+                "mat_302103",  // Ice
+                "mat_401101",  // Nail
+                "mat_401103",  // Leather
+                "mat_401104",  // Turtle Shell
+                "mat_401105",  // Rubber
+                "mat_401106",  // Scrap Metal
+                "mat_401107",  // Lighter
+                "mat_401108",  // Laser Pointer
+                "mat_401109",  // Stallion Medal
+                "mat_401110",  // Battery
+                "mat_401112",  // Oil
+                "mat_401113",  // Cloth
+                "mat_401114",  // Gemstone
+                "mat_401117",  // Paper
+                "mat_401121",  // Gunpowder
+                "mat_401123",  // Chemicals
+                "mat_401124",  // Graphite
+                "mat_401309",  // Plastic
+                "mat_401405",  // Crimson Shard
+                "mat_401406",  // Dawnlight Shard
+                "mat_502104",  // Piano Wire
+                "mat_502401",  // Thread
+            };
+            const string itemPath = "Assets/ScriptableObjects/Items/BSER";
 
             SerializedObject so = new SerializedObject(panel);
-            so.FindProperty("_inventorySystem").objectReferenceValue  = inventory;
-            so.FindProperty("_buttonContainer").objectReferenceValue  = buttonContainer;
+            so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
+            so.FindProperty("_buttonContainer").objectReferenceValue = buttonContainer;
 
             SerializedProperty itemsProp = so.FindProperty("_acquisitionItems");
-            itemsProp.arraySize = baseMatIds.Length;
-            for (int i = 0; i < baseMatIds.Length; i++)
+            itemsProp.arraySize = bserAssetNames.Length;
+            for (int i = 0; i < bserAssetNames.Length; i++)
             {
-                ItemData item = AssetDatabase.LoadAssetAtPath<ItemData>($"{itemPath}/{baseMatIds[i]}.asset");
+                ItemData item = AssetDatabase.LoadAssetAtPath<ItemData>($"{itemPath}/{bserAssetNames[i]}.asset");
                 if (item == null)
-                    Debug.LogWarning($"[InventoryTestUIBuilder] 기본 재료 없음: {baseMatIds[i]} — Generate Dummy Items 먼저 실행하세요.");
+                    Debug.LogWarning($"[InventoryTestUIBuilder] 아이템 없음: {bserAssetNames[i]} — Import BSER Items 먼저 실행하세요.");
                 itemsProp.GetArrayElementAtIndex(i).objectReferenceValue = item;
             }
             so.ApplyModifiedProperties();
@@ -359,27 +351,23 @@ namespace ProjectER.Editor
             SerializedObject so = new SerializedObject(craftingSystem);
             so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
 
-            string[] guids = AssetDatabase.FindAssets("t:RecipeDatabase", new[] { "Assets/ScriptableObjects/Dummy" });
-            if (guids.Length > 0)
-            {
-                RecipeDatabase db = AssetDatabase.LoadAssetAtPath<RecipeDatabase>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            const string dbPath = "Assets/ScriptableObjects/RecipeDatabase.asset";
+            RecipeDatabase db = AssetDatabase.LoadAssetAtPath<RecipeDatabase>(dbPath);
+            if (db != null)
                 so.FindProperty("_recipeDatabase").objectReferenceValue = db;
-            }
             else
-            {
-                Debug.LogWarning("[InventoryTestUIBuilder] RecipeDatabase 없음 — Generate Dummy Recipes 먼저 실행하세요.");
-            }
+                Debug.LogWarning($"[InventoryTestUIBuilder] RecipeDatabase 없음: {dbPath} — Import BSER Items 먼저 실행하세요.");
             so.ApplyModifiedProperties();
         }
 
         private static void WireCraftingUI(
             CraftingUI ui, CraftingSystem craftingSystem,
-            InventorySystem inventory, CraftingSlotUI[] slots)
+            InventorySystem inventory, Transform slotContainer)
         {
             SerializedObject so = new SerializedObject(ui);
             so.FindProperty("_craftingSystem").objectReferenceValue  = craftingSystem;
             so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
-            SetArray(so, "_slots", slots);
+            so.FindProperty("_slotContainer").objectReferenceValue   = slotContainer;
             so.ApplyModifiedProperties();
         }
 

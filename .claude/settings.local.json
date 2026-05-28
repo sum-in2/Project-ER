@@ -8,7 +8,8 @@
       "Bash(powershell -Command \"Get-Content 'Assets/Resources/Data/BSER/ItemArmor.json' | Select-Object -First 100 | Select-Object -Last 60\")",
       "Bash(dir \"D:\\\\Programming\\\\GitHubClone\\\\Project-ER\")",
       "Bash(dir /s /b /ad \"D:\\\\Programming\\\\GitHubClone\\\\Project-ER\\\\Assets\\\\Resources\\\\Image\")",
-      "Bash(powershell -command \"\\(Get-ChildItem 'D:\\\\Programming\\\\GitHubClone\\\\Project-ER\\\\Assets\\\\Resources\\\\Image' -Recurse -Filter '*.png'\\).Count\")"
+      "Bash(powershell -command \"\\(Get-ChildItem 'D:\\\\Programming\\\\GitHubClone\\\\Project-ER\\\\Assets\\\\Resources\\\\Image' -Recurse -Filter '*.png'\\).Count\")",
+      "Bash(python -c ' *)"
     ]
   }
 }

@@ -56,6 +56,7 @@ namespace ProjectER.Inventory
         public bool TryAddItem(ItemData item, int amount = 1)
         {
             if (item == null || amount <= 0) return false;
+            if (_bagSlots == null) InitializeCollections();
 
             if (item.IsStackable)
             {
@@ -102,6 +103,7 @@ namespace ProjectER.Inventory
         public bool TryRemoveItem(string itemId, int amount = 1)
         {
             if (amount <= 0) return false;
+            if (_bagSlots == null) InitializeCollections();
             if (!HasItem(itemId, amount)) return false;
 
             for (int i = 0; i < BagSize && amount > 0; i++)
@@ -127,6 +129,7 @@ namespace ProjectER.Inventory
         /// </summary>
         public int GetItemCount(string itemId)
         {
+            if (_bagSlots == null) InitializeCollections();
             int total = 0;
             for (int i = 0; i < BagSize; i++)
             {

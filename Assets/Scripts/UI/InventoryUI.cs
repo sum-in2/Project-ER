@@ -29,7 +29,7 @@ namespace ProjectER.UI
         private void Awake()
         {
             for (int i = 0; i < _bagSlotUIs.Length; i++)
-                _bagSlotUIs[i].Initialize(i, OnBagSlotClicked);
+                _bagSlotUIs[i].Initialize(i, OnBagSlotClicked, OnBagSlotRightClicked);
 
             for (int i = 0; i < _equipSlotUIs.Length; i++)
                 _equipSlotUIs[i].Initialize(i, OnEquipSlotClicked);
@@ -71,12 +71,20 @@ namespace ProjectER.UI
                 _equipSlotUIs[i].RefreshEquipment(_inventorySystem.GetEquippedItem(EquipOrder[i]));
         }
 
-        // 가방 슬롯 클릭 — 장비 아이템이면 장착 시도
+        // 가방 슬롯 좌클릭 — 장비 아이템이면 장착 시도
         private void OnBagSlotClicked(int index)
         {
             InventorySlot slot = _inventorySystem.BagSlots[index];
             if (!slot.IsEmpty)
                 _inventorySystem.TryEquip(slot.Item);
+        }
+
+        // 가방 슬롯 우클릭 — 슬롯 전체 버리기
+        private void OnBagSlotRightClicked(int index)
+        {
+            InventorySlot slot = _inventorySystem.BagSlots[index];
+            if (!slot.IsEmpty)
+                _inventorySystem.TryRemoveItem(slot.Item.Id, slot.Amount);
         }
 
         // 장비 슬롯 클릭 — 해제 시도

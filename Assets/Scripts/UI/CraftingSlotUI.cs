@@ -34,6 +34,19 @@ namespace ProjectER.UI
                 _craftButton.onClick.RemoveListener(HandleCraftClick);
         }
 
+        /// <summary>
+        /// 런타임에서 동적 생성된 슬롯을 초기화. AddComponent 직후 호출.
+        /// Awake 시점에 _craftButton이 null이므로 이 메서드에서 리스너 등록.
+        /// </summary>
+        public void Init(Text resultNameText, Text ingredientsText, Button craftButton)
+        {
+            _resultNameText  = resultNameText;
+            _ingredientsText = ingredientsText;
+            _craftButton     = craftButton;
+            if (_craftButton != null)
+                _craftButton.onClick.AddListener(HandleCraftClick);
+        }
+
         public void Show(RecipeData recipe, Action<RecipeData> onCraft)
         {
             if (_canvasGroup == null)
