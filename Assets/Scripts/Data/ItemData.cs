@@ -20,8 +20,9 @@ namespace ProjectER.Data
         [SerializeField] private string _displayName;
         [SerializeField][TextArea(2, 4)] private string _description;
         [SerializeField] private Sprite _icon;
-        [SerializeField] private ItemType _itemType;
+        [SerializeField] private ItemType   _itemType;
         [SerializeField] private WeaponType _weaponType; // 무기 세부 종류 (ItemType.Weapon 일 때만 유효)
+        [SerializeField] private ItemGrade  _itemGrade;
 
         // ── 인벤토리 ─────────────────────────────────────────────────
         [Header("인벤토리")]
@@ -59,6 +60,7 @@ namespace ProjectER.Data
         public Sprite Icon        => _icon;
         public ItemType   ItemType   => _itemType;
         public WeaponType WeaponType => _weaponType;
+        public ItemGrade  ItemGrade  => _itemGrade;
 
         public bool IsStackable => _isStackable;
         public int MaxStack => _maxStack;

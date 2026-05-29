@@ -159,8 +159,9 @@ namespace ProjectER.Editor
                 // 기본 정보
                 s.FindProperty("_id").stringValue          = src.code.ToString();
                 s.FindProperty("_displayName").stringValue = src.name;
-                s.FindProperty("_itemType").enumValueIndex = (int)ItemType.Weapon;
+                s.FindProperty("_itemType").enumValueIndex   = (int)ItemType.Weapon;
                 s.FindProperty("_weaponType").enumValueIndex = (int)ParseWeaponType(src.weaponType);
+                s.FindProperty("_itemGrade").enumValueIndex  = (int)ParseItemGrade(src.itemGrade);
 
                 // 인벤토리
                 s.FindProperty("_isStackable").boolValue = src.stackable > 1;
@@ -205,7 +206,8 @@ namespace ProjectER.Editor
                 // 기본 정보
                 s.FindProperty("_id").stringValue          = src.code.ToString();
                 s.FindProperty("_displayName").stringValue = src.name;
-                s.FindProperty("_itemType").enumValueIndex = (int)ParseArmorType(src.armorType);
+                s.FindProperty("_itemType").enumValueIndex  = (int)ParseArmorType(src.armorType);
+                s.FindProperty("_itemGrade").enumValueIndex = (int)ParseItemGrade(src.itemGrade);
 
                 // 인벤토리
                 s.FindProperty("_isStackable").boolValue = src.stackable > 1;
@@ -252,7 +254,8 @@ namespace ProjectER.Editor
                 // 기본 정보
                 s.FindProperty("_id").stringValue          = src.code.ToString();
                 s.FindProperty("_displayName").stringValue = src.name;
-                s.FindProperty("_itemType").enumValueIndex = (int)ParseConsumableType(src.consumableType);
+                s.FindProperty("_itemType").enumValueIndex  = (int)ParseConsumableType(src.consumableType);
+                s.FindProperty("_itemGrade").enumValueIndex = (int)ParseItemGrade(src.itemGrade);
 
                 // 인벤토리 (소비 아이템은 stackable)
                 s.FindProperty("_isStackable").boolValue = src.stackable > 1;
@@ -288,7 +291,8 @@ namespace ProjectER.Editor
                 // 기본 정보
                 s.FindProperty("_id").stringValue          = src.code.ToString();
                 s.FindProperty("_displayName").stringValue = src.name;
-                s.FindProperty("_itemType").enumValueIndex = (int)ItemType.Material;
+                s.FindProperty("_itemType").enumValueIndex  = (int)ItemType.Material;
+                s.FindProperty("_itemGrade").enumValueIndex = (int)ParseItemGrade(src.itemGrade);
 
                 // 인벤토리
                 s.FindProperty("_isStackable").boolValue = src.stackable > 1;
@@ -462,6 +466,20 @@ namespace ProjectER.Editor
         }
 
         // ── 타입 변환 헬퍼 ───────────────────────────────────────────
+
+        private static ItemGrade ParseItemGrade(string raw)
+        {
+            return raw switch
+            {
+                "Common"   => ItemGrade.Common,
+                "Uncommon" => ItemGrade.Uncommon,
+                "Rare"     => ItemGrade.Rare,
+                "Epic"     => ItemGrade.Epic,
+                "Legend"   => ItemGrade.Legend,
+                "Mythic"   => ItemGrade.Mythic,
+                _          => ItemGrade.Common,
+            };
+        }
 
         private static WeaponType ParseWeaponType(string raw)
         {

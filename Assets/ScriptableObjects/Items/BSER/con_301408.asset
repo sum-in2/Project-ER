@@ -21,6 +21,7 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: f86e5e0fa3c744c46a7420d21d41e12b, type: 3}
   _itemType: 2
   _weaponType: 0
+  _itemGrade: 3
   _isStackable: 1
   _maxStack: 6
   _attackPower: 0
