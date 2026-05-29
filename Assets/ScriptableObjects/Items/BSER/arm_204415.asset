@@ -18,7 +18,7 @@ MonoBehaviour:
   _id: 204415
   _displayName: SCV
   _description: 
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 34e4356c7cebe384f96ec9af0074ea22, type: 3}
   _itemType: 7
   _weaponType: 0
   _itemGrade: 3

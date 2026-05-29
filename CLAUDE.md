@@ -174,28 +174,71 @@ CraftingSystem:
 
 ---
 
-## 프로젝트 구조 (참고)
+## 프로젝트 구조 (실제 현황)
 
 ```
 Assets/
 ├── Scripts/
-│   ├── Character/
-│   │   ├── CharacterBase.cs
-│   │   ├── Player/
-│   │   └── Monster/
-│   ├── Combat/
-│   │   ├── IDamageable.cs
-│   │   └── IAttackable.cs
-│   ├── Inventory/
-│   │   ├── InventorySystem.cs
-│   │   └── InventorySlot.cs
 │   ├── Crafting/
 │   │   └── CraftingSystem.cs
-│   ├── Data/          ← ScriptableObject 데이터 클래스
+│   ├── Data/
+│   │   ├── ItemData.cs
+│   │   ├── ItemDatabase.cs
+│   │   ├── ItemGrade.cs
+│   │   ├── ItemIngredient.cs
+│   │   ├── ItemType.cs
+│   │   ├── RecipeData.cs
+│   │   ├── RecipeDatabase.cs
+│   │   └── WeaponType.cs
+│   ├── Editor/
+│   │   ├── BserItemImporter.cs       ← BSER API JSON → SO 일괄 임포터
+│   │   ├── BserSpriteLinker.cs       ← 스프라이트 자동 연결
+│   │   └── InventoryTestUIBuilder.cs
+│   ├── Inventory/
+│   │   ├── EquipmentSlotType.cs
+│   │   ├── InventorySlot.cs
+│   │   └── InventorySystem.cs
 │   └── UI/
+│       ├── CraftingSlotUI.cs
+│       ├── CraftingUI.cs
+│       ├── InventorySlotUI.cs
+│       ├── InventoryTestPanel.cs
+│       └── InventoryUI.cs
 ├── ScriptableObjects/
-│   ├── Items/
-│   ├── Recipes/
-│   └── Characters/
-└── Prefabs/
+│   ├── ItemDatabase.asset
+│   ├── RecipeDatabase.asset
+│   ├── Items/BSER/           ← ItemData SO 786개
+│   └── Recipes/BSER/         ← RecipeData SO 666개
+└── Resources/
+    └── Image/Item/           ← 아이템 아이콘 스프라이트
 ```
+
+---
+
+## 구현 현황 (2026-05-29 기준)
+
+### 완료
+
+| 시스템 | 주요 파일 | 비고 |
+|---|---|---|
+| 데이터 레이어 | `Data/*.cs` | ItemData, ItemDatabase, RecipeData, RecipeDatabase, 열거형 전체 |
+| 인벤토리 시스템 | `Inventory/InventorySystem.cs` | 가방 10슬롯 + 장비 5슬롯, 스택, 장착/해제, 이벤트 |
+| 크래프팅 시스템 | `Crafting/CraftingSystem.cs` | 재료 검증, 차감, 환불, 제작 가능 레시피 조회 |
+| 인벤토리 UI | `UI/InventoryUI.cs`, `InventorySlotUI.cs` | 슬롯 렌더링, 이벤트 바인딩 |
+| 크래프팅 UI | `UI/CraftingUI.cs`, `CraftingSlotUI.cs` | 레시피 목록, 재료 표시 |
+| BSER 에디터 도구 | `Editor/BserItemImporter.cs` | JSON 4종 파싱 → ItemData SO + RecipeData SO 자동 생성 |
+| 스프라이트 연결 | `Editor/BserSpriteLinker.cs` | 아이콘 자동 매핑 |
+| 아이템 데이터 | `ScriptableObjects/Items/BSER/` | BSER API 기반 786개 (무기/방어구/소비/재료) |
+| 레시피 데이터 | `ScriptableObjects/Recipes/BSER/` | 666개 |
+
+### 미구현 (다음 작업 대상)
+
+| 시스템 | 우선순위 | 비고 |
+|---|---|---|
+| 이동 시스템 | 핵심 | NavMesh 클릭투무브, CharacterData SO |
+| 캐릭터 시스템 | 핵심 | CharacterBase, PlayerController, CharacterState 머신 |
+| 전투 시스템 | 핵심 | IDamageable, IAttackable, 기본 공격/피격/사망 |
+| 아이템 줍기 | 핵심 | 월드 아이템 프리팹, 줍기 인터랙션 |
+| 몬스터 AI | 선택 | 순찰 → 어그로 → 추격 |
+| 미니맵 | 선택 | - |
+| 금지구역 | 선택 | - |
