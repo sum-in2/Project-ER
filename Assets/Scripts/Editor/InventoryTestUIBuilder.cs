@@ -238,8 +238,8 @@ namespace ProjectER.Editor
             targetHL.childControlWidth        = true;
             targetHL.childControlHeight       = true;
 
-            EquipmentSlotType[] slotTypes  = { EquipmentSlotType.Weapon, EquipmentSlotType.Helmet, EquipmentSlotType.Chest, EquipmentSlotType.Arms, EquipmentSlotType.Shoes };
-            string[]            slotLabels = { "무기", "머리", "옷", "팔", "다리" };
+            EquipmentSlotType[] slotTypes  = { EquipmentSlotType.Weapon, EquipmentSlotType.Chest, EquipmentSlotType.Helmet, EquipmentSlotType.Arms, EquipmentSlotType.Shoes };
+            string[]            slotLabels = { "무기", "옷", "머리", "팔", "다리" };
             TargetItemSlotUI[]  targetSlots = new TargetItemSlotUI[5];
             for (int i = 0; i < 5; i++)
                 targetSlots[i] = BuildTargetSlot(targetSec.transform, slotLabels[i], slotTypes[i]);
@@ -581,6 +581,13 @@ namespace ProjectER.Editor
             so.FindProperty("_addRouteButton").objectReferenceValue   = addRouteButton;
             so.FindProperty("_targetItemPanel").objectReferenceValue  = targetItemPanel;
 
+            const string recipePath = "Assets/ScriptableObjects/RecipeDatabase.asset";
+            RecipeDatabase recipeDb = AssetDatabase.LoadAssetAtPath<RecipeDatabase>(recipePath);
+            if (recipeDb != null)
+                so.FindProperty("_recipeDatabase").objectReferenceValue = recipeDb;
+            else
+                Debug.LogWarning($"[InventoryTestUIBuilder] RecipeDatabase 없음: {recipePath}");
+
             SerializedProperty itemsProp = so.FindProperty("_acquisitionItems");
             itemsProp.arraySize = sorted.Count;
             for (int i = 0; i < sorted.Count; i++)
@@ -654,14 +661,14 @@ namespace ProjectER.Editor
             return slotUI;
         }
 
-        // 무기 → 머리/옷/팔/다리 → 음식 → 소비 → 재료 → 기타
+        // 무기 → 옷 → 머리 → 팔 → 다리 → 음식 → 소비 → 재료 → 기타
         private static int ItemTypeSortOrder(ItemType type)
         {
             return type switch
             {
                 ItemType.Weapon    => 0,
-                ItemType.Helmet    => 1,
-                ItemType.Chest     => 2,
+                ItemType.Chest     => 1,
+                ItemType.Helmet    => 2,
                 ItemType.Arms      => 3,
                 ItemType.Shoes     => 4,
                 ItemType.Food      => 5,

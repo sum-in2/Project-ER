@@ -131,6 +131,11 @@ CharacterBase (MonoBehaviour + IDamageable):
 - 재료
 - 소비 / 사용가능 아이템
 
+장비 슬롯 고정 순서 (UI 표시, 정렬, 목표 루트 슬롯 모두 동일하게 적용):
+무기 → 옷(Chest) → 머리(Helmet) → 팔(Arms) → 신발(Shoes)
+- EquipmentSlotType 열거 순서도 이를 따름
+- 도감 아이템 정렬: 무기 → 옷 → 머리 → 팔 → 신발 → 음식 → 소비 → 재료 순
+
 ```
 
 ### 크래프팅 시스템

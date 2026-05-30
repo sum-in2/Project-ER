@@ -16,6 +16,7 @@ namespace ProjectER.UI
         [SerializeField] private List<ItemData>  _acquisitionItems;
         [SerializeField] private Transform       _buttonContainer;
         [SerializeField] private Transform       _statContainer;
+        [SerializeField] private RecipeDatabase  _recipeDatabase;
 
         // 우측 패널 — 빌더에서 연결
         [SerializeField] private Button            _acquireButton;
@@ -25,6 +26,9 @@ namespace ProjectER.UI
         private Text[]   _statValueTexts;
         private ItemData _selectedItem;
         private Image    _selectedButtonBg; // 현재 선택된 브라우저 버튼의 배경 Image
+
+        // 버튼 순서 + 삼각형 인디케이터 관리 — 루트 기반 정렬/표시에 사용
+        private readonly List<(ItemData Item, Transform Button, TriangleIndicator Indicator)> _browserButtons = new();
 
         // 선택 강조색 — 등급색보다 밝게
         private static readonly Color SelectedHighlight = new Color(0.85f, 0.85f, 0.50f, 1f);
@@ -60,12 +64,16 @@ namespace ProjectER.UI
         {
             if (_inventorySystem != null)
                 _inventorySystem.OnEquipmentChanged += HandleEquipmentChanged;
+            if (_targetItemPanel != null)
+                _targetItemPanel.OnTargetChanged += HandleRouteChanged;
         }
 
         private void OnDisable()
         {
             if (_inventorySystem != null)
                 _inventorySystem.OnEquipmentChanged -= HandleEquipmentChanged;
+            if (_targetItemPanel != null)
+                _targetItemPanel.OnTargetChanged -= HandleRouteChanged;
         }
 
         private void Start()
@@ -89,9 +97,10 @@ namespace ProjectER.UI
 
             BuildStatPanel();
             RefreshStats();
+            SortButtonsByRoute();
         }
 
-        // ── 브라우저 버튼 ────────────────────────────────────────────
+        // ── 브라우저 버튼 ─────────────────────────────────────────────
 
         private void BuildButtons()
         {
@@ -126,6 +135,20 @@ namespace ProjectER.UI
             Image    bgCaptured = bg;
             btn.onClick.AddListener(() => SelectItem(captured, bgCaptured));
 
+            // 삼각형 인디케이터 — 목표 루트의 필요 재료일 때만 활성화 (초기엔 비활성)
+            GameObject    indGo  = new("RouteIndicator");
+            indGo.transform.SetParent(go.transform, false);
+            TriangleIndicator tri  = indGo.AddComponent<TriangleIndicator>();
+            tri.color              = Color.yellow;
+            tri.raycastTarget      = false;
+            tri.enabled            = false; // 루트 변경 시 SortButtonsByRoute에서 갱신
+            RectTransform indRt    = indGo.GetComponent<RectTransform>();
+            indRt.anchorMin        = new Vector2(0f, 1f);
+            indRt.anchorMax        = new Vector2(0f, 1f);
+            indRt.pivot            = new Vector2(0f, 1f);
+            indRt.sizeDelta        = new Vector2(16f, 16f);
+            indRt.anchoredPosition = Vector2.zero;
+
             GameObject iconGo   = new("Icon");
             iconGo.transform.SetParent(go.transform, false);
             Image icon          = iconGo.AddComponent<Image>();
@@ -145,6 +168,8 @@ namespace ProjectER.UI
             LayoutElement le   = go.AddComponent<LayoutElement>();
             le.preferredHeight = 48f;
             le.preferredWidth  = 48f;
+
+            _browserButtons.Add((item, go.transform, tri));
         }
 
         // ── 선택 ─────────────────────────────────────────────────────
@@ -202,6 +227,74 @@ namespace ProjectER.UI
                 Debug.Log($"[InventoryTestPanel] 루트 추가: {_selectedItem.DisplayName}");
             else
                 Debug.LogWarning($"[InventoryTestPanel] {_selectedItem.DisplayName}은 장비 아이템이 아닙니다.");
+        }
+
+        // ── 루트 기반 정렬 ───────────────────────────────────────────
+
+        private void HandleRouteChanged()
+        {
+            SortButtonsByRoute();
+        }
+
+        /// <summary>
+        /// 루트에 설정된 목표 아이템의 필요 재료를 앞으로, 나머지는 뒤로 정렬.
+        /// 각 그룹 내 순서(타입→등급)는 유지된다.
+        /// </summary>
+        private void SortButtonsByRoute()
+        {
+            if (_browserButtons.Count == 0) return;
+
+            // ⚠️ GC 주의: HashSet 할당 — 루트 변경 시에만 호출되므로 허용
+            HashSet<string> neededIds = CollectAllNeededItemIds();
+
+            int index = 0;
+            // 1패스: 필요한 아이템을 앞으로 + 삼각형 활성화
+            foreach ((ItemData item, Transform btn, TriangleIndicator indicator) in _browserButtons)
+            {
+                bool needed = neededIds.Contains(item.Id);
+                indicator.enabled = needed;
+                if (needed) btn.SetSiblingIndex(index++);
+            }
+
+            // 2패스: 나머지는 뒤로
+            foreach ((ItemData item, Transform btn, TriangleIndicator indicator) in _browserButtons)
+                if (!neededIds.Contains(item.Id))
+                    btn.SetSiblingIndex(index++);
+        }
+
+        /// <summary>
+        /// 루트의 목표 아이템 전체에 대해 필요한 재료 ID를 재귀적으로 수집.
+        /// 루트가 없거나 RecipeDatabase가 없으면 빈 셋 반환.
+        /// </summary>
+        private HashSet<string> CollectAllNeededItemIds()
+        {
+            // ⚠️ GC 주의: HashSet 할당 — 루트 변경 시에만 호출
+            HashSet<string> result = new HashSet<string>();
+
+            if (_targetItemPanel == null || _recipeDatabase == null)
+                return result;
+
+            foreach (KeyValuePair<EquipmentSlotType, ItemData> pair in _targetItemPanel.GetTargetItems())
+                CollectIngredients(pair.Value.Id, result);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 대상 아이템의 레시피를 재귀 탐색하여 필요한 모든 재료 ID를 result에 추가.
+        /// 이미 추가된 ID는 재탐색하지 않아 순환 참조를 방지한다.
+        /// </summary>
+        private void CollectIngredients(string itemId, HashSet<string> result)
+        {
+            RecipeData recipe = _recipeDatabase.GetByResultId(itemId);
+            if (recipe == null) return;
+
+            foreach (ItemIngredient ingredient in recipe.Ingredients)
+            {
+                if (ingredient.Item == null) continue;
+                if (result.Add(ingredient.Item.Id)) // Add가 true면 새로 추가된 항목 → 재귀
+                    CollectIngredients(ingredient.Item.Id, result);
+            }
         }
 
         // ── 스탯 패널 ────────────────────────────────────────────────
