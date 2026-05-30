@@ -13,8 +13,10 @@ namespace ProjectER.UI
     /// </summary>
     public class InventorySlotUI : MonoBehaviour, IPointerClickHandler
     {
-        [SerializeField] private Image _iconImage;
-        [SerializeField] private Text  _amountText;
+        [SerializeField] private Image                _iconImage;
+        [SerializeField] private Text                 _amountText;
+        [SerializeField] private Image                _gradeBorderImage;
+        [SerializeField] private ItemGradeColorConfig _gradeConfig;
 
         private Button       _button;
         private int          _index;
@@ -52,6 +54,8 @@ namespace ProjectER.UI
             _iconImage.enabled  = hasItem;
             _amountText.enabled = hasItem;
 
+            ApplyGradeBorder(hasItem ? slot.Item : null);
+
             if (!hasItem) return;
 
             _iconImage.sprite = slot.Item.Icon;
@@ -65,8 +69,24 @@ namespace ProjectER.UI
             bool hasItem        = item != null;
             _iconImage.enabled  = hasItem;
             _amountText.enabled = false;
+
+            ApplyGradeBorder(item);
+
             if (hasItem)
                 _iconImage.sprite = item.Icon;
+        }
+
+        private void ApplyGradeBorder(ItemData item)
+        {
+            if (_gradeBorderImage == null) return;
+
+            if (item == null || _gradeConfig == null)
+            {
+                _gradeBorderImage.color = Color.clear;
+                return;
+            }
+
+            _gradeBorderImage.color = _gradeConfig.GetColor(item.ItemGrade);
         }
 
         private void HandleClick() => _onClicked?.Invoke(_index);

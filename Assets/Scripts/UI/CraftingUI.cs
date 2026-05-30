@@ -12,9 +12,10 @@ namespace ProjectER.UI
     /// </summary>
     public class CraftingUI : MonoBehaviour
     {
-        [SerializeField] private CraftingSystem   _craftingSystem;
-        [SerializeField] private InventorySystem  _inventorySystem;
-        [SerializeField] private Transform        _slotContainer;
+        [SerializeField] private CraftingSystem      _craftingSystem;
+        [SerializeField] private InventorySystem   _inventorySystem;
+        [SerializeField] private Transform         _slotContainer;
+        [SerializeField] private ItemGradeColorConfig _gradeConfig;
 
         // ⚠️ GC 주의: 버퍼·풀 재사용으로 매 갱신 시 List 할당 방지
         private readonly List<RecipeData>     _craftableBuffer = new List<RecipeData>();
@@ -123,7 +124,7 @@ namespace ProjectER.UI
             go.AddComponent<CanvasGroup>();
 
             CraftingSlotUI slot = go.AddComponent<CraftingSlotUI>();
-            slot.Init(resultName, ingredients, craftBtn);
+            slot.Init(resultName, ingredients, craftBtn, _gradeConfig);
             return slot;
         }
 

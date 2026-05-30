@@ -7,6 +7,7 @@ using ProjectER.Crafting;
 using ProjectER.Data;
 using ProjectER.Inventory;
 using ProjectER.UI;
+using Object = UnityEngine.Object;
 
 namespace ProjectER.Editor
 {
@@ -27,9 +28,16 @@ namespace ProjectER.Editor
         private const float LeftPanelWidth  = 440f;
         private const float RightPanelWidth = 380f;
 
+        private const string GradeConfigPath = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+
         [MenuItem("ProjectER/Build Inventory Test UI")]
         public static void Build()
         {
+            ItemGradeColorConfig gradeConfig = AssetDatabase.LoadAssetAtPath<ItemGradeColorConfig>(GradeConfigPath);
+            if (gradeConfig == null)
+                Debug.LogWarning("[InventoryTestUIBuilder] ItemGradeColorConfig 없음 — " +
+                                 "Create > ProjectER/Config/ItemGradeColor 로 생성 후 다시 실행하세요.");
+
             // ── 플레이어 ────────────────────────────────────────────
             GameObject      player    = new("Player");
             InventorySystem inventory = player.AddComponent<InventorySystem>();
@@ -64,7 +72,8 @@ namespace ProjectER.Editor
             Transform itemButtonContainer = BuildCenterPanel(root.transform);
 
             // ── 우측 패널 (조합 + 목표 + 획득버튼) ──────────────────
-            (Transform craftContent, CraftingUI craftingUI) = BuildRightPanel(root.transform);
+            (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel)
+                = BuildRightPanel(root.transform);
 
             // ── 컴포넌트 부착 ────────────────────────────────────────
             InventoryUI        inventoryUI = root.AddComponent<InventoryUI>();
@@ -72,9 +81,10 @@ namespace ProjectER.Editor
 
             // ── 레퍼런스 연결 ────────────────────────────────────────
             WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
-            WireTestPanel(testPanel, inventory, itemButtonContainer, statContent);
+            WireTestPanel(testPanel, inventory, itemButtonContainer, statContent, acquireButton, addRouteButton, targetPanel);
             WireCraftingSystem(crafting, inventory);
-            WireCraftingUI(craftingUI, crafting, inventory, craftContent);
+            WireCraftingUI(craftingUI, crafting, inventory, craftContent, gradeConfig);
+            WireGradeConfigToSlots(root, gradeConfig);
 
             Debug.Log("[InventoryTestUIBuilder] 완료.");
             Selection.activeGameObject = root;
@@ -196,7 +206,7 @@ namespace ProjectER.Editor
 
         // ── 우측 패널 ───────────────────────────────────────────────
 
-        private static (Transform craftContent, CraftingUI craftingUI) BuildRightPanel(Transform parent)
+        private static (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel) BuildRightPanel(Transform parent)
         {
             GameObject panel = CreatePanel(parent, "RightPanel", PanelBg);
             AddLayoutElement(panel, preferredWidth: RightPanelWidth, flexibleWidth: 0f);
@@ -217,15 +227,27 @@ namespace ProjectER.Editor
 
             CreateDivider(panel.transform);
 
-            // 목표 아이템 5슬롯 (placeholder — TargetItemPanelUI 구현 후 교체)
+            // 목표 아이템 (부위별 5슬롯 — 1행)
             GameObject targetSec = CreateSection(panel.transform, "TargetSection", SectionBg, "목표 아이템");
             AddLayoutElement(targetSec, preferredHeight: 120f, flexibleHeight: 0f);
-            Text targetLabel      = CreateChild<Text>(targetSec.transform, "Placeholder");
-            targetLabel.text      = "[ TargetItemPanelUI 미구현 ]";
-            targetLabel.fontSize  = 12;
-            targetLabel.color     = new Color(0.4f, 0.4f, 0.4f);
-            targetLabel.alignment = TextAnchor.MiddleCenter;
-            StretchFill(targetLabel.GetComponent<RectTransform>(), 0f, -30f);
+            HorizontalLayoutGroup targetHL    = targetSec.AddComponent<HorizontalLayoutGroup>();
+            targetHL.spacing                  = 6f;
+            targetHL.padding                  = new RectOffset(8, 8, 30, 8);
+            targetHL.childForceExpandWidth    = true;
+            targetHL.childForceExpandHeight   = true;
+            targetHL.childControlWidth        = true;
+            targetHL.childControlHeight       = true;
+
+            EquipmentSlotType[] slotTypes  = { EquipmentSlotType.Weapon, EquipmentSlotType.Helmet, EquipmentSlotType.Chest, EquipmentSlotType.Arms, EquipmentSlotType.Shoes };
+            string[]            slotLabels = { "무기", "머리", "옷", "팔", "다리" };
+            TargetItemSlotUI[]  targetSlots = new TargetItemSlotUI[5];
+            for (int i = 0; i < 5; i++)
+                targetSlots[i] = BuildTargetSlot(targetSec.transform, slotLabels[i], slotTypes[i]);
+
+            TargetItemPanelUI targetPanel = targetSec.AddComponent<TargetItemPanelUI>();
+            SerializedObject  targetSO    = new SerializedObject(targetPanel);
+            SetArray(targetSO, "_slots", targetSlots);
+            targetSO.ApplyModifiedProperties();
 
             // 스페이서
             GameObject spacer = new("Spacer");
@@ -233,17 +255,23 @@ namespace ProjectER.Editor
             spacer.AddComponent<RectTransform>();
             AddLayoutElement(spacer, flexibleHeight: 1f);
 
-            // 아이템 획득 버튼 (placeholder — 중앙 패널 버튼 클릭이 현재 획득 수단)
-            GameObject acquireSec = CreatePanel(panel.transform, "AcquireSection", SectionBg);
-            AddLayoutElement(acquireSec, preferredHeight: 52f, flexibleHeight: 0f);
-            Text acquireLabel     = CreateChild<Text>(acquireSec.transform, "Label");
-            acquireLabel.text     = "아이템 획득 버튼  (미구현)";
-            acquireLabel.fontSize = 13;
-            acquireLabel.color    = new Color(0.45f, 0.45f, 0.45f);
-            acquireLabel.alignment = TextAnchor.MiddleCenter;
-            StretchFill(acquireLabel.GetComponent<RectTransform>(), 0f, 0f);
+            // 버튼 행 — 획득 / 루트 추가
+            GameObject btnRow = new("ButtonRow");
+            btnRow.transform.SetParent(panel.transform, false);
+            btnRow.AddComponent<RectTransform>();
+            AddLayoutElement(btnRow, preferredHeight: 52f, flexibleHeight: 0f);
+            HorizontalLayoutGroup btnHL    = btnRow.AddComponent<HorizontalLayoutGroup>();
+            btnHL.spacing                  = 6f;
+            btnHL.padding                  = new RectOffset(6, 6, 6, 6);
+            btnHL.childForceExpandWidth    = true;
+            btnHL.childForceExpandHeight   = true;
+            btnHL.childControlWidth        = true;
+            btnHL.childControlHeight       = true;
 
-            return (craftContent, craftingUI);
+            Button acquireButton   = BuildActionButton(btnRow.transform, "AcquireButton",   "획득",      new Color(0.18f, 0.42f, 0.18f));
+            Button addRouteButton  = BuildActionButton(btnRow.transform, "AddRouteButton",  "루트 추가", new Color(0.18f, 0.28f, 0.45f));
+
+            return (craftContent, craftingUI, acquireButton, addRouteButton, targetPanel);
         }
 
         // ── 캔버스 ──────────────────────────────────────────────────
@@ -358,15 +386,27 @@ namespace ProjectER.Editor
 
         private static InventorySlotUI BuildSlot(Transform parent, string name, Color bgColor)
         {
+            // 슬롯 GO의 Image가 등급 테두리로 사용됨 — 아이템 없을 때 투명
             GameObject go = new(name);
             go.transform.SetParent(parent, false);
-            go.AddComponent<Image>().color = bgColor;
+            Image borderImage   = go.AddComponent<Image>();
+            borderImage.color   = Color.clear;
 
             Button     btn = go.AddComponent<Button>();
             ColorBlock cb  = btn.colors;
             cb.highlightedColor = new Color(0.45f, 0.55f, 0.65f);
             cb.pressedColor     = new Color(0.15f, 0.15f, 0.15f);
             btn.colors          = cb;
+
+            // 등급 테두리 3px 안쪽 배경
+            GameObject innerBgGo     = new("InnerBg");
+            innerBgGo.transform.SetParent(go.transform, false);
+            innerBgGo.AddComponent<Image>().color = bgColor;
+            RectTransform innerRt    = innerBgGo.GetComponent<RectTransform>();
+            innerRt.anchorMin        = Vector2.zero;
+            innerRt.anchorMax        = Vector2.one;
+            innerRt.offsetMin        = new Vector2(3f, 3f);
+            innerRt.offsetMax        = new Vector2(-3f, -3f);
 
             Image         icon   = CreateChild<Image>(go.transform, "Icon");
             icon.enabled         = false;
@@ -390,8 +430,9 @@ namespace ProjectER.Editor
 
             InventorySlotUI slotUI = go.AddComponent<InventorySlotUI>();
             SerializedObject so    = new SerializedObject(slotUI);
-            so.FindProperty("_iconImage").objectReferenceValue  = icon;
-            so.FindProperty("_amountText").objectReferenceValue = amount;
+            so.FindProperty("_iconImage").objectReferenceValue        = icon;
+            so.FindProperty("_amountText").objectReferenceValue       = amount;
+            so.FindProperty("_gradeBorderImage").objectReferenceValue = borderImage;
             so.ApplyModifiedProperties();
             return slotUI;
         }
@@ -511,7 +552,8 @@ namespace ProjectER.Editor
         }
 
         private static void WireTestPanel(InventoryTestPanel panel, InventorySystem inventory,
-            Transform buttonContainer, Transform statContainer)
+            Transform buttonContainer, Transform statContainer,
+            Button acquireButton, Button addRouteButton, TargetItemPanelUI targetItemPanel)
         {
             // ItemDatabase에서 전체 아이템 로드 후 타입 → 등급 순서로 정렬
             const string dbPath = "Assets/ScriptableObjects/ItemDatabase.asset";
@@ -532,9 +574,12 @@ namespace ProjectER.Editor
             });
 
             SerializedObject so = new SerializedObject(panel);
-            so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
-            so.FindProperty("_buttonContainer").objectReferenceValue = buttonContainer;
-            so.FindProperty("_statContainer").objectReferenceValue   = statContainer;
+            so.FindProperty("_inventorySystem").objectReferenceValue  = inventory;
+            so.FindProperty("_buttonContainer").objectReferenceValue  = buttonContainer;
+            so.FindProperty("_statContainer").objectReferenceValue    = statContainer;
+            so.FindProperty("_acquireButton").objectReferenceValue    = acquireButton;
+            so.FindProperty("_addRouteButton").objectReferenceValue   = addRouteButton;
+            so.FindProperty("_targetItemPanel").objectReferenceValue  = targetItemPanel;
 
             SerializedProperty itemsProp = so.FindProperty("_acquisitionItems");
             itemsProp.arraySize = sorted.Count;
@@ -542,6 +587,71 @@ namespace ProjectER.Editor
                 itemsProp.GetArrayElementAtIndex(i).objectReferenceValue = sorted[i];
 
             so.ApplyModifiedProperties();
+        }
+
+        private static Button BuildActionButton(Transform parent, string name, string label, Color bgColor)
+        {
+            GameObject go = CreatePanel(parent, name, bgColor);
+
+            Button     btn = go.AddComponent<Button>();
+            ColorBlock cb  = btn.colors;
+            cb.normalColor      = Color.white;
+            cb.highlightedColor = new Color(1.3f, 1.3f, 1.3f);
+            cb.pressedColor     = new Color(0.7f, 0.7f, 0.7f);
+            btn.colors          = cb;
+
+            Text lbl      = CreateChild<Text>(go.transform, "Label");
+            lbl.text      = label;
+            lbl.fontSize  = 14;
+            lbl.fontStyle = FontStyle.Bold;
+            lbl.color     = Color.white;
+            lbl.alignment = TextAnchor.MiddleCenter;
+            StretchFill(lbl.GetComponent<RectTransform>(), 0f, 0f);
+
+            return btn;
+        }
+
+        private static TargetItemSlotUI BuildTargetSlot(Transform parent, string label, EquipmentSlotType slotType)
+        {
+            GameObject go = new($"TargetSlot_{label}");
+            go.transform.SetParent(parent, false);
+
+            // 배경 — 등급색 표시 + 드롭 수신 Raycast 대상
+            Image bg    = go.AddComponent<Image>();
+            bg.color    = new Color(0.20f, 0.20f, 0.20f);
+
+            // 부위 라벨
+            Text lbl        = CreateChild<Text>(go.transform, "Label");
+            lbl.text        = label;
+            lbl.fontSize    = 11;
+            lbl.color       = new Color(0.60f, 0.60f, 0.60f);
+            lbl.alignment   = TextAnchor.UpperCenter;
+            RectTransform lblRt      = lbl.GetComponent<RectTransform>();
+            lblRt.anchorMin          = new Vector2(0f, 1f);
+            lblRt.anchorMax          = new Vector2(1f, 1f);
+            lblRt.pivot              = new Vector2(0.5f, 1f);
+            lblRt.sizeDelta          = new Vector2(0f, 20f);
+            lblRt.anchoredPosition   = Vector2.zero;
+
+            // 아이콘
+            Image         icon   = CreateChild<Image>(go.transform, "Icon");
+            icon.enabled         = false;
+            icon.preserveAspect  = true;
+            icon.raycastTarget   = false;
+            RectTransform iconRt = icon.GetComponent<RectTransform>();
+            iconRt.anchorMin     = new Vector2(0.1f, 0.1f);
+            iconRt.anchorMax     = new Vector2(0.9f, 0.9f);
+            iconRt.offsetMin     = Vector2.zero;
+            iconRt.offsetMax     = Vector2.zero;
+
+            // TargetItemSlotUI 컴포넌트
+            TargetItemSlotUI slotUI = go.AddComponent<TargetItemSlotUI>();
+            SerializedObject so     = new SerializedObject(slotUI);
+            so.FindProperty("_slotType").enumValueIndex          = (int)slotType;
+            so.FindProperty("_bgImage").objectReferenceValue     = bg;
+            so.FindProperty("_iconImage").objectReferenceValue   = icon;
+            so.ApplyModifiedProperties();
+            return slotUI;
         }
 
         // 무기 → 머리/옷/팔/다리 → 음식 → 소비 → 재료 → 기타
@@ -577,13 +687,27 @@ namespace ProjectER.Editor
 
         private static void WireCraftingUI(
             CraftingUI ui, CraftingSystem craftingSystem,
-            InventorySystem inventory, Transform slotContainer)
+            InventorySystem inventory, Transform slotContainer,
+            ItemGradeColorConfig gradeConfig)
         {
             SerializedObject so = new SerializedObject(ui);
             so.FindProperty("_craftingSystem").objectReferenceValue  = craftingSystem;
             so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
             so.FindProperty("_slotContainer").objectReferenceValue   = slotContainer;
+            so.FindProperty("_gradeConfig").objectReferenceValue     = gradeConfig;
             so.ApplyModifiedProperties();
+        }
+
+        private static void WireGradeConfigToSlots(GameObject root, ItemGradeColorConfig gradeConfig)
+        {
+            if (gradeConfig == null) return;
+            InventorySlotUI[] slots = root.GetComponentsInChildren<InventorySlotUI>();
+            foreach (InventorySlotUI slot in slots)
+            {
+                SerializedObject so = new SerializedObject(slot);
+                so.FindProperty("_gradeConfig").objectReferenceValue = gradeConfig;
+                so.ApplyModifiedProperties();
+            }
         }
 
         private static void SetArray<T>(SerializedObject so, string propName, T[] items) where T : Object

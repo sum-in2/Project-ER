@@ -13,9 +13,10 @@ namespace ProjectER.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class CraftingSlotUI : MonoBehaviour
     {
-        [SerializeField] private Text   _resultNameText;
-        [SerializeField] private Text   _ingredientsText;
-        [SerializeField] private Button _craftButton;
+        [SerializeField] private Text                 _resultNameText;
+        [SerializeField] private Text                 _ingredientsText;
+        [SerializeField] private Button               _craftButton;
+        [SerializeField] private ItemGradeColorConfig _gradeConfig;
 
         private RecipeData         _currentRecipe;
         private Action<RecipeData> _onCraft;
@@ -38,11 +39,13 @@ namespace ProjectER.UI
         /// 런타임에서 동적 생성된 슬롯을 초기화. AddComponent 직후 호출.
         /// Awake 시점에 _craftButton이 null이므로 이 메서드에서 리스너 등록.
         /// </summary>
-        public void Init(Text resultNameText, Text ingredientsText, Button craftButton)
+        public void Init(Text resultNameText, Text ingredientsText, Button craftButton,
+                         ItemGradeColorConfig gradeConfig = null)
         {
             _resultNameText  = resultNameText;
             _ingredientsText = ingredientsText;
             _craftButton     = craftButton;
+            _gradeConfig     = gradeConfig;
             if (_craftButton != null)
                 _craftButton.onClick.AddListener(HandleCraftClick);
         }
@@ -61,7 +64,10 @@ namespace ProjectER.UI
                 return;
             }
 
-            _resultNameText.text = recipe.ResultItem.DisplayName;
+            _resultNameText.text  = recipe.ResultItem.DisplayName;
+            _resultNameText.color = _gradeConfig != null
+                ? _gradeConfig.GetColor(recipe.ResultItem.ItemGrade)
+                : Color.white;
 
             // ⚠️ GC 주의: 이벤트 발생 시에만 호출 — StringBuilder 허용
             StringBuilder sb = new StringBuilder();
