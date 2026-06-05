@@ -69,7 +69,8 @@ namespace ProjectER.Editor
                 = BuildLeftPanel(root.transform);
 
             // ── 중앙 패널 (아이템 브라우저) ─────────────────────────
-            Transform itemButtonContainer = BuildCenterPanel(root.transform);
+            (Transform itemButtonContainer, Transform filterContainer, KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
+                = BuildCenterPanel(root.transform);
 
             // ── 우측 패널 (조합 + 목표 + 획득버튼) ──────────────────
             (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel)
@@ -81,7 +82,9 @@ namespace ProjectER.Editor
 
             // ── 레퍼런스 연결 ────────────────────────────────────────
             WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
-            WireTestPanel(testPanel, inventory, itemButtonContainer, statContent, acquireButton, addRouteButton, targetPanel);
+            WireTestPanel(testPanel, inventory, itemButtonContainer, statContent, filterContainer,
+                acquireButton, addRouteButton, targetPanel,
+                searchAdapter, specialMaterialContainer, statFilterContainer);
             WireCraftingSystem(crafting, inventory);
             WireCraftingUI(craftingUI, crafting, inventory, craftContent, gradeConfig);
             WireGradeConfigToSlots(root, gradeConfig);
@@ -151,7 +154,8 @@ namespace ProjectER.Editor
 
         // ── 중앙 패널 ───────────────────────────────────────────────
 
-        private static Transform BuildCenterPanel(Transform parent)
+        private static (Transform itemContent, Transform filterContainer, KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
+            BuildCenterPanel(Transform parent)
         {
             GameObject panel = CreatePanel(parent, "CenterPanel", PanelBg);
             AddLayoutElement(panel, flexibleWidth: 1f);
@@ -164,15 +168,39 @@ namespace ProjectER.Editor
             vl.childForceExpandWidth  = true;
             vl.childForceExpandHeight = false;
 
-            // 상단 필터 바 (스탯, 전설재료 필터 — placeholder)
+            // 상단 필터 바 (2행: 이름검색+전설재료 | 스탯필터)
             GameObject filterBar = CreatePanel(panel.transform, "FilterBar", SectionBg);
-            AddLayoutElement(filterBar, preferredHeight: 40f, flexibleHeight: 0f);
-            Text filterLabel      = CreateChild<Text>(filterBar.transform, "FilterLabel");
-            filterLabel.text      = "스탯 필터 / 전설재료 필터  (미구현)";
-            filterLabel.fontSize  = 12;
-            filterLabel.color     = new Color(0.45f, 0.45f, 0.45f);
-            filterLabel.alignment = TextAnchor.MiddleLeft;
-            StretchFill(filterLabel.GetComponent<RectTransform>(), 10f, 0f);
+            AddLayoutElement(filterBar, preferredHeight: 84f, flexibleHeight: 0f);
+
+            VerticalLayoutGroup filterBarVL   = filterBar.AddComponent<VerticalLayoutGroup>();
+            filterBarVL.spacing               = 4f;
+            filterBarVL.padding               = new RectOffset(4, 4, 4, 4);
+            filterBarVL.childControlWidth     = true;
+            filterBarVL.childControlHeight    = false;
+            filterBarVL.childForceExpandWidth = true;
+            filterBarVL.childForceExpandHeight = false;
+
+            // 1행: 이름 검색 InputField + 전설재료 필터 버튼
+            GameObject row1 = new("FilterRow1");
+            row1.transform.SetParent(filterBar.transform, false);
+            row1.AddComponent<RectTransform>();
+            AddLayoutElement(row1, preferredHeight: 36f);
+            HorizontalLayoutGroup row1HL   = row1.AddComponent<HorizontalLayoutGroup>();
+            row1HL.spacing                 = 4f;
+            row1HL.childControlWidth       = true;
+            row1HL.childControlHeight      = true;
+            row1HL.childForceExpandHeight  = true;
+            row1HL.childForceExpandWidth   = false;
+
+            KoreanInputFieldAdapter searchAdapter       = BuildSearchField(row1.transform);
+            Transform               specialMaterialContainer = BuildSpecialMaterialContainer(row1.transform);
+
+            // 2행: 스탯 필터 버튼 (런타임에 InventoryTestPanel.BuildStatFilterButtons()가 채움)
+            GameObject row2 = new("FilterRow2");
+            row2.transform.SetParent(filterBar.transform, false);
+            row2.AddComponent<RectTransform>();
+            AddLayoutElement(row2, preferredHeight: 36f);
+            Transform statFilterContainer = row2.transform;
 
             CreateDivider(panel.transform);
 
@@ -186,22 +214,75 @@ namespace ProjectER.Editor
             mainHL.childForceExpandWidth   = false;
             mainHL.childForceExpandHeight  = true;
 
-            // 장비 구분 필터 열 (placeholder)
+            // 장비 구분 필터 열 (런타임에 InventoryTestPanel.BuildFilterButtons()가 채움)
             GameObject typeFilter = CreatePanel(mainArea.transform, "TypeFilter", SectionBg);
             AddLayoutElement(typeFilter, preferredWidth: 60f, flexibleWidth: 0f);
-            Text typeLabel        = CreateChild<Text>(typeFilter.transform, "TypeLabel");
-            typeLabel.text        = "구분\n(미구현)";
-            typeLabel.fontSize    = 11;
-            typeLabel.color       = new Color(0.45f, 0.45f, 0.45f);
-            typeLabel.alignment   = TextAnchor.MiddleCenter;
-            StretchFill(typeLabel.GetComponent<RectTransform>(), 0f, 0f);
 
             // 아이템 그리드 (스크롤)
             GameObject gridArea = CreatePanel(mainArea.transform, "ItemGridArea", BgColor);
             AddLayoutElement(gridArea, flexibleWidth: 1f);
             Transform itemContent = BuildItemScrollView(gridArea.transform);
 
-            return itemContent;
+            return (itemContent, typeFilter.transform, searchAdapter, specialMaterialContainer, statFilterContainer);
+        }
+
+        private static KoreanInputFieldAdapter BuildSearchField(Transform parent)
+        {
+            GameObject go = new("SearchField");
+            go.transform.SetParent(parent, false);
+            AddLayoutElement(go, flexibleWidth: 1f);
+            go.AddComponent<Image>().color = new Color(0.15f, 0.15f, 0.15f);
+
+            Font builtinFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            // Placeholder 텍스트
+            GameObject    phGo  = new("Placeholder");
+            phGo.transform.SetParent(go.transform, false);
+            Text          phTxt = phGo.AddComponent<Text>();
+            phTxt.text          = "아이템 검색...";
+            phTxt.font          = builtinFont;
+            phTxt.fontSize      = 13;
+            phTxt.color         = new Color(0.40f, 0.40f, 0.40f);
+            phTxt.alignment     = TextAnchor.MiddleLeft;
+            RectTransform phRt  = phGo.GetComponent<RectTransform>();
+            phRt.anchorMin      = Vector2.zero;
+            phRt.anchorMax      = Vector2.one;
+            phRt.offsetMin      = new Vector2(6f, 0f);
+            phRt.offsetMax      = new Vector2(-6f, 0f);
+
+            // 입력 텍스트
+            GameObject    inGo  = new("Text");
+            inGo.transform.SetParent(go.transform, false);
+            Text          inTxt = inGo.AddComponent<Text>();
+            inTxt.font          = builtinFont;
+            inTxt.fontSize      = 13;
+            inTxt.color         = Color.white;
+            inTxt.alignment     = TextAnchor.MiddleLeft;
+            RectTransform inRt  = inGo.GetComponent<RectTransform>();
+            inRt.anchorMin      = Vector2.zero;
+            inRt.anchorMax      = Vector2.one;
+            inRt.offsetMin      = new Vector2(6f, 0f);
+            inRt.offsetMax      = new Vector2(-6f, 0f);
+
+            InputField input     = go.AddComponent<InputField>();
+            input.textComponent  = inTxt;
+            input.placeholder    = phTxt;
+
+            // IME 실시간 이벤트 어댑터 — InputField와 같은 GO에 부착
+            KoreanInputFieldAdapter adapter = go.AddComponent<KoreanInputFieldAdapter>();
+            return adapter;
+        }
+
+        private static Transform BuildSpecialMaterialContainer(Transform parent)
+        {
+            // 특수 재료 필터 버튼 5개를 담을 컨테이너
+            // 런타임에 InventoryTestPanel.BuildSpecialMaterialButtons()가 버튼을 채움
+            // 예상 너비: 생(28)+운(28)+미(28)+포(28)+VF(32) + spacing*4 = 156px
+            GameObject go = new("SpecialMaterialContainer");
+            go.transform.SetParent(parent, false);
+            go.AddComponent<RectTransform>();
+            AddLayoutElement(go, preferredWidth: 160f, flexibleWidth: 0f);
+            return go.transform;
         }
 
         // ── 우측 패널 ───────────────────────────────────────────────
@@ -552,8 +633,9 @@ namespace ProjectER.Editor
         }
 
         private static void WireTestPanel(InventoryTestPanel panel, InventorySystem inventory,
-            Transform buttonContainer, Transform statContainer,
-            Button acquireButton, Button addRouteButton, TargetItemPanelUI targetItemPanel)
+            Transform buttonContainer, Transform statContainer, Transform filterContainer,
+            Button acquireButton, Button addRouteButton, TargetItemPanelUI targetItemPanel,
+            KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
         {
             // ItemDatabase에서 전체 아이템 로드 후 타입 → 등급 순서로 정렬
             const string dbPath = "Assets/ScriptableObjects/ItemDatabase.asset";
@@ -577,9 +659,13 @@ namespace ProjectER.Editor
             so.FindProperty("_inventorySystem").objectReferenceValue  = inventory;
             so.FindProperty("_buttonContainer").objectReferenceValue  = buttonContainer;
             so.FindProperty("_statContainer").objectReferenceValue    = statContainer;
-            so.FindProperty("_acquireButton").objectReferenceValue    = acquireButton;
-            so.FindProperty("_addRouteButton").objectReferenceValue   = addRouteButton;
-            so.FindProperty("_targetItemPanel").objectReferenceValue  = targetItemPanel;
+            so.FindProperty("_filterContainer").objectReferenceValue  = filterContainer;
+            so.FindProperty("_acquireButton").objectReferenceValue              = acquireButton;
+            so.FindProperty("_addRouteButton").objectReferenceValue             = addRouteButton;
+            so.FindProperty("_targetItemPanel").objectReferenceValue            = targetItemPanel;
+            so.FindProperty("_searchAdapter").objectReferenceValue              = searchAdapter;
+            so.FindProperty("_specialMaterialContainer").objectReferenceValue   = specialMaterialContainer;
+            so.FindProperty("_statFilterContainer").objectReferenceValue        = statFilterContainer;
 
             const string recipePath = "Assets/ScriptableObjects/RecipeDatabase.asset";
             RecipeDatabase recipeDb = AssetDatabase.LoadAssetAtPath<RecipeDatabase>(recipePath);

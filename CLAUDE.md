@@ -114,7 +114,7 @@ CharacterBase (MonoBehaviour + IDamageable):
 
 ```
 데이터 레이어:
-- ItemData (ScriptableObject): ID, 이름, 아이콘, 타입, 스탯 보너스
+- ItemData (ScriptableObject): ID, 이름, 아이콘, 타입, 등급, 스탯 보너스
 - ItemDatabase (ScriptableObject): List<ItemData> + Dictionary 조회용 캐시
 
 런타임 레이어:
@@ -136,6 +136,61 @@ CharacterBase (MonoBehaviour + IDamageable):
 - EquipmentSlotType 열거 순서도 이를 따름
 - 도감 아이템 정렬: 무기 → 옷 → 머리 → 팔 → 신발 → 음식 → 소비 → 재료 순
 
+아이템 등급 (ItemGrade enum, 낮은 숫자 = 낮은 등급):
+Common(0) → Uncommon(1) → Rare(2) → Epic(3) → Legend(4) → Mythic(5)
+- BSER JSON의 itemGrade 문자열과 1:1 대응
+- 등급별 색상은 ItemGradeColorConfig (SO) 에서 관리 → Client/Assets/ScriptableObjects/ItemGradeColorConfig.asset
+
+장비 스탯 목록 (ItemData 필드):
+공격력(AttackPower), 방어력(Defense), 최대체력(MaxHpBonus), 이동속도(MoveSpeedBonus),
+공격속도(AttackSpeedBonus), 스킬증폭(SkillAmp), 쿨감(CooldownReduction),
+적응형(AdaptiveForce), 치명타(CriticalStrikeChance), 생명흡수(LifeSteal),
+체력재생(HpRegenRatio, 방어구 전용), 방어관통(PenetrationDefense, 방어구 전용)
+```
+
+### 도감 시스템
+
+```
+용어 정의:
+- 도감: 가방·루트를 제외한 전체 아이템 탐색 화면 (중앙 패널)
+- 루트: 목표 아이템 슬롯(TargetItemPanelUI)에 설정된 목표 장비 조합
+
+도감 기능:
+- 전체 아이템(ItemDatabase 786개)을 등급색 배경으로 표시
+- 좌클릭 → 아이템 선택 (노란 강조)
+- 획득 버튼 → 선택 아이템을 가방에 추가
+- 루트 추가 버튼 → 선택 장비를 목표 루트 슬롯에 자동 배치 (부위 기준)
+
+도감 정렬 (우선순위 순):
+1. 루트 기반: 목표 아이템의 모든 재료(재귀 탐색)를 앞으로
+2. 타입 기반: 무기 → 옷 → 머리 → 팔 → 신발 → 음식 → 소비 → 재료
+3. 등급 기반: Common → Uncommon → Rare → Epic → Legend → Mythic
+
+도감 필터 (좌측 1열):
+전체 / 무 / 옷 / 머 / 팔 / 신 / 음 / 소 / 재
+- 무기 세부 분류(23종)는 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 예정
+
+루트 필요 재료 표시:
+- 목표 루트의 필요 재료인 슬롯 좌상단에 노란 삼각형(TriangleIndicator) 표시
+- 루트 변경 시 실시간 갱신
+
+스탯 아이콘:
+- 현재 미구현 (에셋 준비 후 추가 예정)
+- InventoryTestPanel.StatDefs에 아이콘 슬롯 자리 확보됨
+```
+
+### 목표 루트 시스템
+
+```
+TargetItemPanelUI:
+- 부위별 5슬롯 (무기·옷·머리·팔·신발 고정 순서)
+- TrySetItem(ItemData): 아이템 부위에 맞는 슬롯에 자동 배치
+- OnTargetChanged 이벤트 → 도감 정렬/삼각형 표시 갱신
+
+TargetItemSlotUI:
+- 우클릭 → 슬롯 초기화
+- 슬롯 배경에 등급색 표시
+- IDropHandler 구현 (드래그 드롭 수신 가능, 현재 버튼 방식 사용)
 ```
 
 ### 크래프팅 시스템
@@ -182,57 +237,75 @@ CraftingSystem:
 ## 프로젝트 구조 (실제 현황)
 
 ```
-Assets/
-├── Scripts/
-│   ├── Crafting/
-│   │   └── CraftingSystem.cs
-│   ├── Data/
-│   │   ├── ItemData.cs
-│   │   ├── ItemDatabase.cs
-│   │   ├── ItemGrade.cs
-│   │   ├── ItemIngredient.cs
-│   │   ├── ItemType.cs
-│   │   ├── RecipeData.cs
-│   │   ├── RecipeDatabase.cs
-│   │   └── WeaponType.cs
-│   ├── Editor/
-│   │   ├── BserItemImporter.cs       ← BSER API JSON → SO 일괄 임포터
-│   │   ├── BserSpriteLinker.cs       ← 스프라이트 자동 연결
-│   │   └── InventoryTestUIBuilder.cs
-│   ├── Inventory/
-│   │   ├── EquipmentSlotType.cs
-│   │   ├── InventorySlot.cs
-│   │   └── InventorySystem.cs
-│   └── UI/
-│       ├── CraftingSlotUI.cs
-│       ├── CraftingUI.cs
-│       ├── InventorySlotUI.cs
-│       ├── InventoryTestPanel.cs
-│       └── InventoryUI.cs
-├── ScriptableObjects/
-│   ├── ItemDatabase.asset
-│   ├── RecipeDatabase.asset
-│   ├── Items/BSER/           ← ItemData SO 786개
-│   └── Recipes/BSER/         ← RecipeData SO 666개
-└── Resources/
-    └── Image/Item/           ← 아이템 아이콘 스프라이트
+Project-ER/                           ← 모노레포 루트
+├── Client/                           ← Unity 프로젝트 루트 (Unity Hub에서 이 폴더를 열 것)
+│   ├── Assets/
+│   │   ├── Scripts/
+│   │   │   ├── Crafting/
+│   │   │   │   └── CraftingSystem.cs
+│   │   │   ├── Data/
+│   │   │   │   ├── ItemData.cs
+│   │   │   │   ├── ItemDatabase.cs
+│   │   │   │   ├── ItemGrade.cs              ← 등급 열거형 (Common~Mythic)
+│   │   │   │   ├── ItemGradeColorConfig.cs   ← 등급별 색상 SO
+│   │   │   │   ├── ItemIngredient.cs
+│   │   │   │   ├── ItemType.cs
+│   │   │   │   ├── RecipeData.cs
+│   │   │   │   ├── RecipeDatabase.cs
+│   │   │   │   └── WeaponType.cs
+│   │   │   ├── Editor/
+│   │   │   │   ├── BserItemImporter.cs       ← BSER API JSON → SO 일괄 임포터
+│   │   │   │   ├── BserSpriteLinker.cs       ← 스프라이트 자동 연결
+│   │   │   │   └── InventoryTestUIBuilder.cs ← 1920×1080 3패널 테스트 UI 자동 생성
+│   │   │   ├── Inventory/
+│   │   │   │   ├── EquipmentSlotType.cs
+│   │   │   │   ├── InventorySlot.cs
+│   │   │   │   └── InventorySystem.cs
+│   │   │   └── UI/
+│   │   │       ├── CraftingSlotUI.cs
+│   │   │       ├── CraftingUI.cs
+│   │   │       ├── InventorySlotUI.cs
+│   │   │       ├── InventoryTestPanel.cs     ← 도감 + 스탯창 + 필터 + 루트 정렬
+│   │   │       ├── InventoryUI.cs
+│   │   │       ├── TargetItemPanelUI.cs      ← 목표 루트 패널 (5슬롯)
+│   │   │       ├── TargetItemSlotUI.cs       ← 목표 슬롯 (드롭 수신, 우클릭 제거)
+│   │   │       └── TriangleIndicator.cs      ← 재료 표시용 삼각형 Graphic
+│   │   ├── ScriptableObjects/
+│   │   │   ├── ItemDatabase.asset
+│   │   │   ├── ItemGradeColorConfig.asset    ← 등급 색상 설정
+│   │   │   ├── RecipeDatabase.asset
+│   │   │   ├── Items/BSER/                   ← ItemData SO 786개
+│   │   │   └── Recipes/BSER/                 ← RecipeData SO 666개
+│   │   └── Resources/
+│   │       └── Image/Item/                   ← 아이템 아이콘 스프라이트
+│   ├── Packages/
+│   └── ProjectSettings/
+└── Server/                           ← 서버 코드 (추후 추가)
 ```
 
 ---
 
-## 구현 현황 (2026-05-29 기준)
+## 구현 현황 (2026-06-01 기준)
 
 ### 완료
 
+경로 기준: `Client/Assets/Scripts/` (스크립트), `Client/Assets/ScriptableObjects/` (에셋)
+
 | 시스템 | 주요 파일 | 비고 |
 |---|---|---|
-| 데이터 레이어 | `Data/*.cs` | ItemData, ItemDatabase, RecipeData, RecipeDatabase, 열거형 전체 |
-| 인벤토리 시스템 | `Inventory/InventorySystem.cs` | 가방 10슬롯 + 장비 5슬롯, 스택, 장착/해제, 이벤트 |
-| 크래프팅 시스템 | `Crafting/CraftingSystem.cs` | 재료 검증, 차감, 환불, 제작 가능 레시피 조회 |
-| 인벤토리 UI | `UI/InventoryUI.cs`, `InventorySlotUI.cs` | 슬롯 렌더링, 이벤트 바인딩 |
-| 크래프팅 UI | `UI/CraftingUI.cs`, `CraftingSlotUI.cs` | 레시피 목록, 재료 표시 |
-| BSER 에디터 도구 | `Editor/BserItemImporter.cs` | JSON 4종 파싱 → ItemData SO + RecipeData SO 자동 생성 |
-| 스프라이트 연결 | `Editor/BserSpriteLinker.cs` | 아이콘 자동 매핑 |
+| 데이터 레이어 | `Scripts/Data/*.cs` | ItemData(등급 포함), ItemDatabase, RecipeData, RecipeDatabase, 열거형 전체 |
+| 아이템 등급 | `Scripts/Data/ItemGrade.cs`, `ItemGradeColorConfig.cs` | Common~Mythic, 색상 SO |
+| 인벤토리 시스템 | `Scripts/Inventory/InventorySystem.cs` | 가방 10슬롯 + 장비 5슬롯, 스택, 장착/해제, 이벤트 |
+| 크래프팅 시스템 | `Scripts/Crafting/CraftingSystem.cs` | 재료 검증, 차감, 환불, 제작 가능 레시피 조회 |
+| 인벤토리 UI | `Scripts/UI/InventoryUI.cs`, `InventorySlotUI.cs` | 슬롯 렌더링, 이벤트 바인딩 |
+| 크래프팅 UI | `Scripts/UI/CraftingUI.cs`, `CraftingSlotUI.cs` | 레시피 목록, 재료 표시 |
+| 도감 UI | `Scripts/UI/InventoryTestPanel.cs` | 전체 아이템 탐색, 타입 필터, 등급색, 선택/획득, 루트 기반 정렬 |
+| 스탯창 | `Scripts/UI/InventoryTestPanel.cs` | 장착 스탯 합산 표시 (4열 2그룹, 12종) |
+| 목표 루트 UI | `Scripts/UI/TargetItemPanelUI.cs`, `TargetItemSlotUI.cs` | 부위별 5슬롯, 루트 추가, 우클릭 제거 |
+| 삼각형 표시 | `Scripts/UI/TriangleIndicator.cs` | 루트 필요 재료 슬롯 좌상단 표시 |
+| 테스트 UI 빌더 | `Scripts/Editor/InventoryTestUIBuilder.cs` | 1920×1080 3패널 자동 생성, 전체 연결 |
+| BSER 에디터 도구 | `Scripts/Editor/BserItemImporter.cs` | JSON 4종 파싱 → ItemData SO + RecipeData SO 자동 생성 |
+| 스프라이트 연결 | `Scripts/Editor/BserSpriteLinker.cs` | 아이콘 자동 매핑 |
 | 아이템 데이터 | `ScriptableObjects/Items/BSER/` | BSER API 기반 786개 (무기/방어구/소비/재료) |
 | 레시피 데이터 | `ScriptableObjects/Recipes/BSER/` | 666개 |
 
@@ -244,6 +317,8 @@ Assets/
 | 캐릭터 시스템 | 핵심 | CharacterBase, PlayerController, CharacterState 머신 |
 | 전투 시스템 | 핵심 | IDamageable, IAttackable, 기본 공격/피격/사망 |
 | 아이템 줍기 | 핵심 | 월드 아이템 프리팹, 줍기 인터랙션 |
+| 스탯 아이콘 | UI | 에셋 준비 후 StatDefs에 아이콘 슬롯 연결 |
+| 무기 세부 필터 | UI | 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 |
 | 몬스터 AI | 선택 | 순찰 → 어그로 → 추격 |
 | 미니맵 | 선택 | - |
 | 금지구역 | 선택 | - |
