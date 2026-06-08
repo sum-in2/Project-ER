@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "Jd1IMX/Nfuk=",
+  "success": true,
+  "projectFilePath": "D:\\Programming\\GitHubClone\\Project-ER\\Server\\ProjectER.Core\\ProjectER.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\aaa\\.nuget\\packages\\messagepack\\3.1.6\\messagepack.3.1.6.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\messagepack.annotations\\3.1.6\\messagepack.annotations.3.1.6.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\messagepackanalyzer\\3.1.6\\messagepackanalyzer.3.1.6.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\microsoft.net.stringtools\\17.11.4\\microsoft.net.stringtools.17.11.4.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\system.collections.immutable\\8.0.0\\system.collections.immutable.8.0.0.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Users\\aaa\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
