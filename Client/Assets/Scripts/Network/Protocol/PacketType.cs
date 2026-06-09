@@ -19,5 +19,18 @@ namespace ProjectER.Network.Protocol
         C2S_Attack      = 300,
         S2C_TakeDamage  = 301,
         S2C_Die         = 302,
+
+        // ── 매치메이킹 ────────────────────────
+        C2S_MatchRequest   = 400,
+        S2C_MatchQueued    = 401,
+        C2S_MatchCancel    = 402,
+        S2C_MatchCancelled = 403,
+        S2C_MatchFound     = 404,
+
+        // ── 인증 ──────────────────────────────
+        C2S_Register       = 500,
+        S2C_RegisterResult = 501,
+        C2S_Login          = 502,
+        S2C_LoginResult    = 503,
     }
 }

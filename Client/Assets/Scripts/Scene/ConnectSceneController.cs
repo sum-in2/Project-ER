@@ -13,6 +13,7 @@ namespace ProjectER.Scene
     public class ConnectSceneController : MonoBehaviour
     {
         // ── UI 참조 ───────────────────────────────────────────────
+        [SerializeField] private GameObject     _connectPanel;
         [SerializeField] private TMP_InputField _hostInput;
         [SerializeField] private TMP_InputField _portInput;
         [SerializeField] private Button         _connectButton;
@@ -21,7 +22,7 @@ namespace ProjectER.Scene
         // ── 상수 ─────────────────────────────────────────────────
         private const string DefaultHost   = "127.0.0.1";
         private const string DefaultPort   = "7777";
-        private const string SceneLobby    = "LobbyScene";
+        private const string SceneLogin    = "LoginScene";
 
         // ── 생명주기 ─────────────────────────────────────────────
         private void Start()
@@ -72,7 +73,7 @@ namespace ProjectER.Scene
             }
 
             SetStatus("접속 중...");
-            SetInteractable(false);
+            SetPanelVisible(false);
 
             NetworkClient.Instance.Connect(host, port);
         }
@@ -81,13 +82,13 @@ namespace ProjectER.Scene
         private void HandleConnectSuccess()
         {
             SetStatus("접속 성공");
-            SceneManager.LoadScene(SceneLobby);
+            SceneManager.LoadScene(SceneLogin);
         }
 
         private void HandleConnectFailed(string reason)
         {
             SetStatus($"접속 실패: {reason}");
-            SetInteractable(true);
+            SetPanelVisible(true);
         }
 
         // ── 내부 유틸 ─────────────────────────────────────────────
@@ -97,11 +98,10 @@ namespace ProjectER.Scene
                 _statusText.text = message;
         }
 
-        private void SetInteractable(bool interactable)
+        private void SetPanelVisible(bool visible)
         {
-            _connectButton.interactable = interactable;
-            _hostInput.interactable     = interactable;
-            _portInput.interactable     = interactable;
+            if (_connectPanel != null)
+                _connectPanel.SetActive(visible);
         }
     }
 }

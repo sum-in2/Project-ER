@@ -13,7 +13,8 @@ namespace ProjectER.Server.Network
     public class ClientSession : IDisposable
     {
         // ── 상태 ────────────────────────────────────────────────
-        public int SessionId { get; }
+        public int  SessionId   { get; }
+        public int? AccountId   { get; set; }   // 로그인 성공 후 설정
         public bool IsConnected => _tcpClient?.Connected ?? false;
 
         // ── 의존성 ──────────────────────────────────────────────

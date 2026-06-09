@@ -5,8 +5,9 @@
 이터널리턴(Eternal Return)을 레퍼런스로 한 포트폴리오용 Unity 모작 프로젝트.
 클라이언트 프로그래머 기술 어필을 목적으로 한다.
 
-- **엔진**: Unity (URP)
-- **언어**: C# (.NET Standard 2.1)
+- **엔진**: Unity 6 (6000.0.4f1, URP)
+- **클라이언트 언어**: C# (.NET Standard 2.1)
+- **서버 언어**: C# (.NET 9.0)
 - **플랫폼**: PC (Windows)
 - **라이센스**: MIT
 
@@ -19,6 +20,7 @@
 - 기본 전투 (공격, 피격, 사망)
 - 아이템 줍기 + 인벤토리 시스템
 - 크래프팅 시스템 (재료 조합 → 아이템 제작)
+- 서버 연동 (TCP 소켓, 접속/로비/이동/전투 동기화)
 
 **선택 구현 (여유 시 추가)**
 
@@ -28,7 +30,6 @@
 
 **제외 (스코프 아웃)**
 
-- 멀티플레이어 / 네트워킹
 - 전체 맵 16구역 재현
 - 캐릭터 40종 이상 구현
 
@@ -63,6 +64,8 @@
 컴포넌트 클래스  : 역할 명사       → PlayerController, InventorySystem
 ScriptableObject : Data 접미사    → ItemData, RecipeData, CharacterData
 이벤트           : On 접두사      → OnDeath, OnItemPickup, OnCraftComplete
+패킷 (C→S)      : C2S 접두사     → C2SMovePacket, C2SConnectPacket
+패킷 (S→C)      : S2C 접두사     → S2CMoveSyncPacket, S2CConnectedPacket
 ```
 
 ### 필수 컨벤션
@@ -71,13 +74,14 @@ ScriptableObject : Data 접미사    → ItemData, RecipeData, CharacterData
 - `GetComponent<T>()` 대신 `TryGetComponent<T>()` 사용
 - 런타임에서 `Find()`, `FindObjectOfType()` 호출 금지 → 직접 참조 또는 DI
 - 태그 비교는 `CompareTag()` 사용 (string 할당 방지)
-- 이벤트 구독/해제는 `OnEnable` / `OnDisable` 쌍으로
+- 이벤트 구독/해제는 `OnEnable` / `OnDisable` 쌍으로 (단, NetworkClient 이벤트는 `Start`에서 구독)
 - 매직 넘버 금지 → `const` 또는 `[SerializeField]` 상수로 선언
 
 ### 하지 말 것
 
 - **God Class 금지**: GameManager 하나에 모든 로직 몰아넣기 금지
 - **static 남용 금지**: 전역 상태가 필요하면 ScriptableObject 이벤트 채널 사용
+  - 예외: `NetworkClient.Instance` (DontDestroyOnLoad 씬 간 지속 목적)
 - **Update() 내 GC 유발 코드 금지**: LINQ, string 연결, `new` 컬렉션 생성 금지
 - **컴포넌트 캐싱 누락 금지**: 참조는 `Awake()`/`Start()`에서 캐싱
 
@@ -207,6 +211,62 @@ CraftingSystem:
 - 조회 성능: Dictionary<string, RecipeData> 로 캐싱
 ```
 
+### 네트워크 시스템
+
+```
+패킷 프로토콜:
+- 헤더 4바이트: [TotalLength(2) | PacketType(2)] 리틀엔디안
+- 바디: MessagePack 직렬화 (서버), MiniMsgPack 호환 구현 (클라이언트)
+- 새 패킷 추가 시: PacketType 열거형 → Core 패킷 클래스 → 서버 핸들러 → 클라이언트 Serializer 순으로 작업
+
+서버 아키텍처:
+- TcpGameServer: 연결 수락, ClientSession 생성, 브로드캐스트
+- ClientSession: 세션 1개의 수신/송신 루프 (async)
+- PacketDispatcher: PacketType → 핸들러 라우팅
+- LobbyManager: 세션을 LobbyRoom 단위로 분산 관리 (메모리 관리 목적)
+- LobbyRoom: 최대 18명 단위 세션 그룹 (UI 표시 없음, 서버 내부 용도)
+
+클라이언트 아키텍처:
+- NetworkClient (MonoBehaviour, DontDestroyOnLoad): TcpClient 래퍼
+  - 수신: 백그라운드 Thread → ConcurrentQueue → Update()에서 메인 스레드 처리
+  - 이벤트: OnConnectSuccess, OnConnectFailed, OnDisconnected
+- ClientPacketDispatcher: PacketType → 핸들러 라우팅
+- MiniMsgPack: MessagePack 호환 최소 구현 (외부 라이브러리 불필요)
+
+씬 흐름:
+ConnectScene (0) → LoginScene (1) → LobbyScene (2) → GameScene
+- ConnectScene: IP/포트 입력, 접속 버튼, 상태 텍스트
+- LoginScene: 아이디/비밀번호 입력, 로그인/회원가입 버튼
+- LobbyScene: 매치 찾기 버튼, 연결 해제 버튼
+- NetworkClient 이벤트 구독은 OnEnable이 아닌 Start에서 수행 (Instance 보장)
+
+서버 실행:
+cd Server && dotnet run --project ProjectER.Server
+- 포트: 7777 (고정)
+- 버전: 0.1.0 (클라이언트와 일치해야 접속 수락)
+```
+
+### 에디터 씬 빌더 (NetworkSceneBuilder)
+
+```
+에디터로 씬을 코드로 생성할 때 반드시 포함해야 하는 오브젝트:
+
+1. Main Camera
+   - tag: "MainCamera"
+   - Camera 컴포넌트 + AudioListener 컴포넌트
+   - clearFlags: SolidColor
+
+2. EventSystem
+   - EventSystem 컴포넌트
+   - InputSystemUIInputModule 컴포넌트  ← 반드시 이것 사용
+     (프로젝트가 New Input System을 사용하므로 StandaloneInputModule 사용 금지)
+   - using UnityEngine.InputSystem.UI; 필요
+
+누락 시 버튼/UI 클릭이 동작하지 않거나 아래 오류 발생:
+InvalidOperationException: You are trying to read Input using the UnityEngine.Input class,
+but you have switched active Input handling to Input System package in Player Settings.
+```
+
 ---
 
 ## Claude에게 지시사항
@@ -218,6 +278,7 @@ CraftingSystem:
 3. MonoBehaviour 생성 시 생명주기 스텁(`Awake`, `OnEnable`, `OnDisable`, `OnDestroy`) 포함
 4. GC 할당 가능성 있는 코드엔 `// ⚠️ GC 주의` 코멘트 추가
 5. Unity 버전 종속 API 사용 시 버전 명시
+6. 새 패킷 추가 시 서버(Core + Handler)와 클라이언트(Protocol + PacketSerializer) 양쪽 모두 작성
 
 ### 리팩터링 제안 시
 
@@ -240,39 +301,57 @@ CraftingSystem:
 Project-ER/                           ← 모노레포 루트
 ├── Client/                           ← Unity 프로젝트 루트 (Unity Hub에서 이 폴더를 열 것)
 │   ├── Assets/
+│   │   ├── Scenes/
+│   │   │   ├── ConnectScene.unity    ← 서버 접속 씬
+│   │   │   └── LobbyScene.unity      ← 대기 씬
 │   │   ├── Scripts/
 │   │   │   ├── Crafting/
 │   │   │   │   └── CraftingSystem.cs
 │   │   │   ├── Data/
 │   │   │   │   ├── ItemData.cs
 │   │   │   │   ├── ItemDatabase.cs
-│   │   │   │   ├── ItemGrade.cs              ← 등급 열거형 (Common~Mythic)
-│   │   │   │   ├── ItemGradeColorConfig.cs   ← 등급별 색상 SO
+│   │   │   │   ├── ItemGrade.cs
+│   │   │   │   ├── ItemGradeColorConfig.cs
 │   │   │   │   ├── ItemIngredient.cs
 │   │   │   │   ├── ItemType.cs
 │   │   │   │   ├── RecipeData.cs
 │   │   │   │   ├── RecipeDatabase.cs
 │   │   │   │   └── WeaponType.cs
 │   │   │   ├── Editor/
-│   │   │   │   ├── BserItemImporter.cs       ← BSER API JSON → SO 일괄 임포터
-│   │   │   │   ├── BserSpriteLinker.cs       ← 스프라이트 자동 연결
-│   │   │   │   └── InventoryTestUIBuilder.cs ← 1920×1080 3패널 테스트 UI 자동 생성
+│   │   │   │   ├── BserItemImporter.cs
+│   │   │   │   ├── BserSpriteLinker.cs
+│   │   │   │   ├── InventoryTestUIBuilder.cs
+│   │   │   │   └── NetworkSceneBuilder.cs    ← ConnectScene/LobbyScene 자동 생성
 │   │   │   ├── Inventory/
 │   │   │   │   ├── EquipmentSlotType.cs
 │   │   │   │   ├── InventorySlot.cs
 │   │   │   │   └── InventorySystem.cs
+│   │   │   ├── Network/
+│   │   │   │   ├── Protocol/
+│   │   │   │   │   ├── PacketType.cs         ← 패킷 식별자 (서버 Core와 값 일치 유지)
+│   │   │   │   │   ├── PacketHeader.cs       ← 헤더 상수 (Size = 4)
+│   │   │   │   │   ├── C2SConnectPacket.cs
+│   │   │   │   │   └── S2CConnectedPacket.cs
+│   │   │   │   ├── MiniMsgPack.cs            ← MessagePack 호환 최소 구현
+│   │   │   │   ├── PacketSerializer.cs       ← 패킷별 직렬화/역직렬화
+│   │   │   │   ├── PacketBuilder.cs          ← [헤더+바디] 조립
+│   │   │   │   ├── ClientPacketDispatcher.cs ← 패킷 타입별 핸들러 라우팅
+│   │   │   │   └── NetworkClient.cs          ← TcpClient 래퍼 (DontDestroyOnLoad)
+│   │   │   ├── Scene/
+│   │   │   │   ├── ConnectSceneController.cs ← 접속 씬 UI 제어
+│   │   │   │   └── LobbySceneController.cs   ← 로비 씬 UI 제어
 │   │   │   └── UI/
 │   │   │       ├── CraftingSlotUI.cs
 │   │   │       ├── CraftingUI.cs
 │   │   │       ├── InventorySlotUI.cs
-│   │   │       ├── InventoryTestPanel.cs     ← 도감 + 스탯창 + 필터 + 루트 정렬
+│   │   │       ├── InventoryTestPanel.cs
 │   │   │       ├── InventoryUI.cs
-│   │   │       ├── TargetItemPanelUI.cs      ← 목표 루트 패널 (5슬롯)
-│   │   │       ├── TargetItemSlotUI.cs       ← 목표 슬롯 (드롭 수신, 우클릭 제거)
-│   │   │       └── TriangleIndicator.cs      ← 재료 표시용 삼각형 Graphic
+│   │   │       ├── TargetItemPanelUI.cs
+│   │   │       ├── TargetItemSlotUI.cs
+│   │   │       └── TriangleIndicator.cs
 │   │   ├── ScriptableObjects/
 │   │   │   ├── ItemDatabase.asset
-│   │   │   ├── ItemGradeColorConfig.asset    ← 등급 색상 설정
+│   │   │   ├── ItemGradeColorConfig.asset
 │   │   │   ├── RecipeDatabase.asset
 │   │   │   ├── Items/BSER/                   ← ItemData SO 786개
 │   │   │   └── Recipes/BSER/                 ← RecipeData SO 666개
@@ -280,16 +359,46 @@ Project-ER/                           ← 모노레포 루트
 │   │       └── Image/Item/                   ← 아이템 아이콘 스프라이트
 │   ├── Packages/
 │   └── ProjectSettings/
-└── Server/                           ← 서버 코드 (추후 추가)
+└── Server/                           ← C# .NET 9.0 게임 서버
+    ├── ProjectER.sln
+    ├── ProjectER.Core/               ← netstandard2.1 (패킷 정의, 공유 가능)
+    │   └── Packets/
+    │       ├── PacketType.cs
+    │       ├── PacketHeader.cs
+    │       ├── C2S/
+    │       │   ├── C2SConnectPacket.cs
+    │       │   └── C2SMovePacket.cs
+    │       └── S2C/
+    │           ├── S2CConnectedPacket.cs
+    │           └── S2CMoveSyncPacket.cs
+    ├── ProjectER.Server/             ← net9.0 서버 실행 프로젝트
+    │   ├── Program.cs
+    │   ├── Handlers/
+    │   │   ├── ConnectHandler.cs     ← C2S_Connect 처리, 버전 검증, 로비 배정
+    │   │   ├── MoveHandler.cs        ← C2S_Move 처리 (TODO: GameRoom 연동)
+    │   │   └── MatchRequestHandler.cs ← C2S_MatchRequest/Cancel 처리
+    │   ├── Lobby/
+    │   │   ├── LobbyRoom.cs          ← 세션 그룹 (최대 18명)
+    │   │   └── LobbyManager.cs       ← 동적 생성/삭제, 세션 배정
+    │   ├── Matchmaking/
+    │   │   ├── MatchmakingConfig.cs  ← MinPlayers/MaxPlayers 설정
+    │   │   ├── MatchmakingQueue.cs   ← 스레드 안전 대기 큐
+    │   │   └── MatchmakingManager.cs ← 큐 관리, 매치 성사, 연결 해제 정리
+    │   └── Network/
+    │       ├── TcpGameServer.cs      ← 연결 수락, 세션 생명주기
+    │       ├── ClientSession.cs      ← 세션 1개 (수신/송신 루프)
+    │       ├── PacketDispatcher.cs   ← 패킷 라우팅
+    │       └── PacketBuilder.cs      ← [헤더+바디] 조립 유틸
+    └── ProjectER.Tests/              ← net9.0, xUnit
 ```
 
 ---
 
-## 구현 현황 (2026-06-01 기준)
+## 구현 현황 (2026-06-09 기준)
 
 ### 완료
 
-경로 기준: `Client/Assets/Scripts/` (스크립트), `Client/Assets/ScriptableObjects/` (에셋)
+경로 기준: `Client/Assets/Scripts/` (클라이언트), `Server/` (서버)
 
 | 시스템 | 주요 파일 | 비고 |
 |---|---|---|
@@ -308,6 +417,13 @@ Project-ER/                           ← 모노레포 루트
 | 스프라이트 연결 | `Scripts/Editor/BserSpriteLinker.cs` | 아이콘 자동 매핑 |
 | 아이템 데이터 | `ScriptableObjects/Items/BSER/` | BSER API 기반 786개 (무기/방어구/소비/재료) |
 | 레시피 데이터 | `ScriptableObjects/Recipes/BSER/` | 666개 |
+| 서버 네트워크 레이어 | `Server/ProjectER.Server/Network/` | TcpGameServer, ClientSession, PacketDispatcher, PacketBuilder |
+| 서버 로비 시스템 | `Server/ProjectER.Server/Lobby/` | LobbyRoom(18명), LobbyManager(동적 생성/삭제) |
+| 서버 패킷 정의 | `Server/ProjectER.Core/Packets/` | C2S_Connect/Move/MatchRequest/MatchCancel, S2C_Connected/MoveSync/MatchQueued/MatchCancelled/MatchFound |
+| 서버 핸들러 | `Server/ProjectER.Server/Handlers/` | ConnectHandler(버전 검증, 로비 배정), MoveHandler(stub), MatchRequestHandler |
+| 서버 매치메이킹 | `Server/ProjectER.Server/Matchmaking/` | MatchmakingConfig(MinPlayers/MaxPlayers), MatchmakingQueue, MatchmakingManager |
+| 클라이언트 네트워크 | `Scripts/Network/` | NetworkClient(매치메이킹 API 포함), MiniMsgPack, PacketSerializer, PacketBuilder, Dispatcher |
+| 접속/로비 씬 | `Scripts/Scene/`, `Assets/Scenes/` | ConnectSceneController, LobbySceneController(매치 찾기 버튼), 에디터 빌더 |
 
 ### 미구현 (다음 작업 대상)
 
@@ -317,6 +433,9 @@ Project-ER/                           ← 모노레포 루트
 | 캐릭터 시스템 | 핵심 | CharacterBase, PlayerController, CharacterState 머신 |
 | 전투 시스템 | 핵심 | IDamageable, IAttackable, 기본 공격/피격/사망 |
 | 아이템 줍기 | 핵심 | 월드 아이템 프리팹, 줍기 인터랙션 |
+| 이동 동기화 | 네트워크 | MoveHandler GameRoom 연동, S2C_MoveSync 브로드캐스트 |
+| 전투 동기화 | 네트워크 | AttackHandler, S2C_TakeDamage/Die 패킷 |
+| GameRoom | 서버 | 틱 루프, 플레이어 위치 관리 |
 | 스탯 아이콘 | UI | 에셋 준비 후 StatDefs에 아이콘 슬롯 연결 |
 | 무기 세부 필터 | UI | 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 |
 | 몬스터 AI | 선택 | 순찰 → 어그로 → 추격 |

@@ -21,13 +21,25 @@ namespace ProjectER.Network
         private const string ClientVersion = "0.1.0";
 
         // ── 상태 ─────────────────────────────────────────────────
-        public bool IsConnected { get; private set; }
-        public int  SessionId   { get; private set; }
+        public bool IsConnected   { get; private set; }
+        public bool IsMatchmaking { get; private set; }
+        public bool IsLoggedIn    { get; private set; }
+        public int  SessionId     { get; private set; }
+        public int  AccountId     { get; private set; }
 
         // ── 이벤트 (메인 스레드에서 발생) ────────────────────────
         public event Action           OnConnectSuccess;
         public event Action<string>   OnConnectFailed;
         public event Action           OnDisconnected;
+
+        public event Action<int>      OnMatchQueued;    // 인수: 큐 순서(1-based)
+        public event Action           OnMatchCancelled;
+        public event Action<int, int> OnMatchFound;     // 인수: matchId, playerCount
+
+        public event Action           OnRegisterSuccess;
+        public event Action<string>   OnRegisterFailed;
+        public event Action           OnLoginSuccess;
+        public event Action<string>   OnLoginFailed;
 
         // ── 내부 컴포넌트 ─────────────────────────────────────────
         private TcpClient              _tcpClient;
@@ -41,7 +53,6 @@ namespace ProjectER.Network
         // ── 생명주기 ─────────────────────────────────────────────
         private void Awake()
         {
-            // 중복 인스턴스 방지
             if (Instance != null)
             {
                 Destroy(gameObject);
@@ -57,7 +68,6 @@ namespace ProjectER.Network
 
         private void Update()
         {
-            // 수신 큐 드레인 (메인 스레드에서 안전하게 처리)
             while (_receiveQueue.TryDequeue(out (PacketType type, byte[] body) packet))
             {
                 _dispatcher.Dispatch(packet.type, packet.body);
@@ -77,16 +87,14 @@ namespace ProjectER.Network
 
             try
             {
-                _tcpClient = new TcpClient();
+                _tcpClient  = new TcpClient();
                 await _tcpClient.ConnectAsync(host, port);
-                _stream    = _tcpClient.GetStream();
+                _stream     = _tcpClient.GetStream();
                 IsConnected = true;
 
-                // 수신 스레드 시작
                 _receiveThread = new Thread(ReceiveLoop) { IsBackground = true };
                 _receiveThread.Start();
 
-                // 접속 패킷 전송
                 SendConnectPacket();
             }
             catch (Exception ex)
@@ -120,8 +128,60 @@ namespace ProjectER.Network
             if (!IsConnected)
                 return;
 
-            IsConnected = false;
+            IsConnected   = false;
+            IsMatchmaking = false;
+            IsLoggedIn    = false;
             _tcpClient?.Close();
+        }
+
+        // ── 인증 API ──────────────────────────────────────────────
+        /// <summary>회원가입 요청.</summary>
+        public void Register(string username, string password)
+        {
+            if (!IsConnected)
+                return;
+
+            C2SRegisterPacket packet = new() { Username = username, Password = password };
+            byte[] body = PacketSerializer.Serialize(packet);
+            byte[] data = PacketBuilder.Build(PacketType.C2S_Register, body);
+            Send(data);
+        }
+
+        /// <summary>로그인 요청.</summary>
+        public void Login(string username, string password)
+        {
+            if (!IsConnected)
+                return;
+
+            C2SLoginPacket packet = new() { Username = username, Password = password };
+            byte[] body = PacketSerializer.Serialize(packet);
+            byte[] data = PacketBuilder.Build(PacketType.C2S_Login, body);
+            Send(data);
+        }
+
+        // ── 매치메이킹 API ────────────────────────────────────────
+        /// <summary>매치메이킹 큐 진입 요청. 이미 대기 중이면 무시.</summary>
+        public void RequestMatch()
+        {
+            if (!IsConnected || IsMatchmaking)
+                return;
+
+            C2SMatchRequestPacket packet = new();
+            byte[] body = PacketSerializer.Serialize(packet);
+            byte[] data = PacketBuilder.Build(PacketType.C2S_MatchRequest, body);
+            Send(data);
+        }
+
+        /// <summary>매치메이킹 큐 취소 요청. 대기 중이 아니면 무시.</summary>
+        public void CancelMatch()
+        {
+            if (!IsConnected || !IsMatchmaking)
+                return;
+
+            C2SMatchCancelPacket packet = new();
+            byte[] body = PacketSerializer.Serialize(packet);
+            byte[] data = PacketBuilder.Build(PacketType.C2S_MatchCancel, body);
+            Send(data);
         }
 
         // ── 내부: 접속 패킷 전송 ─────────────────────────────────
@@ -142,7 +202,6 @@ namespace ProjectER.Network
             {
                 try
                 {
-                    // 헤더 읽기
                     ReadExact(headerBuf, 0, PacketHeader.Size);
 
                     ushort totalLength = (ushort)(headerBuf[0] | (headerBuf[1] << 8));
@@ -182,18 +241,26 @@ namespace ProjectER.Network
             if (!IsConnected)
                 return;
 
-            IsConnected = false;
+            IsConnected   = false;
+            IsMatchmaking = false;
+            IsLoggedIn    = false;
             _tcpClient?.Close();
 
-            // 메인 스레드에서 이벤트 발생하도록 큐에 특수 마커 삽입
             _receiveQueue.Enqueue((PacketType.C2S_Disconnect, Array.Empty<byte>()));
         }
 
         // ── 내부: 핸들러 등록 ────────────────────────────────────
         private void RegisterHandlers()
         {
-            _dispatcher.Register(PacketType.S2C_Connected, HandleConnected);
-            _dispatcher.Register(PacketType.C2S_Disconnect, _ => OnDisconnected?.Invoke());
+            _dispatcher.Register(PacketType.S2C_Connected,   HandleConnected);
+            _dispatcher.Register(PacketType.C2S_Disconnect,  _ => OnDisconnected?.Invoke());
+
+            _dispatcher.Register(PacketType.S2C_MatchQueued,    HandleMatchQueued);
+            _dispatcher.Register(PacketType.S2C_MatchCancelled, HandleMatchCancelled);
+            _dispatcher.Register(PacketType.S2C_MatchFound,     HandleMatchFound);
+
+            _dispatcher.Register(PacketType.S2C_RegisterResult, HandleRegisterResult);
+            _dispatcher.Register(PacketType.S2C_LoginResult,    HandleLoginResult);
         }
 
         private void HandleConnected(byte[] body)
@@ -212,6 +279,62 @@ namespace ProjectER.Network
                 _tcpClient?.Close();
                 Debug.LogWarning($"[NetworkClient] 접속 거절: {response.RejectReason}");
                 OnConnectFailed?.Invoke(response.RejectReason);
+            }
+        }
+
+        private void HandleMatchQueued(byte[] body)
+        {
+            S2CMatchQueuedPacket response = PacketSerializer.DeserializeMatchQueued(body);
+            IsMatchmaking = true;
+            Debug.Log($"[NetworkClient] 매치메이킹 큐 진입 (순서: {response.QueuePosition})");
+            OnMatchQueued?.Invoke(response.QueuePosition);
+        }
+
+        private void HandleMatchCancelled(byte[] body)
+        {
+            _ = PacketSerializer.DeserializeMatchCancelled(body);
+            IsMatchmaking = false;
+            Debug.Log("[NetworkClient] 매치메이킹 취소됨");
+            OnMatchCancelled?.Invoke();
+        }
+
+        private void HandleMatchFound(byte[] body)
+        {
+            S2CMatchFoundPacket response = PacketSerializer.DeserializeMatchFound(body);
+            IsMatchmaking = false;
+            Debug.Log($"[NetworkClient] 매치 성사! (MatchId: {response.MatchId}, 플레이어: {response.PlayerCount}명)");
+            OnMatchFound?.Invoke(response.MatchId, response.PlayerCount);
+        }
+
+        private void HandleRegisterResult(byte[] body)
+        {
+            S2CRegisterResultPacket response = PacketSerializer.DeserializeRegisterResult(body);
+            if (response.Success)
+            {
+                Debug.Log("[NetworkClient] 회원가입 성공");
+                OnRegisterSuccess?.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkClient] 회원가입 실패: {response.RejectReason}");
+                OnRegisterFailed?.Invoke(response.RejectReason);
+            }
+        }
+
+        private void HandleLoginResult(byte[] body)
+        {
+            S2CLoginResultPacket response = PacketSerializer.DeserializeLoginResult(body);
+            if (response.Success)
+            {
+                AccountId  = response.AccountId;
+                IsLoggedIn = true;
+                Debug.Log($"[NetworkClient] 로그인 성공 (AccountId: {AccountId})");
+                OnLoginSuccess?.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkClient] 로그인 실패: {response.RejectReason}");
+                OnLoginFailed?.Invoke(response.RejectReason);
             }
         }
     }
