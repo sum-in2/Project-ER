@@ -15,6 +15,7 @@ namespace ProjectER.Server.Network
     {
         // ── 설정 ────────────────────────────────────────────────
         private readonly int _port;
+        private const int MaxConnections = 200;
 
         // ── 런타임 상태 ──────────────────────────────────────────
         private TcpListener? _listener;
@@ -45,6 +46,15 @@ namespace ProjectER.Server.Network
                 while (!ct.IsCancellationRequested)
                 {
                     TcpClient tcpClient = await _listener.AcceptTcpClientAsync(ct);
+
+                    // 연결 수 상한 초과 시 즉시 거부
+                    if (_sessions.Count >= MaxConnections)
+                    {
+                        Console.WriteLine($"[Server] 연결 수 상한({MaxConnections}) 초과 → 거부");
+                        tcpClient.Close();
+                        continue;
+                    }
+
                     int sessionId = Interlocked.Increment(ref _nextSessionId);
                     ClientSession session = new(sessionId, tcpClient, _dispatcher);
 

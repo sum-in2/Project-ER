@@ -19,6 +19,13 @@ namespace ProjectER.Server.Handlers
 
         private static void Handle(ClientSession session, byte[] body)
         {
+            // 인증 전 요청 차단
+            if (session.AccountId == null)
+            {
+                Console.WriteLine($"[MoveHandler] 세션 {session.SessionId} 미인증 상태로 이동 요청 → 거부");
+                return;
+            }
+
             C2SMovePacket packet = MessagePackSerializer.Deserialize<C2SMovePacket>(body);
 
             // TODO: GameRoom에서 플레이어 위치 갱신 및 브로드캐스트

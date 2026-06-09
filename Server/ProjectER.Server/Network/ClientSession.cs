@@ -25,6 +25,9 @@ namespace ProjectER.Server.Network
         // ── 수신 버퍼 ───────────────────────────────────────────
         private readonly byte[] _recvBuffer = new byte[4096];
 
+        // ── 패킷 크기 상한 ───────────────────────────────────────
+        private const int MaxBodySize = 4096;
+
         // ── 이벤트 ──────────────────────────────────────────────
         public event Action<ClientSession>? OnDisconnected;
 
@@ -53,8 +56,11 @@ namespace ProjectER.Server.Network
                     PacketType type    = (PacketType)typeRaw;
 
                     int bodyLength = totalLength - PacketHeader.Size;
-                    if (bodyLength < 0)
-                        break; // 잘못된 패킷
+                    if (bodyLength < 0 || bodyLength > MaxBodySize)
+                    {
+                        Console.WriteLine($"[Session {SessionId}] 비정상 패킷 크기: {bodyLength} → 연결 종료");
+                        break;
+                    }
 
                     // 바디 읽기
                     byte[] body = new byte[bodyLength]; // ⚠️ GC 주의: 패킷마다 할당. 추후 ArrayPool 적용 권장

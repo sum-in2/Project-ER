@@ -9,7 +9,7 @@ namespace ProjectER.Server.Database
         // ── 유효성 제한 ───────────────────────────────────────────
         private const int UsernameMinLength = 3;
         private const int UsernameMaxLength = 20;
-        private const int PasswordMinLength = 4;
+        private const int PasswordMinLength = 8;
 
         private readonly AccountDb _db;
 

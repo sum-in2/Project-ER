@@ -11,6 +11,7 @@ namespace ProjectER.Server.Database
     public class AccountDb : IDisposable
     {
         private readonly SqliteConnection _connection;
+        private readonly object _lock = new();
 
         public AccountDb(string dbPath)
         {
@@ -46,25 +47,28 @@ namespace ProjectER.Server.Database
         /// </summary>
         public bool TryInsert(string username, string passwordHash, out int accountId)
         {
-            try
+            lock (_lock)
             {
-                using SqliteCommand cmd = _connection.CreateCommand();
-                cmd.CommandText = @"
-                    INSERT INTO accounts (username, password, created_at)
-                    VALUES ($username, $password, $createdAt);
-                    SELECT last_insert_rowid();";
-                cmd.Parameters.AddWithValue("$username",   username);
-                cmd.Parameters.AddWithValue("$password",   passwordHash);
-                cmd.Parameters.AddWithValue("$createdAt",  DateTime.UtcNow.ToString("o"));
+                try
+                {
+                    using SqliteCommand cmd = _connection.CreateCommand();
+                    cmd.CommandText = @"
+                        INSERT INTO accounts (username, password, created_at)
+                        VALUES ($username, $password, $createdAt);
+                        SELECT last_insert_rowid();";
+                    cmd.Parameters.AddWithValue("$username",   username);
+                    cmd.Parameters.AddWithValue("$password",   passwordHash);
+                    cmd.Parameters.AddWithValue("$createdAt",  DateTime.UtcNow.ToString("o"));
 
-                object? result = cmd.ExecuteScalar();
-                accountId = result != null ? Convert.ToInt32(result) : 0;
-                return true;
-            }
-            catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint failed
-            {
-                accountId = 0;
-                return false;
+                    object? result = cmd.ExecuteScalar();
+                    accountId = result != null ? Convert.ToInt32(result) : 0;
+                    return true;
+                }
+                catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint failed
+                {
+                    accountId = 0;
+                    return false;
+                }
             }
         }
 
@@ -75,25 +79,28 @@ namespace ProjectER.Server.Database
         /// </summary>
         public bool TryFind(string username, out int accountId, out string passwordHash)
         {
-            using SqliteCommand cmd = _connection.CreateCommand();
-            cmd.CommandText = @"
-                SELECT account_id, password
-                FROM accounts
-                WHERE username = $username
-                LIMIT 1;";
-            cmd.Parameters.AddWithValue("$username", username);
-
-            using SqliteDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            lock (_lock)
             {
-                accountId    = reader.GetInt32(0);
-                passwordHash = reader.GetString(1);
-                return true;
-            }
+                using SqliteCommand cmd = _connection.CreateCommand();
+                cmd.CommandText = @"
+                    SELECT account_id, password
+                    FROM accounts
+                    WHERE username = $username
+                    LIMIT 1;";
+                cmd.Parameters.AddWithValue("$username", username);
 
-            accountId    = 0;
-            passwordHash = string.Empty;
-            return false;
+                using SqliteDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    accountId    = reader.GetInt32(0);
+                    passwordHash = reader.GetString(1);
+                    return true;
+                }
+
+                accountId    = 0;
+                passwordHash = string.Empty;
+                return false;
+            }
         }
 
         public void Dispose() => _connection.Dispose();

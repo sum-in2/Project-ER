@@ -26,12 +26,23 @@ namespace ProjectER.Server.Handlers
 
         private void HandleMatchRequest(ClientSession session, byte[] body)
         {
+            // 인증 전 요청 차단
+            if (session.AccountId == null)
+            {
+                Console.WriteLine($"[MatchRequestHandler] 세션 {session.SessionId} 미인증 상태로 매치 요청 → 거부");
+                return;
+            }
+
             _ = MessagePackSerializer.Deserialize<C2SMatchRequestPacket>(body);
             _matchmaking.EnqueueSession(session);
         }
 
         private void HandleMatchCancel(ClientSession session, byte[] body)
         {
+            // 인증 전 요청 차단
+            if (session.AccountId == null)
+                return;
+
             _ = MessagePackSerializer.Deserialize<C2SMatchCancelPacket>(body);
             _matchmaking.CancelSession(session);
         }
