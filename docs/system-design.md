@@ -1,5 +1,33 @@
 ## 시스템별 설계 가이드
 
+### 핵심 인터페이스 설계
+
+```
+IDamageable    : TakeDamage(float amount), Die()
+IAttackable    : Attack(IDamageable target)
+
+ISkill (공통 베이스)
+├── float Cooldown { get; }
+├── bool IsReady { get; }
+└── void Activate(CharacterBase caster)
+
+IActiveSkill   : ISkill   → Q/W/E/R (액티브 스킬 1~4)
+IWeaponSkill   : ISkill   → D (무기 스킬)
+ITacticalSkill : ISkill   → F (전술 스킬)
+
+IPassiveSkill (T)
+├── void OnEquip(CharacterBase owner)
+└── void OnUnequip(CharacterBase owner)
+
+IInteractable  : void Interact(PlayerController interactor)
+- 월드 아이템 줍기도 Interact() 내부에서 인벤토리 추가 처리 (별도 IPickupable 불필요)
+
+우클릭 입력 처리 우선순위 (Raycast 결과 기준):
+1. IDamageable 대상   → 공격
+2. IInteractable 대상 → 상호작용 (줍기 포함)
+3. 그 외             → 이동 (NavMeshAgent.SetDestination)
+```
+
 ### 이동 시스템 (Click-to-Move)
 
 ```
@@ -12,14 +40,12 @@ NavMesh 기반 클릭투무브
 ### 전투 시스템
 
 ```
-인터페이스 설계:
-- IDamageable   : TakeDamage(float amount)
-- IAttackable   : Attack(IDamageable target)
-- ISkillUser    : UseSkill(int skillIndex)
-
 CharacterBase (MonoBehaviour + IDamageable):
-├── PlayerController : CharacterBase, ISkillUser
+├── PlayerController : CharacterBase
+│     - IActiveSkill x4 (Q/W/E/R), IWeaponSkill(D), ITacticalSkill(F), IPassiveSkill(T) 보유
 └── MonsterController : CharacterBase, IAttackable
+
+(인터페이스 정의는 "핵심 인터페이스 설계" 섹션 참조)
 
 스탯: CharacterData(ScriptableObject)에서 읽어옴
 상태 관리: enum CharacterState + StateMachine 구조 사용 (bool 플래그 남발 금지)
