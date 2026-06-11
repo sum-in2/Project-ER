@@ -29,6 +29,7 @@ namespace ProjectER.Editor
         private const float RightPanelWidth = 380f;
 
         private const string GradeConfigPath = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+        private const string LoadOutPanelPrefabPath = "Assets/Prefabs/UI/LoadOutPanel.prefab";
 
         [MenuItem("ProjectER/Build Inventory Test UI")]
         public static void Build()
@@ -77,8 +78,8 @@ namespace ProjectER.Editor
                 = BuildRightPanel(root.transform);
 
             // ── 컴포넌트 부착 ────────────────────────────────────────
-            InventoryUI        inventoryUI = root.AddComponent<InventoryUI>();
-            InventoryTestPanel testPanel   = root.AddComponent<InventoryTestPanel>();
+            InventoryUI  inventoryUI = root.AddComponent<InventoryUI>();
+            LoadOutPanel testPanel   = root.AddComponent<LoadOutPanel>();
 
             // ── 레퍼런스 연결 ────────────────────────────────────────
             WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
@@ -91,6 +92,73 @@ namespace ProjectER.Editor
 
             Debug.Log("[InventoryTestUIBuilder] 완료.");
             Selection.activeGameObject = root;
+        }
+
+        /// <summary>
+        /// LobbyUIManager에 등록할 LoadOut 패널 프리팹 생성.
+        /// 인벤토리/크래프팅 시스템을 패널 자체에 부착한 자기완결형 프리팹.
+        /// 실행 전 Import BSER Items 먼저 실행 필요
+        /// </summary>
+        [MenuItem("ProjectER/Build LoadOut Panel Prefab")]
+        public static void BuildLoadOutPanelPrefab()
+        {
+            ItemGradeColorConfig gradeConfig = AssetDatabase.LoadAssetAtPath<ItemGradeColorConfig>(GradeConfigPath);
+            if (gradeConfig == null)
+                Debug.LogWarning("[InventoryTestUIBuilder] ItemGradeColorConfig 없음 — " +
+                                 "Create > ProjectER/Config/ItemGradeColor 로 생성 후 다시 실행하세요.");
+
+            // ── 루트 (LobbyUIManager._panelRoot 하위에 풀스크린으로 배치됨) ──
+            GameObject root = new("LoadOutPanel");
+            root.AddComponent<Image>().color = BgColor;
+            RectTransform rootRt = root.GetComponent<RectTransform>();
+            rootRt.anchorMin     = Vector2.zero;
+            rootRt.anchorMax     = Vector2.one;
+            rootRt.offsetMin     = Vector2.zero;
+            rootRt.offsetMax     = Vector2.zero;
+
+            HorizontalLayoutGroup rootHL  = root.AddComponent<HorizontalLayoutGroup>();
+            rootHL.spacing                = 2f;
+            rootHL.padding                = new RectOffset(0, 0, 0, 0);
+            rootHL.childControlWidth      = true;
+            rootHL.childControlHeight     = true;
+            rootHL.childForceExpandWidth  = false;
+            rootHL.childForceExpandHeight = true;
+
+            // ── 인벤토리/크래프팅 시스템 (자기완결형) ──────────────
+            InventorySystem inventory = root.AddComponent<InventorySystem>();
+            CraftingSystem  crafting  = root.AddComponent<CraftingSystem>();
+
+            // ── 좌측 패널 (인벤토리 + 장비 + 스탯) ─────────────────
+            (InventorySlotUI[] bagSlots, InventorySlotUI[] equipSlots, Transform statContent)
+                = BuildLeftPanel(root.transform);
+
+            // ── 중앙 패널 (아이템 브라우저) ─────────────────────────
+            (Transform itemButtonContainer, Transform filterContainer, KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
+                = BuildCenterPanel(root.transform);
+
+            // ── 우측 패널 (조합 + 목표 + 획득버튼) ──────────────────
+            (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel)
+                = BuildRightPanel(root.transform);
+
+            // ── 컴포넌트 부착 ────────────────────────────────────────
+            InventoryUI  inventoryUI = root.AddComponent<InventoryUI>();
+            LoadOutPanel panel       = root.AddComponent<LoadOutPanel>();
+
+            // ── 레퍼런스 연결 ────────────────────────────────────────
+            WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
+            WireTestPanel(panel, inventory, itemButtonContainer, statContent, filterContainer,
+                acquireButton, addRouteButton, targetPanel,
+                searchAdapter, specialMaterialContainer, statFilterContainer);
+            WireCraftingSystem(crafting, inventory);
+            WireCraftingUI(craftingUI, crafting, inventory, craftContent, gradeConfig);
+            WireGradeConfigToSlots(root, gradeConfig);
+
+            // ── 프리팹 저장 ──────────────────────────────────────────
+            System.IO.Directory.CreateDirectory("Assets/Prefabs/UI");
+            PrefabUtility.SaveAsPrefabAsset(root, LoadOutPanelPrefabPath);
+            Object.DestroyImmediate(root);
+
+            Debug.Log($"[InventoryTestUIBuilder] LoadOut 패널 프리팹 저장 완료: {LoadOutPanelPrefabPath}");
         }
 
         // ── 좌측 패널 ───────────────────────────────────────────────
@@ -137,7 +205,7 @@ namespace ProjectER.Editor
             CreateDivider(panel.transform);
 
             // 장착 스탯 (남은 공간 전부)
-            // InventoryTestPanel.BuildStatPanel()이 런타임에 GridLayoutGroup + Text를 추가함
+            // LoadOutPanel.BuildStatPanel()이 런타임에 GridLayoutGroup + Text를 추가함
             GameObject statSec = CreateSection(panel.transform, "StatSection", SectionBg, "장착 스탯");
             AddLayoutElement(statSec, flexibleHeight: 1f);
             GameObject statContent     = new("StatContent");
@@ -195,7 +263,7 @@ namespace ProjectER.Editor
             KoreanInputFieldAdapter searchAdapter       = BuildSearchField(row1.transform);
             Transform               specialMaterialContainer = BuildSpecialMaterialContainer(row1.transform);
 
-            // 2행: 스탯 필터 버튼 (런타임에 InventoryTestPanel.BuildStatFilterButtons()가 채움)
+            // 2행: 스탯 필터 버튼 (런타임에 LoadOutPanel.BuildStatFilterButtons()가 채움)
             GameObject row2 = new("FilterRow2");
             row2.transform.SetParent(filterBar.transform, false);
             row2.AddComponent<RectTransform>();
@@ -214,7 +282,7 @@ namespace ProjectER.Editor
             mainHL.childForceExpandWidth   = false;
             mainHL.childForceExpandHeight  = true;
 
-            // 장비 구분 필터 열 (런타임에 InventoryTestPanel.BuildFilterButtons()가 채움)
+            // 장비 구분 필터 열 (런타임에 LoadOutPanel.BuildFilterButtons()가 채움)
             GameObject typeFilter = CreatePanel(mainArea.transform, "TypeFilter", SectionBg);
             AddLayoutElement(typeFilter, preferredWidth: 60f, flexibleWidth: 0f);
 
@@ -276,7 +344,7 @@ namespace ProjectER.Editor
         private static Transform BuildSpecialMaterialContainer(Transform parent)
         {
             // 특수 재료 필터 버튼 5개를 담을 컨테이너
-            // 런타임에 InventoryTestPanel.BuildSpecialMaterialButtons()가 버튼을 채움
+            // 런타임에 LoadOutPanel.BuildSpecialMaterialButtons()가 버튼을 채움
             // 예상 너비: 생(28)+운(28)+미(28)+포(28)+VF(32) + spacing*4 = 156px
             GameObject go = new("SpecialMaterialContainer");
             go.transform.SetParent(parent, false);
@@ -632,7 +700,7 @@ namespace ProjectER.Editor
             so.ApplyModifiedProperties();
         }
 
-        private static void WireTestPanel(InventoryTestPanel panel, InventorySystem inventory,
+        private static void WireTestPanel(LoadOutPanel panel, InventorySystem inventory,
             Transform buttonContainer, Transform statContainer, Transform filterContainer,
             Button acquireButton, Button addRouteButton, TargetItemPanelUI targetItemPanel,
             KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)

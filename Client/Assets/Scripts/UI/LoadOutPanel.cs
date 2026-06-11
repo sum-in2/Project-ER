@@ -8,9 +8,9 @@ using UnityEngine.UI;
 namespace ProjectER.UI
 {
     /// <summary>
-    /// 테스트 패널 — 아이템 브라우저(선택/드래그) + 획득/루트추가 버튼 + 장착 스탯 합계
+    /// 로드아웃 패널 — 아이템 브라우저(선택/드래그) + 획득/루트추가 버튼 + 장착 스탯 합계
     /// </summary>
-    public class InventoryTestPanel : MonoBehaviour
+    public class LoadOutPanel : MonoBehaviour, IUIPanel
     {
         [SerializeField] private InventorySystem _inventorySystem;
         [SerializeField] private List<ItemData>  _acquisitionItems;
@@ -71,6 +71,22 @@ namespace ProjectER.UI
             ("방어관통", item => item.PenetrationDefense,   false),
         };
 
+        // ── IUIPanel ─────────────────────────────────────────────────
+
+        public LobbyPanelType PanelType => LobbyPanelType.LoadOut;
+
+        // 786개 아이템 브라우저 — 닫을 때 Destroy하여 메모리 회수 (LobbyUIManager가 처리)
+        public bool CacheOnClose => false;
+
+        // CacheOnClose가 false이므로 매번 새로 Instantiate됨 → Start()에서 이미 초기화 처리됨
+        public void OnOpen()
+        {
+        }
+
+        public void OnClose()
+        {
+        }
+
         private void OnEnable()
         {
             if (_inventorySystem != null)
@@ -95,7 +111,7 @@ namespace ProjectER.UI
         {
             if (_inventorySystem == null)
             {
-                Debug.LogError("[InventoryTestPanel] InventorySystem이 연결되지 않았습니다.");
+                Debug.LogError("[LoadOutPanel] InventorySystem이 연결되지 않았습니다.");
                 return;
             }
 
@@ -110,7 +126,7 @@ namespace ProjectER.UI
             if (_acquisitionItems != null && _acquisitionItems.Count > 0)
                 BuildButtons();
             else
-                Debug.LogWarning("[InventoryTestPanel] _acquisitionItems가 비어있습니다.");
+                Debug.LogWarning("[LoadOutPanel] _acquisitionItems가 비어있습니다.");
 
             BuildFilterButtons();
             BuildSpecialMaterialButtons();
@@ -133,7 +149,7 @@ namespace ProjectER.UI
                 CreateButton(item, parent);
                 created++;
             }
-            Debug.Log($"[InventoryTestPanel] 버튼 {created}개 생성 완료");
+            Debug.Log($"[LoadOutPanel] 버튼 {created}개 생성 완료");
         }
 
         private void CreateButton(ItemData item, Transform parent)
@@ -205,7 +221,7 @@ namespace ProjectER.UI
             _selectedButtonBg = buttonBg;
             buttonBg.color    = SelectedHighlight;
 
-            Debug.Log($"[InventoryTestPanel] 선택: {item.DisplayName} ({item.ItemGrade})");
+            Debug.Log($"[LoadOutPanel] 선택: {item.DisplayName} ({item.ItemGrade})");
         }
 
         // ── 외부 버튼 액션 ───────────────────────────────────────────
@@ -217,14 +233,14 @@ namespace ProjectER.UI
         {
             if (_selectedItem == null)
             {
-                Debug.LogWarning("[InventoryTestPanel] 획득할 아이템을 선택하세요.");
+                Debug.LogWarning("[LoadOutPanel] 획득할 아이템을 선택하세요.");
                 return;
             }
 
             if (_inventorySystem.TryAddItem(_selectedItem))
-                Debug.Log($"[InventoryTestPanel] 획득: {_selectedItem.DisplayName}");
+                Debug.Log($"[LoadOutPanel] 획득: {_selectedItem.DisplayName}");
             else
-                Debug.LogWarning($"[InventoryTestPanel] 가방이 꽉 참 — {_selectedItem.DisplayName}");
+                Debug.LogWarning($"[LoadOutPanel] 가방이 꽉 참 — {_selectedItem.DisplayName}");
         }
 
         /// <summary>
@@ -234,20 +250,20 @@ namespace ProjectER.UI
         {
             if (_selectedItem == null)
             {
-                Debug.LogWarning("[InventoryTestPanel] 루트에 추가할 아이템을 선택하세요.");
+                Debug.LogWarning("[LoadOutPanel] 루트에 추가할 아이템을 선택하세요.");
                 return;
             }
 
             if (_targetItemPanel == null)
             {
-                Debug.LogWarning("[InventoryTestPanel] TargetItemPanelUI가 연결되지 않았습니다.");
+                Debug.LogWarning("[LoadOutPanel] TargetItemPanelUI가 연결되지 않았습니다.");
                 return;
             }
 
             if (_targetItemPanel.TrySetItem(_selectedItem))
-                Debug.Log($"[InventoryTestPanel] 루트 추가: {_selectedItem.DisplayName}");
+                Debug.Log($"[LoadOutPanel] 루트 추가: {_selectedItem.DisplayName}");
             else
-                Debug.LogWarning($"[InventoryTestPanel] {_selectedItem.DisplayName}은 장비 아이템이 아닙니다.");
+                Debug.LogWarning($"[LoadOutPanel] {_selectedItem.DisplayName}은 장비 아이템이 아닙니다.");
         }
 
         // ── 루트 기반 정렬 ───────────────────────────────────────────

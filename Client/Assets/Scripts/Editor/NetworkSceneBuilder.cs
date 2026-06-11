@@ -1,5 +1,6 @@
 using ProjectER.Network;
 using ProjectER.Scene;
+using ProjectER.UI;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -31,20 +32,11 @@ namespace ProjectER.Editor
         // ── ConnectScene ──────────────────────────────────────────
         private static void BuildConnectScene()
         {
-            UnityEngine.SceneManagement.Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // 카메라
-            AddCamera();
-
-            // 이벤트 시스템
-            AddEventSystem();
+            GameObject canvasObj = BuildBaseScene(out UnityEngine.SceneManagement.Scene scene);
 
             // NetworkClient (DontDestroyOnLoad 오브젝트)
             GameObject networkObj = new("NetworkClient");
             networkObj.AddComponent<NetworkClient>();
-
-            // Canvas
-            GameObject canvasObj = CreateCanvas("Canvas");
 
             // 배경 패널
             GameObject panel = CreatePanel(canvasObj.transform, "Panel", new Vector2(400, 260));
@@ -83,12 +75,7 @@ namespace ProjectER.Editor
         // ── LoginScene ────────────────────────────────────────────
         private static void BuildLoginScene()
         {
-            UnityEngine.SceneManagement.Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            AddCamera();
-            AddEventSystem();
-
-            GameObject canvasObj = CreateCanvas("Canvas");
+            GameObject canvasObj = BuildBaseScene(out UnityEngine.SceneManagement.Scene scene);
             GameObject panel     = CreatePanel(canvasObj.transform, "Panel", new Vector2(400, 300));
 
             CreateText(panel.transform, "Title", "로그인", 24, new Vector2(0, 115), new Vector2(360, 40));
@@ -128,33 +115,56 @@ namespace ProjectER.Editor
         }
 
         // ── LobbyScene ────────────────────────────────────────────
+        private const string LoadOutPanelPrefabPath = "Assets/Prefabs/UI/LoadOutPanel.prefab";
+
         private static void BuildLobbyScene()
         {
-            UnityEngine.SceneManagement.Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-
-            // 카메라
-            AddCamera();
-
-            // 이벤트 시스템
-            AddEventSystem();
-
-            // Canvas
-            GameObject canvasObj = CreateCanvas("Canvas");
+            GameObject canvasObj = BuildBaseScene(out UnityEngine.SceneManagement.Scene scene);
 
             // 패널
-            GameObject panel = CreatePanel(canvasObj.transform, "Panel", new Vector2(400, 280));
+            GameObject panel = CreatePanel(canvasObj.transform, "Panel", new Vector2(400, 340));
 
             // 접속 상태 텍스트
-            GameObject statusText = CreateText(panel.transform, "StatusText", "서버 접속됨", 20, new Vector2(0, 100), new Vector2(360, 40));
+            GameObject statusText = CreateText(panel.transform, "StatusText", "서버 접속됨", 20, new Vector2(0, 130), new Vector2(360, 40));
 
             // 매치메이킹 상태 텍스트
-            GameObject matchStatusText = CreateText(panel.transform, "MatchStatusText", string.Empty, 16, new Vector2(0, 55), new Vector2(360, 36));
+            GameObject matchStatusText = CreateText(panel.transform, "MatchStatusText", string.Empty, 16, new Vector2(0, 85), new Vector2(360, 36));
 
             // 매치 찾기 버튼
-            GameObject matchBtn = CreateButton(panel.transform, "MatchButton", "매치 찾기", new Vector2(0, 5), new Vector2(200, 44));
+            GameObject matchBtn = CreateButton(panel.transform, "MatchButton", "매치 찾기", new Vector2(0, 35), new Vector2(200, 44));
 
             // 연결 해제 버튼
-            GameObject disconnectBtn = CreateButton(panel.transform, "DisconnectButton", "연결 해제", new Vector2(0, -55), new Vector2(200, 44));
+            GameObject disconnectBtn = CreateButton(panel.transform, "DisconnectButton", "연결 해제", new Vector2(0, -25), new Vector2(200, 44));
+
+            // 로드아웃 버튼
+            GameObject loadOutBtn = CreateButton(panel.transform, "LoadOutButton", "로드아웃", new Vector2(0, -85), new Vector2(200, 44));
+
+            // 로드아웃 패널이 채워질 풀스크린 영역
+            GameObject panelRoot = new("PanelRoot");
+            panelRoot.transform.SetParent(canvasObj.transform, false);
+            RectTransform panelRootRt = panelRoot.AddComponent<RectTransform>();
+            panelRootRt.anchorMin = Vector2.zero;
+            panelRootRt.anchorMax = Vector2.one;
+            panelRootRt.offsetMin = Vector2.zero;
+            panelRootRt.offsetMax = Vector2.zero;
+
+            // LobbyUIManager 연결
+            GameObject uiManagerObj = new("LobbyUIManager");
+            LobbyUIManager uiManager = uiManagerObj.AddComponent<LobbyUIManager>();
+            SerializedObject uiManagerSo = new(uiManager);
+            uiManagerSo.FindProperty("_panelRoot").objectReferenceValue = panelRootRt;
+
+            GameObject loadOutPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(LoadOutPanelPrefabPath);
+            if (loadOutPrefab == null)
+                Debug.LogWarning($"[NetworkSceneBuilder] LoadOut 패널 프리팹 없음: {LoadOutPanelPrefabPath} — " +
+                                 "ProjectER > Build LoadOut Panel Prefab 먼저 실행하세요.");
+
+            SerializedProperty entriesProp = uiManagerSo.FindProperty("_panelEntries");
+            entriesProp.arraySize = 1;
+            SerializedProperty entry0 = entriesProp.GetArrayElementAtIndex(0);
+            entry0.FindPropertyRelative("_type").enumValueIndex = (int)LobbyPanelType.LoadOut;
+            entry0.FindPropertyRelative("_prefab").objectReferenceValue = loadOutPrefab;
+            uiManagerSo.ApplyModifiedProperties();
 
             // LobbySceneController 연결
             GameObject controllerObj = new("LobbySceneController");
@@ -164,12 +174,28 @@ namespace ProjectER.Editor
             so.FindProperty("_matchStatusText").objectReferenceValue = matchStatusText.GetComponent<TMP_Text>();
             so.FindProperty("_matchButton").objectReferenceValue     = matchBtn.GetComponent<Button>();
             so.FindProperty("_disconnectButton").objectReferenceValue = disconnectBtn.GetComponent<Button>();
+            so.FindProperty("_loadOutButton").objectReferenceValue   = loadOutBtn.GetComponent<Button>();
+            so.FindProperty("_lobbyUIManager").objectReferenceValue  = uiManager;
             so.ApplyModifiedProperties();
 
             SaveScene(scene, "Assets/Scenes/LobbyScene.unity");
         }
 
         // ── 공통 씬 오브젝트 ──────────────────────────────────────
+
+        /// <summary>
+        /// 새 씬 생성 + 카메라/이벤트 시스템 추가 + Canvas 생성까지의 공통 초기화.
+        /// </summary>
+        private static GameObject BuildBaseScene(out UnityEngine.SceneManagement.Scene scene)
+        {
+            scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            AddCamera();
+            AddEventSystem();
+
+            return CreateCanvas("Canvas");
+        }
+
         private static void AddCamera()
         {
             GameObject camObj = new("Main Camera");

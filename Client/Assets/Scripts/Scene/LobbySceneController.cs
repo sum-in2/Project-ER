@@ -1,4 +1,5 @@
 using ProjectER.Network;
+using ProjectER.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,8 @@ namespace ProjectER.Scene
         [SerializeField] private TMP_Text _matchStatusText;
         [SerializeField] private Button   _matchButton;
         [SerializeField] private Button   _disconnectButton;
+        [SerializeField] private Button   _loadOutButton;
+        [SerializeField] private LobbyUIManager _lobbyUIManager;
 
         // ── 상수 ─────────────────────────────────────────────────
         private const string SceneConnect = "ConnectScene";
@@ -34,6 +37,7 @@ namespace ProjectER.Scene
         {
             _matchButton.onClick.AddListener(OnMatchButtonClicked);
             _disconnectButton.onClick.AddListener(OnDisconnectButtonClicked);
+            _loadOutButton.onClick.AddListener(OnLoadOutButtonClicked);
 
             if (NetworkClient.Instance == null)
                 return;
@@ -48,6 +52,7 @@ namespace ProjectER.Scene
         {
             _matchButton.onClick.RemoveListener(OnMatchButtonClicked);
             _disconnectButton.onClick.RemoveListener(OnDisconnectButtonClicked);
+            _loadOutButton.onClick.RemoveListener(OnLoadOutButtonClicked);
 
             if (NetworkClient.Instance == null)
                 return;
@@ -74,6 +79,11 @@ namespace ProjectER.Scene
         {
             NetworkClient.Instance?.Disconnect();
             SceneManager.LoadScene(SceneConnect);
+        }
+
+        private void OnLoadOutButtonClicked()
+        {
+            _lobbyUIManager.OpenPanel(LobbyPanelType.LoadOut);
         }
 
         // ── 네트워크 이벤트 핸들러 ───────────────────────────────

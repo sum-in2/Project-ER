@@ -183,6 +183,19 @@ cd Server && dotnet run --project ProjectER.Server
 - 버전: 0.1.0 (클라이언트와 일치해야 접속 수락)
 ```
 
+### 매칭 중 데이터 잠금 규칙
+
+```
+매칭 큐 등록 시점 = 출전 정보(인벤토리/장비 구성)가 서버에 제출/확정되는 시점
+- NetworkClient.IsMatchmaking == true 인 동안:
+  - 인벤토리/도감의 아이템 획득·장착·교체 등 상태 변경 UI는 비활성화(interactable = false)
+  - 서버도 매칭 중인 세션의 인벤토리 변경 패킷은 거부 (정합성 보장)
+- 매치 취소(OnMatchCancelled) 시 잠금 해제
+
+목적: 클라이언트가 들고 있는 인벤토리 상태와 서버에 제출된 출전 정보가
+서로 어긋나는(diverge) 것을 방지 (동시성/정합성 문제)
+```
+
 ### 에디터 씬 빌더 (NetworkSceneBuilder)
 
 ```
