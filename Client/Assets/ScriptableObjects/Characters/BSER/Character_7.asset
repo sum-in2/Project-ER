@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_7
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 7
+  _name: Hyunwoo
+  _displayName: "\uD604\uC6B0"
+  _portraitFull: {fileID: 21300000, guid: 80984ce61121571479100375c3a19ffc, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: d3e1d76fd6c0bb341b4bfbdaeeddcb8a, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 212c032b5e2768f4e88d66f059e57337, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0b00000009000000
+  _maxHp: 960
+  _attackPower: 40
+  _defense: 51
+  _hpRegen: 1.8
+  _attackSpeed: 0.14
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_52
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 52
+  _name: Adina
+  _displayName: "\uC544\uB514\uB098"
+  _portraitFull: {fileID: 21300000, guid: 3996328764e12cd44a635f8c6923496c, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 4c5e34193cdc3804a88290f87a8d50a1, type: 3}
+  _portraitMini: {fileID: 21300000, guid: a4aa50f047f141844b7168ccdf60e3db, type: 3}
+  _archeType1: 5
+  _archeType2: 6
+  _weaponRangeType: 1
+  _weaponMasteries: 17000000
+  _maxHp: 880
+  _attackPower: 34
+  _defense: 52
+  _hpRegen: 0.8
+  _attackSpeed: 0.1
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_45
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 45
+  _name: Mai
+  _displayName: "\uB9C8\uC774"
+  _portraitFull: {fileID: 21300000, guid: eb2c882ef65488d48a4dc86a36d054cd, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 3b94548c9cd00d9448506b5e364323e4, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 54d2090323b6be64182c422658a691d8, type: 3}
+  _archeType1: 2
+  _archeType2: 6
+  _weaponRangeType: 0
+  _weaponMasteries: 0c000000
+  _maxHp: 980
+  _attackPower: 30
+  _defense: 50
+  _hpRegen: 2.25
+  _attackSpeed: 0.13
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

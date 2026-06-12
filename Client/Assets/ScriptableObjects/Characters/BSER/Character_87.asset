@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_87
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 87
+  _name: Coraline
+  _displayName: "\uCF54\uB810\uB77C\uC778"
+  _portraitFull: {fileID: 21300000, guid: 4b9c750502aaf634880de49039330124, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 292191f72717cda4888769d782eb135b, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 0fb3291e9c21a4a4eb4b1ceb45b436cd, type: 3}
+  _archeType1: 5
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 17000000
+  _maxHp: 940
+  _attackPower: 40
+  _defense: 51
+  _hpRegen: 1.6
+  _attackSpeed: 0.14
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

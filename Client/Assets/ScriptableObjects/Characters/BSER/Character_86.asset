@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_86
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 86
+  _name: Fenrir
+  _displayName: "\uD39C\uB9AC\uB974"
+  _portraitFull: {fileID: 21300000, guid: 68597c2ac5bebad41ab449428b94b9cc, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: a64180b11df1fce4abfd0fa3df23412c, type: 3}
+  _portraitMini: {fileID: 21300000, guid: ca29a2cbfaff82f49a30c9ab321866b9, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0b000000
+  _maxHp: 980
+  _attackPower: 33
+  _defense: 54
+  _hpRegen: 1.48
+  _attackSpeed: 0.14
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

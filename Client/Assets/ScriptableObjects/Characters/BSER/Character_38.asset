@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_38
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 38
+  _name: Jenny
+  _displayName: "\uC81C\uB2C8"
+  _portraitFull: {fileID: 21300000, guid: 436d515738bf56143989377c0dff0744, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 49c7b99617ec08e42ae7f4700529181e, type: 3}
+  _portraitMini: {fileID: 21300000, guid: c0f363d4153da414586436219c8bc118, type: 3}
+  _archeType1: 4
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 10000000
+  _maxHp: 935
+  _attackPower: 35
+  _defense: 52
+  _hpRegen: 0.75
+  _attackSpeed: 0.11
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

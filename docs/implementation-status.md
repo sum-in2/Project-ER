@@ -1,4 +1,4 @@
-## 구현 현황 (2026-06-09 기준)
+## 구현 현황 (2026-06-13 기준)
 
 ### 완료
 
@@ -7,6 +7,9 @@
 | 시스템 | 주요 파일 | 비고 |
 |---|---|---|
 | 데이터 레이어 | `Scripts/Data/*.cs` | ItemData(등급 포함), ItemDatabase, RecipeData, RecipeDatabase, 열거형 전체 |
+| 실험체 데이터 | `Scripts/Data/CharacterData.cs`, `CharacterDatabase.cs`, `CharacterArcheType.cs`, `WeaponRangeType.cs` | BSER API 기반 89개, 역할군/교전거리/무기군/전투스탯 |
+| 무기군 데이터 | `Scripts/Data/WeaponTypeInfoData.cs`, `WeaponTypeDatabase.cs` | BSER API 기반 23개, 무기군별 공속/사거리/상점필터 |
+| BSER 실험체 임포터 | `Scripts/Editor/BserCharacterImporter.cs` | Character/CharacterAttributes/WeaponTypeInfo/l10n_Korean_character JSON → SO 자동 생성 |
 | 아이템 등급 | `Scripts/Data/ItemGrade.cs`, `ItemGradeColorConfig.cs` | Common~Mythic, 색상 SO |
 | 인벤토리 시스템 | `Scripts/Inventory/InventorySystem.cs` | 가방 10슬롯 + 장비 5슬롯, 스택, 장착/해제, 이벤트 |
 | 크래프팅 시스템 | `Scripts/Crafting/CraftingSystem.cs` | 재료 검증, 차감, 환불, 제작 가능 레시피 조회 |
@@ -21,6 +24,7 @@
 | 스프라이트 연결 | `Scripts/Editor/BserSpriteLinker.cs` | 아이콘 자동 매핑 |
 | 아이템 데이터 | `ScriptableObjects/Items/BSER/` | BSER API 기반 786개 (무기/방어구/소비/재료) |
 | 레시피 데이터 | `ScriptableObjects/Recipes/BSER/` | 666개 |
+| 실험체/무기군 SO | `ScriptableObjects/Characters/BSER/`, `WeaponTypes/BSER/`, `CharacterDatabase.asset`, `WeaponTypeDatabase.asset` | 실험체 89개, 무기군 23개 |
 | 서버 네트워크 레이어 | `Server/ProjectER.Server/Network/` | TcpGameServer, ClientSession, PacketDispatcher, PacketBuilder |
 | 서버 로비 시스템 | `Server/ProjectER.Server/Lobby/` | LobbyRoom(18명), LobbyManager(동적 생성/삭제) |
 | 서버 패킷 정의 | `Server/ProjectER.Core/Packets/` | C2S_Connect/Move/MatchRequest/MatchCancel, S2C_Connected/MoveSync/MatchQueued/MatchCancelled/MatchFound |
@@ -28,6 +32,8 @@
 | 서버 매치메이킹 | `Server/ProjectER.Server/Matchmaking/` | MatchmakingConfig(MinPlayers/MaxPlayers), MatchmakingQueue, MatchmakingManager |
 | 클라이언트 네트워크 | `Scripts/Network/` | NetworkClient(매치메이킹 API 포함), MiniMsgPack, PacketSerializer, PacketBuilder, Dispatcher |
 | 접속/로비 씬 | `Scripts/Scene/`, `Assets/Scenes/` | ConnectSceneController, LobbySceneController(매치 찾기 버튼), 에디터 빌더 |
+| 실험체 초상화 | `Scripts/Data/CharacterData.cs`(PortraitFull/Half/Mini), `Scripts/Editor/BserCharacterSpriteLinker.cs` | Eternal Return Fankit 이미지 자동 연결 (88/89, CravER 제외) |
+| 캐릭터 선택 씬 (1차) | `Scripts/UI/Pick/*.cs`, `Scripts/Scene/PickSceneController.cs`, `Scripts/Editor/PickSceneBuilder.cs`, `Assets/Scenes/03_PickScene.unity` | 좌측 역할군 필터/이름순 정렬/검색 + 5열 그리드, 우측 선택 초상화 + 플레이어 슬롯 3칸 + 30초 타이머. 채팅/스킨 목록/멀티플레이어 연동은 보류 |
 
 ### 미구현 (다음 작업 대상)
 
@@ -42,6 +48,8 @@
 | GameRoom | 서버 | 틱 루프, 플레이어 위치 관리 |
 | 스탯 아이콘 | UI | 에셋 준비 후 StatDefs에 아이콘 슬롯 연결 |
 | 무기 세부 필터 | UI | 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 |
+| 픽 화면 - 채팅/스킨/루트 선택 | 핵심 | 채팅창, 스킨 목록(에셋 준비 후), 루트 선택 등 마무리(30초) 단계 → 시작 시 인게임 씬(04) 로딩 |
+| 픽 화면 - 멀티플레이어 연동 | 핵심 | 매칭된 다른 플레이어 정보를 플레이어 슬롯 2/3에 표시 (현재 로컬 1인만 슬롯 0에 표시) |
 | 몬스터 AI | 선택 | 순찰 → 어그로 → 추격 |
 | 미니맵 | 선택 | - |
 | 금지구역 | 선택 | - |

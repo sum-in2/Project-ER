@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_54
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 54
+  _name: Karla
+  _displayName: "\uCE7C\uB77C"
+  _portraitFull: {fileID: 21300000, guid: 004a3b355f8a1154da40f5af438f36e4, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: b4a301575471c734db638e34b8d52a9d, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 757100d7a3589a84cb20dc343d4c4399, type: 3}
+  _archeType1: 4
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 0f000000
+  _maxHp: 910
+  _attackPower: 34
+  _defense: 50
+  _hpRegen: 0.8
+  _attackSpeed: 0.03
+  _attackSpeedLimit: 1.1
+  _moveSpeed: 3.45
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

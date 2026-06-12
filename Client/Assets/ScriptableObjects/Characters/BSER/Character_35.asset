@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_35
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 35
+  _name: Jan
+  _displayName: "\uC580"
+  _portraitFull: {fileID: 21300000, guid: 34a1f9bb72d30544e85389bfb6e2eb89, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: f6ada82726ef5314f88359412d9d953d, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 487ecd08d11a61646bcbe4ef02fc96d2, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0b00000009000000
+  _maxHp: 1013
+  _attackPower: 37
+  _defense: 56
+  _hpRegen: 1.8
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

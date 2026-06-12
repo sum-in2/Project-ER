@@ -171,10 +171,11 @@ CraftingSystem:
 - MiniMsgPack: MessagePack 호환 최소 구현 (외부 라이브러리 불필요)
 
 씬 흐름:
-ConnectScene (0) → LoginScene (1) → LobbyScene (2) → GameScene
+00_ConnectScene → 01_LoginScene → 02_LobbyScene → 03_PickScene → 04_InGameScene
 - ConnectScene: IP/포트 입력, 접속 버튼, 상태 텍스트
 - LoginScene: 아이디/비밀번호 입력, 로그인/회원가입 버튼
 - LobbyScene: 매치 찾기 버튼, 연결 해제 버튼
+- PickScene (예정): 매치 성사 후 캐릭터 선택(30초) + 루트 선택 등 마무리(30초) 진행, 종료 시 InGameScene 로딩
 - NetworkClient 이벤트 구독은 OnEnable이 아닌 Start에서 수행 (Instance 보장)
 
 서버 실행:

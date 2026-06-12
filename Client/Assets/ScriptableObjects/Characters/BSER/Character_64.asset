@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_64
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 64
+  _name: Vanya
+  _displayName: "\uBC14\uB0D0"
+  _portraitFull: {fileID: 21300000, guid: dea46001f31f63a4fb395124894f1792, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: e8f69b33fb4e1494da9fc08739b7f083, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 46bcbaa35fb22de41b6c38e4ae17033e, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 17000000
+  _maxHp: 930
+  _attackPower: 30
+  _defense: 52
+  _hpRegen: 1.5
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

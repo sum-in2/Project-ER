@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_78
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 78
+  _name: Hisui
+  _displayName: "\uD788\uC2A4\uC774"
+  _portraitFull: {fileID: 21300000, guid: cca728716d9319f4fae6d389142e4926, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 10bd69c6f2160da4cb8c43cbe40c64df, type: 3}
+  _portraitMini: {fileID: 21300000, guid: d49d2f806aa8a5749b873365f582881b, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 02000000
+  _maxHp: 980
+  _attackPower: 25
+  _defense: 54
+  _hpRegen: 1.02
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 999
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

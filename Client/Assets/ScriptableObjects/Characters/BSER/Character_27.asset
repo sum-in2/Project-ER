@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_27
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 27
+  _name: Alex
+  _displayName: "\uC54C\uB809\uC2A4"
+  _portraitFull: {fileID: 21300000, guid: 6b7bc46eb229c7a479f9a3498a9b0c14, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: fcbb1dda7b9195d4d9564c3b2035d995, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 6177e9f2a48ef1c408a75795b5d676f7, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 2
+  _weaponMasteries: 09000000020000001400000010000000
+  _maxHp: 950
+  _attackPower: 28
+  _defense: 49
+  _hpRegen: 0.75
+  _attackSpeed: 0.14
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.45
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

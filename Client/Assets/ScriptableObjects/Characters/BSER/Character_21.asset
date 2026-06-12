@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_21
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 21
+  _name: Rozzi
+  _displayName: "\uB85C\uC9C0"
+  _portraitFull: {fileID: 21300000, guid: 478f1197fe7e9b340bed5e401a649c63, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 6411436c4a561ac4893cbb033ce78cd1, type: 3}
+  _portraitMini: {fileID: 21300000, guid: e35ec66326895ca4ca6b511540611913, type: 3}
+  _archeType1: 4
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 10000000
+  _maxHp: 910
+  _attackPower: 32
+  _defense: 50
+  _hpRegen: 0.6
+  _attackSpeed: 0.11
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

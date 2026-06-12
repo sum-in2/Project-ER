@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_51
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 51
+  _name: Priya
+  _displayName: "\uD504\uB9AC\uC57C"
+  _portraitFull: {fileID: 21300000, guid: 953c9a7df18c5ce4bbfdf2c812d7c84a, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 4a2296585ee63ce4e8d023395d6035ad, type: 3}
+  _portraitMini: {fileID: 21300000, guid: d2e2eab7ba1dcec418991ceb2aa6ecbb, type: 3}
+  _archeType1: 6
+  _archeType2: 5
+  _weaponRangeType: 1
+  _weaponMasteries: 15000000
+  _maxHp: 915
+  _attackPower: 40
+  _defense: 55
+  _hpRegen: 0.8
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

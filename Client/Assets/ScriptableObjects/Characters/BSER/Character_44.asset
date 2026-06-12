@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_44
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 44
+  _name: Echion
+  _displayName: "\uC5D0\uD0A4\uC628"
+  _portraitFull: {fileID: 21300000, guid: daf9c84303be4004e98a67f4729c4ee5, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 7ce83fa3f2dced14a890dc0242356b1c, type: 3}
+  _portraitMini: {fileID: 21300000, guid: cecf937ed5f61e44da9b2f6649bf8ee2, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0d000000
+  _maxHp: 955
+  _attackPower: 35
+  _defense: 50
+  _hpRegen: 1.13
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

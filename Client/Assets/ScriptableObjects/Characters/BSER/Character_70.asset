@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_70
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 70
+  _name: Tsubame
+  _displayName: "\uCE20\uBC14\uBA54"
+  _portraitFull: {fileID: 21300000, guid: ce07471a4572e1243a6ce0ebf008d7ea, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 0ec51d471b715ce41974a06cac9993c2, type: 3}
+  _portraitMini: {fileID: 21300000, guid: a63cfda75c6174443aaed031da8f4593, type: 3}
+  _archeType1: 4
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 14000000
+  _maxHp: 940
+  _attackPower: 32
+  _defense: 50
+  _hpRegen: 0.75
+  _attackSpeed: 0.14
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

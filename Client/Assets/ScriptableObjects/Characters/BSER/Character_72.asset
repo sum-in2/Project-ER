@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_72
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 72
+  _name: Katja
+  _displayName: "\uCE74\uD2F0\uC57C"
+  _portraitFull: {fileID: 21300000, guid: b0d2755a0fb0ca74bb8a6817dab3347b, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 1031ceb31a6f5ff4394ef3fc0eb43f36, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 977a013105ea5cd49af547c21f902a6f, type: 3}
+  _archeType1: 4
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 12000000
+  _maxHp: 890
+  _attackPower: 36
+  _defense: 52
+  _hpRegen: 1.2
+  _attackSpeed: 0.13
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

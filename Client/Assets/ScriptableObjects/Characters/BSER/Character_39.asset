@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_39
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 39
+  _name: Camilo
+  _displayName: "\uCE74\uBC00\uB85C"
+  _portraitFull: {fileID: 21300000, guid: 79f9a125c2f6edf45baf1f916b3a5791, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 4e2bb03101a621c4fa03b6baf1b0499e, type: 3}
+  _portraitMini: {fileID: 21300000, guid: a4d2c44da41bb014dba0ba91afab62f8, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0300000004000000
+  _maxHp: 980
+  _attackPower: 31
+  _defense: 51
+  _hpRegen: 2.25
+  _attackSpeed: 0.11
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

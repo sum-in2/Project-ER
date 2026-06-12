@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_10
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 10
+  _name: LiDailin
+  _displayName: "\uB9AC \uB2E4\uC774\uB9B0"
+  _portraitFull: {fileID: 21300000, guid: 8e6d8be3452b2b249a5f849e6955fb45, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: f1c702bfeed9ad34bb7772d3ac2824db, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 354ab64ee8881c74fbe49303b194a358, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 0b00000008000000
+  _maxHp: 970
+  _attackPower: 27
+  _defense: 54
+  _hpRegen: 2.48
+  _attackSpeed: 0.15
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

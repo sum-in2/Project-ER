@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_1
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 1
+  _name: Jackie
+  _displayName: "\uC7AC\uD0A4"
+  _portraitFull: {fileID: 21300000, guid: aae83201e317cc54ea2e6caa7bc537fd, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 86fed4cbd64a4fa4cabef2eddc6a700a, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 1ded41ba652ee8d45b0d56834742677a, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 01000000020000000600000003000000
+  _maxHp: 940
+  _attackPower: 36
+  _defense: 50
+  _hpRegen: 1.28
+  _attackSpeed: 0.1
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

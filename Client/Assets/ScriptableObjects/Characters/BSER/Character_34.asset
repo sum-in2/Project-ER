@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_34
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 34
+  _name: Nathapon
+  _displayName: "\uB098\uD0C0\uD3F0"
+  _portraitFull: {fileID: 21300000, guid: 59351533a8e7a4a40b1ca8fc1c8d3007, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: cc38d950da561374a8336881825558a3, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 1b26cb5cb0cbd3549b809d09e5a9433f, type: 3}
+  _archeType1: 5
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 16000000
+  _maxHp: 905
+  _attackPower: 35
+  _defense: 53
+  _hpRegen: 0.9
+  _attackSpeed: 0.11
+  _attackSpeedLimit: 0.66
+  _moveSpeed: 3.55
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

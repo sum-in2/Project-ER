@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_12
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 12
+  _name: Hyejin
+  _displayName: "\uD61C\uC9C4"
+  _portraitFull: {fileID: 21300000, guid: cde75dbc54d14dc4fb233cd578c710f1, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 023262ff79839a54985efb7cd903a8e6, type: 3}
+  _portraitMini: {fileID: 21300000, guid: 6ec770f94b41957488e585d851fb777a, type: 3}
+  _archeType1: 5
+  _archeType2: 0
+  _weaponRangeType: 1
+  _weaponMasteries: 0e00000014000000
+  _maxHp: 940
+  _attackPower: 30
+  _defense: 51
+  _hpRegen: 1.2
+  _attackSpeed: 0.08
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.5
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0

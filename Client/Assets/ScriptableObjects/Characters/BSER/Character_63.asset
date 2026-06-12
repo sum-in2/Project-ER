@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1d0a1e6ced494cb5b09c9066bf6f1, type: 3}
+  m_Name: Character_63
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.CharacterData
+  _bserCode: 63
+  _name: Lyanh
+  _displayName: "\uC774\uC548"
+  _portraitFull: {fileID: 21300000, guid: 5ab64bbaf18e7a84aa2fca5113658a38, type: 3}
+  _portraitHalf: {fileID: 21300000, guid: 5465d309ff305d749afa34074e1bc713, type: 3}
+  _portraitMini: {fileID: 21300000, guid: b555fb4137b1d0c44bc69830e4009ebd, type: 3}
+  _archeType1: 1
+  _archeType2: 0
+  _weaponRangeType: 0
+  _weaponMasteries: 01000000
+  _maxHp: 970
+  _attackPower: 38
+  _defense: 52
+  _hpRegen: 1.02
+  _attackSpeed: 0.12
+  _attackSpeedLimit: 2.5
+  _moveSpeed: 3.6
+  _sightRange: 8.5
+  _skillAmp: 0
+  _adaptiveForce: 0
+  _criticalStrikeChance: 0
