@@ -56,6 +56,16 @@ namespace ProjectER.Network
             buf.Add(value ? (byte)0xc3 : (byte)0xc2);
         }
 
+        /// <summary>float32 (고정 4바이트, 빅엔디안 - MessagePack 표준)</summary>
+        public static void WriteFloat(List<byte> buf, float value)
+        {
+            buf.Add(0xca); // float32 포맷 코드
+            byte[] bytes = BitConverter.GetBytes(value); // ⚠️ GC 주의
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            buf.AddRange(bytes);
+        }
+
         // ── 읽기 ──────────────────────────────────────────────────
         /// <summary>fixarray 헤더 읽기. 반환값: 요소 수</summary>
         public static int ReadArrayHeader(byte[] data, ref int offset)
@@ -115,6 +125,21 @@ namespace ProjectER.Network
             if (b == 0xc3) return true;
             if (b == 0xc2) return false;
             throw new Exception($"bool 헤더 예상, 실제: 0x{b:X2}");
+        }
+
+        /// <summary>float32 읽기</summary>
+        public static float ReadFloat(byte[] data, ref int offset)
+        {
+            byte b = data[offset++];
+            if (b != 0xca)
+                throw new Exception($"float 헤더 예상, 실제: 0x{b:X2}");
+
+            byte[] bytes = new byte[4]; // ⚠️ GC 주의
+            Array.Copy(data, offset, bytes, 0, 4);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            offset += 4;
+            return BitConverter.ToSingle(bytes, 0);
         }
     }
 }

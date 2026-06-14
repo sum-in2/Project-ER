@@ -273,6 +273,10 @@ namespace ProjectER.Editor
             for (int i = 0; i < PlayerSlotCount; i++)
                 playerSlots[i] = BuildPlayerSlot(playerSlotsRow.transform, $"PlayerSlot_{i}");
 
+            // ── 우측: 테스트 버튼 (인게임 씬 즉시 진입) ─────────
+            GameObject testInGameButton = CreateButton(rightPanel.transform, "TestInGameButton", "테스트: 인게임 진입");
+            AddLayoutElement(testInGameButton, preferredHeight: 40, flexibleHeight: 0);
+
             // ── 컴포넌트 연결 ──────────────────────────────────
             CharacterFilterPanelUI filterPanel = leftPanel.AddComponent<CharacterFilterPanelUI>();
             SerializedObject filterSo = new(filterPanel);
@@ -313,6 +317,7 @@ namespace ProjectER.Editor
             controllerSo.FindProperty("_filterPanel").objectReferenceValue   = filterPanel;
             controllerSo.FindProperty("_selectedPanel").objectReferenceValue = selectedPanelUI;
             controllerSo.FindProperty("_timer").objectReferenceValue        = timer;
+            controllerSo.FindProperty("_testInGameButton").objectReferenceValue = testInGameButton.GetComponent<Button>();
             SerializedProperty playerSlotsProp = controllerSo.FindProperty("_playerSlots");
             playerSlotsProp.arraySize = playerSlots.Length;
             for (int i = 0; i < playerSlots.Length; i++)

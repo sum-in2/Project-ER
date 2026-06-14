@@ -20,7 +20,8 @@ namespace ProjectER.Scene
         [SerializeField] private TMP_Text       _statusText;
 
         // ── 상수 ─────────────────────────────────────────────────
-        private const string SceneLobby = "LobbyScene";
+        private const string SceneLobby   = "02_LobbyScene";
+        private const string SceneConnect = "00_ConnectScene";
 
         // ── 생명주기 ─────────────────────────────────────────────
         private void Start()
@@ -105,7 +106,7 @@ namespace ProjectER.Scene
         private void HandleDisconnected()
         {
             Debug.Log("[LoginScene] 서버 연결 끊김");
-            SceneManager.LoadScene("ConnectScene");
+            SceneManager.LoadScene(SceneConnect);
         }
 
         // ── 내부 유틸 ─────────────────────────────────────────────

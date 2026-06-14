@@ -6,6 +6,7 @@ using ProjectER.Server.Handlers;
 using ProjectER.Server.Lobby;
 using ProjectER.Server.Matchmaking;
 using ProjectER.Server.Network;
+using ProjectER.Server.Pick;
 
 namespace ProjectER.Server
 {
@@ -27,28 +28,32 @@ namespace ProjectER.Server
             LobbyManager     lobbyManager   = new(RoomCapacity);
             PacketDispatcher dispatcher     = new();
 
+            PickManager pickManager = new();
+
             MatchmakingConfig matchConfig   = new()
             {
                 MinPlayers = 1,  // 테스트: 1명만 있어도 매치 성사
                 MaxPlayers = 18,
             };
-            MatchmakingManager matchmaking  = new(matchConfig);
+            MatchmakingManager matchmaking  = new(matchConfig, pickManager);
 
             // 핸들러 등록
             new ConnectHandler(lobbyManager).Register(dispatcher);
             MoveHandler.Register(dispatcher);
             new MatchRequestHandler(matchmaking).Register(dispatcher);
             new LoginHandler(accountRepo).Register(dispatcher);
+            new PickHandler(pickManager).Register(dispatcher);
             // TODO: AttackHandler.Register(dispatcher);
 
             // 서버 시작
             TcpGameServer server = new(Port, dispatcher);
 
-            // 세션 해제 시 로비 + 매치메이킹 큐에서도 제거
+            // 세션 해제 시 로비 + 매치메이킹 큐 + 픽 단계에서도 제거
             server.OnSessionDisconnected += session =>
             {
                 lobbyManager.Release(session);
                 matchmaking.ReleaseSession(session);
+                pickManager.ReleaseSession(session);
             };
 
             using CancellationTokenSource cts = new();

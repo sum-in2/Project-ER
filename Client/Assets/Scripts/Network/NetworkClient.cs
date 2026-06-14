@@ -20,6 +20,11 @@ namespace ProjectER.Network
         // ── 서버 버전 ─────────────────────────────────────────────
         private const string ClientVersion = "0.1.0";
 
+        // ── 픽 단계 제한시간 동기화 ──────────────────────────────
+        private const float DefaultPickDuration = 30f;
+        private float _pickPhaseDuration = -1f;
+        private float _pickPhaseStartRealtime;
+
         // ── 상태 ─────────────────────────────────────────────────
         public bool IsConnected   { get; private set; }
         public bool IsMatchmaking { get; private set; }
@@ -35,6 +40,21 @@ namespace ProjectER.Network
         public event Action<int>      OnMatchQueued;    // 인수: 큐 순서(1-based)
         public event Action           OnMatchCancelled;
         public event Action<int, int> OnMatchFound;     // 인수: matchId, playerCount
+
+        public event Action           OnPickDodged;     // 픽 제한시간 내 미선택자 존재 → 매치 취소
+
+        /// <summary>픽 1단계(실험체 선택) 남은 시간(초). 서버가 보낸 시작 시각/제한시간 기준으로 계산.</summary>
+        public float PickPhaseRemainingSeconds
+        {
+            get
+            {
+                if (_pickPhaseDuration < 0f)
+                    return DefaultPickDuration;
+
+                float elapsed = Time.realtimeSinceStartup - _pickPhaseStartRealtime;
+                return Mathf.Max(0f, _pickPhaseDuration - elapsed);
+            }
+        }
 
         public event Action           OnRegisterSuccess;
         public event Action<string>   OnRegisterFailed;
@@ -184,6 +204,19 @@ namespace ProjectER.Network
             Send(data);
         }
 
+        // ── 픽 API ────────────────────────────────────────────────
+        /// <summary>픽 화면 실험체 선택 요청.</summary>
+        public void SelectCharacter(int characterId)
+        {
+            if (!IsConnected)
+                return;
+
+            C2SSelectCharacterPacket packet = new() { CharacterId = characterId };
+            byte[] body = PacketSerializer.Serialize(packet);
+            byte[] data = PacketBuilder.Build(PacketType.C2S_SelectCharacter, body);
+            Send(data);
+        }
+
         // ── 내부: 접속 패킷 전송 ─────────────────────────────────
         private void SendConnectPacket()
         {
@@ -261,6 +294,9 @@ namespace ProjectER.Network
 
             _dispatcher.Register(PacketType.S2C_RegisterResult, HandleRegisterResult);
             _dispatcher.Register(PacketType.S2C_LoginResult,    HandleLoginResult);
+
+            _dispatcher.Register(PacketType.S2C_PickDodged, HandlePickDodged);
+            _dispatcher.Register(PacketType.S2C_PickStarted, HandlePickStarted);
         }
 
         private void HandleConnected(byte[] body)
@@ -336,6 +372,21 @@ namespace ProjectER.Network
                 Debug.LogWarning($"[NetworkClient] 로그인 실패: {response.RejectReason}");
                 OnLoginFailed?.Invoke(response.RejectReason);
             }
+        }
+
+        private void HandlePickDodged(byte[] body)
+        {
+            _ = PacketSerializer.DeserializePickDodged(body);
+            Debug.Log("[NetworkClient] 픽 제한시간 내 미선택자 존재 → 매치 취소");
+            OnPickDodged?.Invoke();
+        }
+
+        private void HandlePickStarted(byte[] body)
+        {
+            S2CPickStartedPacket response = PacketSerializer.DeserializePickStarted(body);
+            _pickPhaseDuration      = response.DurationSeconds;
+            _pickPhaseStartRealtime = Time.realtimeSinceStartup;
+            Debug.Log($"[NetworkClient] 픽 단계 시작 (제한시간: {response.DurationSeconds}초)");
         }
     }
 }

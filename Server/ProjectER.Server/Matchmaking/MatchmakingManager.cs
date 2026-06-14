@@ -4,6 +4,7 @@ using System.Threading;
 using ProjectER.Core.Packets;
 using ProjectER.Core.Packets.S2C;
 using ProjectER.Server.Network;
+using ProjectER.Server.Pick;
 
 namespace ProjectER.Server.Matchmaking
 {
@@ -14,12 +15,14 @@ namespace ProjectER.Server.Matchmaking
     public class MatchmakingManager
     {
         private readonly MatchmakingConfig _config;
+        private readonly PickManager _pickManager;
         private readonly MatchmakingQueue _queue = new();
         private int _nextMatchId;
 
-        public MatchmakingManager(MatchmakingConfig config)
+        public MatchmakingManager(MatchmakingConfig config, PickManager pickManager)
         {
             _config = config;
+            _pickManager = pickManager;
         }
 
         // ── 큐 진입 ──────────────────────────────────────────────
@@ -83,6 +86,8 @@ namespace ProjectER.Server.Matchmaking
 
             foreach (ClientSession session in matched)
                 SendMatchFound(session, matchId, matched.Count);
+
+            _pickManager.CreateSession(matchId, matched);
         }
 
         // ── 패킷 송신 ─────────────────────────────────────────────

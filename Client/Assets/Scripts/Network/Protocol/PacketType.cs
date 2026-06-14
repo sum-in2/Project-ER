@@ -32,5 +32,10 @@ namespace ProjectER.Network.Protocol
         S2C_RegisterResult = 501,
         C2S_Login          = 502,
         S2C_LoginResult    = 503,
+
+        // ── 픽 ────────────────────────────────
+        C2S_SelectCharacter = 600,
+        S2C_PickDodged      = 601,
+        S2C_PickStarted     = 602,
     }
 }

@@ -50,6 +50,14 @@ namespace ProjectER.Network
             return buf.ToArray();
         }
 
+        public static byte[] Serialize(C2SSelectCharacterPacket packet)
+        {
+            List<byte> buf = new List<byte>(); // ⚠️ GC 주의
+            MiniMsgPack.WriteArrayHeader(buf, 1);
+            MiniMsgPack.WriteInt32(buf, packet.CharacterId);
+            return buf.ToArray();
+        }
+
         // ── 역직렬화 (서버 → 클라이언트) ────────────────────────
         public static S2CConnectedPacket DeserializeConnected(byte[] data)
         {
@@ -111,6 +119,23 @@ namespace ProjectER.Network
                 Success      = MiniMsgPack.ReadBool(data, ref offset),
                 AccountId    = MiniMsgPack.ReadInt32(data, ref offset),
                 RejectReason = MiniMsgPack.ReadString(data, ref offset),
+            };
+        }
+
+        public static S2CPickDodgedPacket DeserializePickDodged(byte[] data)
+        {
+            int offset = 0;
+            MiniMsgPack.ReadArrayHeader(data, ref offset);
+            return new S2CPickDodgedPacket();
+        }
+
+        public static S2CPickStartedPacket DeserializePickStarted(byte[] data)
+        {
+            int offset = 0;
+            MiniMsgPack.ReadArrayHeader(data, ref offset);
+            return new S2CPickStartedPacket
+            {
+                DurationSeconds = MiniMsgPack.ReadFloat(data, ref offset),
             };
         }
     }

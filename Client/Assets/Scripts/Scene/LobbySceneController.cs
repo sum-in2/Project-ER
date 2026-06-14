@@ -22,7 +22,8 @@ namespace ProjectER.Scene
         [SerializeField] private LobbyUIManager _lobbyUIManager;
 
         // ── 상수 ─────────────────────────────────────────────────
-        private const string SceneConnect = "ConnectScene";
+        private const string SceneConnect = "00_ConnectScene";
+        private const string ScenePick    = "03_PickScene";
 
         // ── 생명주기 ─────────────────────────────────────────────
         private void Start()
@@ -109,7 +110,7 @@ namespace ProjectER.Scene
         {
             _matchStatusText.text = $"매치 성사! (매치 #{matchId}, {playerCount}명)";
             RefreshMatchButton();
-            // TODO: GameScene 전환
+            SceneManager.LoadScene(ScenePick);
         }
 
         // ── 내부 유틸 ─────────────────────────────────────────────

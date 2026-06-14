@@ -22,7 +22,7 @@ namespace ProjectER.Scene
         // ── 상수 ─────────────────────────────────────────────────
         private const string DefaultHost   = "127.0.0.1";
         private const string DefaultPort   = "7777";
-        private const string SceneLogin    = "LoginScene";
+        private const string SceneLogin    = "01_LoginScene";
 
         // ── 생명주기 ─────────────────────────────────────────────
         private void Start()

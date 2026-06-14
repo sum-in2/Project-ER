@@ -18,10 +18,13 @@ namespace ProjectER.UI.Pick
 
         public event Action OnTimeExpired;
 
-        /// <summary>카운트다운 시작 (재시작 가능)</summary>
-        public void StartTimer()
+        /// <summary>카운트다운 시작 (재시작 가능, 기본 제한시간 사용)</summary>
+        public void StartTimer() => StartTimer(_duration);
+
+        /// <summary>카운트다운 시작 (재시작 가능, 서버 동기화 등으로 받은 남은 시간 사용)</summary>
+        public void StartTimer(float remainingSeconds)
         {
-            _remaining            = _duration;
+            _remaining            = Mathf.Max(0f, remainingSeconds);
             _running              = true;
             _lastDisplayedSeconds = -1;
             UpdateDisplay();

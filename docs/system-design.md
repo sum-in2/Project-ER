@@ -197,6 +197,75 @@ cd Server && dotnet run --project ProjectER.Server
 서로 어긋나는(diverge) 것을 방지 (동시성/정합성 문제)
 ```
 
+### 픽 화면 진행 흐름
+
+```
+픽 씬(03_PickScene)은 매치 성사 후 60초(30초 x 2단계)로 진행:
+
+1단계 (0~30초, 구현됨): 실험체 선택
+- CharacterGridUI에서 실험체 선택 → C2S_SelectCharacter 전송 (CharacterId = CharacterData.BserCode)
+  - 재선택 시마다 갱신 전송 (서버는 마지막 선택값으로 덮어씀)
+- 서버 PickManager/PickSession이 매치별 선택 상태와 30초 타이머를 관리
+- 타이머 종료 시:
+  - 전원 선택 완료 → 2단계로 진행 (TODO)
+  - 미선택자 존재 → 매치 전체 닷지: S2C_PickDodged를 참가자 전원에게 브로드캐스트
+    → 클라이언트는 02_LobbyScene으로 복귀
+- 연결 해제로 픽 단계 중 이탈하는 세션이 있어도 동일하게 매치 전체 닷지 처리
+
+2단계 (30~60초, TODO): 루트/전술스킬/스킨 선택
+- 1단계의 CharacterGridUI 자리에 루트 선택 UI 배치 (TargetItemPanelUI 재사용 검토)
+- 전술스킬(F)은 TacticalSkillSet.json 기반, 스킨은 미구현 → 더미/스킵 처리
+- 60초 종료 시 서버가 전원의 선택 정보를 모아 InGameScene 진입 트리거 (S2C_GameStart류, TODO)
+
+인게임 진입 전 서버에 저장되는 데이터:
+- 실험체 ID (구현됨, PickSession._selections)
+- 루트(목표 장비 5종) / 전술스킬 ID / 스킨 ID (TODO, 2단계에서 추가)
+
+서버 구조:
+- PickManager: 매치별 PickSession 생성/조회, sessionId → PickSession 매핑
+- PickSession: 참가자 목록, 선택 상태(Dictionary<sessionId, characterId>), 30초 단발 Timer
+- 향후 GameRoom(틱 루프, 게임 상태 관리)으로 확장될 수 있는 최소 단위
+
+시간 흐름(타이머)은 서버가 관리:
+- PickSession 생성 시 참가자 전원에게 S2C_PickStarted(DurationSeconds) 브로드캐스트
+- 클라이언트는 패킷 수신 시각(Time.realtimeSinceStartup)을 기준으로 남은 시간을 계산해
+  PickTimerUI에 표시 (NetworkClient.PickPhaseRemainingSeconds)
+- 닷지/타임아웃 판정은 클라이언트 타이머와 무관하게 서버 PickSession의 Timer가 단독으로 수행
+  → 클라이언트 타이머는 표시(UX) 용도일 뿐, 실제 제한시간 기준은 항상 서버
+
+테스트용 인게임 진입:
+- 우측 패널 "테스트: 인게임 진입" 버튼 → 02단계/서버 트리거 없이 04_InGameScene으로 즉시 전환
+- 2단계(루트 선택) 및 S2C_GameStart 구현 전까지 인게임 씬 작업을 위한 임시 진입점
+```
+
+### 서버 검증 설계 원칙 (안티치트)
+
+```
+서버를 두는 이유 = 클라이언트를 신뢰하지 않기 위함.
+패킷 후킹/조작으로 클라이언트가 무엇을 보내든, 서버는 자체 데이터/상태를 기준으로
+다시 검증해야 한다. "클라가 보낸 값이니 맞겠지"라고 가정하는 코드는 작성하지 않는다.
+
+적용된 예 (픽 1단계):
+- 인증 검증: PickHandler.HandleSelectCharacter에서 session.AccountId == null이면 거부
+  (로그인 안 된 세션의 요청 차단 — MatchRequestHandler와 동일 패턴)
+- 데이터 검증: PickManager.HandleSelectCharacter에서 CharacterId가
+  CharacterCatalog.ValidCharacterIds(Server/ProjectER.Core/Data/CharacterCatalog.cs,
+  Character.json의 code 1~89 기준)에 없으면 무시
+  → 패킷 조작으로 존재하지 않는 실험체 ID를 보내도 서버 상태에 반영되지 않음
+
+향후 시스템에도 동일 원칙 적용 (TODO):
+- 이동: 클라이언트가 보낸 좌표/속도가 NavMesh·CharacterData의 이동속도 범위를 벗어나면 거부
+  (이동속도 핵, 텔레포트 핵 방지)
+- 전투: 데미지 계산은 서버가 CharacterData/ItemData 스탯으로 직접 계산,
+  클라이언트가 보낸 데미지 값은 신뢰하지 않음 (데미지 조작 방지)
+- 인벤토리/루트: 아이템 획득·장착·루트 구성은 서버가 보유한 ItemDatabase/RecipeDatabase
+  기준으로 재검증 (인벤토리 조작 방지). "매칭 중 데이터 잠금 규칙" 섹션과 함께 적용
+
+검증 실패 시 공통 처리:
+- 패킷을 조용히 무시 + Console.WriteLine으로 거부 로그 남김 (연결 차단 등 과한 처벌은 보류)
+- 클라이언트에는 별도 에러 응답을 보내지 않음 (정상 클라이언트는 발생할 일이 없는 케이스)
+```
+
 ### 에디터 씬 빌더 (NetworkSceneBuilder)
 
 ```

@@ -27,13 +27,14 @@
 | 실험체/무기군 SO | `ScriptableObjects/Characters/BSER/`, `WeaponTypes/BSER/`, `CharacterDatabase.asset`, `WeaponTypeDatabase.asset` | 실험체 89개, 무기군 23개 |
 | 서버 네트워크 레이어 | `Server/ProjectER.Server/Network/` | TcpGameServer, ClientSession, PacketDispatcher, PacketBuilder |
 | 서버 로비 시스템 | `Server/ProjectER.Server/Lobby/` | LobbyRoom(18명), LobbyManager(동적 생성/삭제) |
-| 서버 패킷 정의 | `Server/ProjectER.Core/Packets/` | C2S_Connect/Move/MatchRequest/MatchCancel, S2C_Connected/MoveSync/MatchQueued/MatchCancelled/MatchFound |
-| 서버 핸들러 | `Server/ProjectER.Server/Handlers/` | ConnectHandler(버전 검증, 로비 배정), MoveHandler(stub), MatchRequestHandler |
+| 서버 패킷 정의 | `Server/ProjectER.Core/Packets/` | C2S_Connect/Move/MatchRequest/MatchCancel/SelectCharacter, S2C_Connected/MoveSync/MatchQueued/MatchCancelled/MatchFound/PickDodged/PickStarted |
+| 서버 핸들러 | `Server/ProjectER.Server/Handlers/` | ConnectHandler(버전 검증, 로비 배정), MoveHandler(stub), MatchRequestHandler, PickHandler |
 | 서버 매치메이킹 | `Server/ProjectER.Server/Matchmaking/` | MatchmakingConfig(MinPlayers/MaxPlayers), MatchmakingQueue, MatchmakingManager |
-| 클라이언트 네트워크 | `Scripts/Network/` | NetworkClient(매치메이킹 API 포함), MiniMsgPack, PacketSerializer, PacketBuilder, Dispatcher |
+| 서버 픽 단계 (1단계) | `Server/ProjectER.Server/Pick/` | PickManager(매치별 PickSession 관리), PickSession(30초 타이머, 선택 상태). 세션 생성 시 S2C_PickStarted(제한시간) 브로드캐스트, 미선택자 존재 시 S2C_PickDodged 전체 브로드캐스트 |
+| 클라이언트 네트워크 | `Scripts/Network/` | NetworkClient(매치메이킹/픽 API 포함, PickPhaseRemainingSeconds로 서버 동기화 타이머 계산), MiniMsgPack(float 지원), PacketSerializer, PacketBuilder, Dispatcher |
 | 접속/로비 씬 | `Scripts/Scene/`, `Assets/Scenes/` | ConnectSceneController, LobbySceneController(매치 찾기 버튼), 에디터 빌더 |
 | 실험체 초상화 | `Scripts/Data/CharacterData.cs`(PortraitFull/Half/Mini), `Scripts/Editor/BserCharacterSpriteLinker.cs` | Eternal Return Fankit 이미지 자동 연결 (88/89, CravER 제외) |
-| 캐릭터 선택 씬 (1차) | `Scripts/UI/Pick/*.cs`, `Scripts/Scene/PickSceneController.cs`, `Scripts/Editor/PickSceneBuilder.cs`, `Assets/Scenes/03_PickScene.unity` | 좌측 역할군 필터/이름순 정렬/검색 + 5열 그리드, 우측 선택 초상화 + 플레이어 슬롯 3칸 + 30초 타이머. 채팅/스킨 목록/멀티플레이어 연동은 보류 |
+| 캐릭터 선택 씬 (1차) | `Scripts/UI/Pick/*.cs`, `Scripts/Scene/PickSceneController.cs`, `Scripts/Editor/PickSceneBuilder.cs`, `Assets/Scenes/03_PickScene.unity` | 좌측 역할군 필터/이름순 정렬/검색 + 5열 그리드, 우측 선택 초상화 + 플레이어 슬롯 3칸 + 서버 동기화 타이머. 선택 시 서버 전송(C2S_SelectCharacter), 미선택 닷지 시 로비 복귀(S2C_PickDodged), 타이머는 S2C_PickStarted 기준. 테스트용 인게임 진입 버튼 포함. 채팅/스킨 목록/멀티플레이어 연동은 보류 |
 
 ### 미구현 (다음 작업 대상)
 

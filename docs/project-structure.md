@@ -46,8 +46,11 @@ Project-ER/                           ← 모노레포 루트
 │   │   │   │   │   ├── PacketType.cs         ← 패킷 식별자 (서버 Core와 값 일치 유지)
 │   │   │   │   │   ├── PacketHeader.cs       ← 헤더 상수 (Size = 4)
 │   │   │   │   │   ├── C2SConnectPacket.cs
-│   │   │   │   │   └── S2CConnectedPacket.cs
-│   │   │   │   ├── MiniMsgPack.cs            ← MessagePack 호환 최소 구현
+│   │   │   │   │   ├── S2CConnectedPacket.cs
+│   │   │   │   │   ├── C2SSelectCharacterPacket.cs ← 픽 화면 실험체 선택
+│   │   │   │   │   ├── S2CPickDodgedPacket.cs      ← 픽 닷지로 매치 취소
+│   │   │   │   │   └── S2CPickStartedPacket.cs     ← 픽 단계 시작 (제한시간 동기화)
+│   │   │   │   ├── MiniMsgPack.cs            ← MessagePack 호환 최소 구현 (float 포함)
 │   │   │   │   ├── PacketSerializer.cs       ← 패킷별 직렬화/역직렬화
 │   │   │   │   ├── PacketBuilder.cs          ← [헤더+바디] 조립
 │   │   │   │   ├── ClientPacketDispatcher.cs ← 패킷 타입별 핸들러 라우팅
@@ -94,28 +97,37 @@ Project-ER/                           ← 모노레포 루트
 └── Server/                           ← C# .NET 9.0 게임 서버
     ├── ProjectER.sln
     ├── ProjectER.Core/               ← netstandard2.1 (패킷 정의, 공유 가능)
+    │   ├── Data/
+    │   │   └── CharacterCatalog.cs   ← 유효한 실험체 ID 목록 (서버 검증용, Character.json code 1~89)
     │   └── Packets/
     │       ├── PacketType.cs
     │       ├── PacketHeader.cs
     │       ├── C2S/
     │       │   ├── C2SConnectPacket.cs
-    │       │   └── C2SMovePacket.cs
+    │       │   ├── C2SMovePacket.cs
+    │       │   └── C2SSelectCharacterPacket.cs ← 픽 화면 실험체 선택
     │       └── S2C/
     │           ├── S2CConnectedPacket.cs
-    │           └── S2CMoveSyncPacket.cs
+    │           ├── S2CMoveSyncPacket.cs
+    │           ├── S2CPickDodgedPacket.cs      ← 픽 닷지로 매치 취소
+    │           └── S2CPickStartedPacket.cs     ← 픽 단계 시작 (제한시간 동기화)
     ├── ProjectER.Server/             ← net9.0 서버 실행 프로젝트
     │   ├── Program.cs
     │   ├── Handlers/
     │   │   ├── ConnectHandler.cs     ← C2S_Connect 처리, 버전 검증, 로비 배정
     │   │   ├── MoveHandler.cs        ← C2S_Move 처리 (TODO: GameRoom 연동)
-    │   │   └── MatchRequestHandler.cs ← C2S_MatchRequest/Cancel 처리
+    │   │   ├── MatchRequestHandler.cs ← C2S_MatchRequest/Cancel 처리
+    │   │   └── PickHandler.cs        ← C2S_SelectCharacter 처리
     │   ├── Lobby/
     │   │   ├── LobbyRoom.cs          ← 세션 그룹 (최대 18명)
     │   │   └── LobbyManager.cs       ← 동적 생성/삭제, 세션 배정
     │   ├── Matchmaking/
     │   │   ├── MatchmakingConfig.cs  ← MinPlayers/MaxPlayers 설정
     │   │   ├── MatchmakingQueue.cs   ← 스레드 안전 대기 큐
-    │   │   └── MatchmakingManager.cs ← 큐 관리, 매치 성사, 연결 해제 정리
+    │   │   └── MatchmakingManager.cs ← 큐 관리, 매치 성사, 연결 해제 정리, PickManager.CreateSession 호출
+    │   ├── Pick/
+    │   │   ├── PickSession.cs        ← 매치 1개의 픽 단계 (참가자/선택 상태/30초 타이머)
+    │   │   └── PickManager.cs        ← 매치별 PickSession 관리, 닷지 판정
     │   └── Network/
     │       ├── TcpGameServer.cs      ← 연결 수락, 세션 생명주기
     │       ├── ClientSession.cs      ← 세션 1개 (수신/송신 루프)
