@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b307ff24922dec4fa131c2f07ecb969, type: 3}
+  m_Name: Zone_10_1002
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Data.ZoneSpawnData
+  _areaCode: 10
+  _areaSpawnGroup: 1002
+  _entries:
+  - _item: {fileID: 11400000, guid: d847234ad0ce4284c9ac3a3a8e710547, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: ae89977d62f7ff54bbef4f87440af6f3, type: 2}
+    _dropCount: 2
+  - _item: {fileID: 11400000, guid: 588c1f823dfea86449ae1bf9729fa10a, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: 6542b0b528642b64689b971f2d271b79, type: 2}
+    _dropCount: 4
+  - _item: {fileID: 11400000, guid: e06a2de55c1f52b4a9aa79cd082080c3, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: fe4bd5089015b204498acd740520f490, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: 7ad8b69bcfefcb1439fe643bd85feddb, type: 2}
+    _dropCount: 4
+  - _item: {fileID: 11400000, guid: bc3d2ac214947ac4687840da42869e75, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: 5df93485bd8403048a3f97ebb357bff6, type: 2}
+    _dropCount: 2
+  - _item: {fileID: 11400000, guid: 86774f69002f46c48a05e6ab3d2615c1, type: 2}
+    _dropCount: 3
+  - _item: {fileID: 11400000, guid: a6ff7bb1612261646ade3d1342aa01c8, type: 2}
+    _dropCount: 2

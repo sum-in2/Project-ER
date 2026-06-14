@@ -40,6 +40,7 @@ namespace ProjectER.Data
         [SerializeField] private float _attackSpeed;
         [SerializeField] private float _attackSpeedLimit;
         [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _stoppingDistance = 0.1f; // NavMeshAgent.stoppingDistance
         [SerializeField] private float _sightRange;
         [SerializeField] private float _skillAmp;
         [SerializeField] private float _adaptiveForce;
@@ -67,6 +68,7 @@ namespace ProjectER.Data
         public float AttackSpeed          => _attackSpeed;
         public float AttackSpeedLimit     => _attackSpeedLimit;
         public float MoveSpeed            => _moveSpeed;
+        public float StoppingDistance     => _stoppingDistance;
         public float SightRange           => _sightRange;
         public float SkillAmp             => _skillAmp;
         public float AdaptiveForce        => _adaptiveForce;
