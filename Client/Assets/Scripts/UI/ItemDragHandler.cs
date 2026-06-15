@@ -6,40 +6,32 @@ using UnityEngine.UI;
 namespace ProjectER.UI
 {
     /// <summary>
-    /// 아이템 브라우저 슬롯에 부착 — 드래그 시작 시 비주얼 복사본을 생성하고 커서를 따라 이동.
+    /// IItemSlot 구현체에 부착 — 드래그 시작 시 비주얼 복사본을 생성하고 커서를 따라 이동.
+    /// 슬롯의 IsDraggable이 false거나 CurrentItem이 없으면 드래그를 시작하지 않는다.
     /// 원본 슬롯의 데이터는 그대로 유지된다.
     /// </summary>
+    [RequireComponent(typeof(RectTransform))]
     public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        // 드래그 중인 아이템 — TargetItemSlotUI가 OnDrop에서 읽음
-        public static ItemData CurrentDraggedItem { get; private set; }
+        private const float DragVisualSize = 52f;
 
-        [SerializeField] private ItemData _itemData;
-
+        private IItemSlot     _slot;
         private Canvas        _rootCanvas;
         private RectTransform _rootCanvasRect;
         private GameObject    _dragVisual;
 
         private void Awake()
         {
-            // 씬의 루트 Canvas를 찾아 드래그 비주얼의 부모로 사용
+            TryGetComponent(out _slot);
             _rootCanvas     = GetComponentInParent<Canvas>().rootCanvas;
             _rootCanvasRect = _rootCanvas.GetComponent<RectTransform>();
         }
 
-        /// <summary>
-        /// 런타임 생성 시 ItemData 주입
-        /// </summary>
-        public void Initialize(ItemData itemData)
-        {
-            _itemData = itemData;
-        }
-
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (_itemData == null) return;
-            CurrentDraggedItem = _itemData;
-            CreateDragVisual(eventData);
+            if (_slot == null || !_slot.IsDraggable || _slot.CurrentItem == null) return;
+
+            CreateDragVisual(eventData, _slot.CurrentItem);
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -52,12 +44,29 @@ namespace ProjectER.UI
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            CurrentDraggedItem = null;
             if (_dragVisual != null)
+            {
                 Destroy(_dragVisual);
+
+                // 도착 지점 판정: 마우스 포인터 아래에 IItemDropTarget 슬롯이 있으면 그 슬롯으로 이동
+                IItemDropTarget dropTarget = FindDropTarget(eventData);
+                if (dropTarget == null || !dropTarget.TryDropItem(_slot))
+                {
+                    // 슬롯이 아닌 곳(월드맵)에 드롭 — 캐릭터 발 밑에 아이템 드랍
+                    // TODO: 인게임 인벤토리 UI 연동 시 플레이어 위치에 월드 아이템 스폰 처리
+                    Debug.Log($"[ItemDragHandler] {_slot.CurrentItem.DisplayName}을 월드(캐릭터 발 밑)에 드랍합니다. (TODO: 월드 드랍 미구현)");
+                }
+            }
         }
 
-        private void CreateDragVisual(PointerEventData eventData)
+        // 마우스 포인터 아래에 있는 UI 요소에서 IItemDropTarget을 탐색
+        private static IItemDropTarget FindDropTarget(PointerEventData eventData)
+        {
+            GameObject hover = eventData.pointerCurrentRaycast.gameObject;
+            return hover != null ? hover.GetComponentInParent<IItemDropTarget>() : null;
+        }
+
+        private void CreateDragVisual(PointerEventData eventData, ItemData item)
         {
             _dragVisual = new GameObject("DragVisual");
             _dragVisual.transform.SetParent(_rootCanvas.transform, false);
@@ -65,13 +74,13 @@ namespace ProjectER.UI
             Image img          = _dragVisual.AddComponent<Image>();
             img.raycastTarget  = false; // 드래그 비주얼이 드롭 이벤트를 가로채면 안 됨
             img.preserveAspect = true;
-            if (_itemData.Icon != null)
-                img.sprite = _itemData.Icon;
+            if (item.Icon != null)
+                img.sprite = item.Icon;
             else
                 img.color = new Color(0.5f, 0.5f, 0.5f);
 
             RectTransform rt = _dragVisual.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(52f, 52f);
+            rt.sizeDelta = new Vector2(DragVisualSize, DragVisualSize);
             rt.SetAsLastSibling(); // 항상 최상단에 렌더링
 
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(

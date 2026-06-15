@@ -23,6 +23,11 @@ namespace ProjectER.UI
         [SerializeField] private Button            _addRouteButton;
         [SerializeField] private TargetItemPanelUI _targetItemPanel;
 
+        // 닫기 버튼 — 빌더에서 연결
+        [SerializeField] private Button _closeButton;
+
+        private Action _onCloseRequested;
+
         // 중앙 패널 좌측 필터 컨테이너 — 빌더에서 연결
         [SerializeField] private Transform _filterContainer;
 
@@ -87,6 +92,11 @@ namespace ProjectER.UI
         {
         }
 
+        public void SetCloseHandler(Action onCloseRequested)
+        {
+            _onCloseRequested = onCloseRequested;
+        }
+
         private void OnEnable()
         {
             if (_inventorySystem != null)
@@ -120,6 +130,8 @@ namespace ProjectER.UI
                 _acquireButton.onClick.AddListener(AcquireSelected);
             if (_addRouteButton != null)
                 _addRouteButton.onClick.AddListener(AddToRoute);
+            if (_closeButton != null)
+                _closeButton.onClick.AddListener(() => _onCloseRequested?.Invoke());
 
             // 검색 구독은 OnEnable에서 처리 (_searchAdapter.OnTextChanged)
 
@@ -202,9 +214,15 @@ namespace ProjectER.UI
             iconRt.offsetMin     = Vector2.zero;
             iconRt.offsetMax     = Vector2.zero;
 
+            // 실제 크기는 GridLayoutGroup.cellSize(LoadOutPanelBuilder.GridCellWidth/Height)가 결정
             LayoutElement le   = go.AddComponent<LayoutElement>();
-            le.preferredHeight = 48f;
-            le.preferredWidth  = 48f;
+            le.preferredHeight = 40f;
+            le.preferredWidth  = 67.5f;
+
+            // 드래그로 목표 루트 슬롯에 배치 — IItemSlot 구현 + 드래그 핸들러
+            ItemBrowserSlotUI browserSlot = go.AddComponent<ItemBrowserSlotUI>();
+            browserSlot.SetItem(item);
+            go.AddComponent<ItemDragHandler>();
 
             _browserButtons.Add((item, go.transform, tri));
         }
@@ -374,7 +392,7 @@ namespace ProjectER.UI
             vlg.childForceExpandWidth  = true;
             vlg.childForceExpandHeight = false;
             vlg.childControlWidth      = true;
-            vlg.childControlHeight     = false;
+            vlg.childControlHeight     = true; // false면 LayoutElement.preferredHeight가 무시되어 버튼 높이가 적용되지 않음
 
             _filterButtonImages = new Image[FilterDefs.Length];
 
@@ -407,7 +425,7 @@ namespace ProjectER.UI
                 Text text              = textGo.AddComponent<Text>();
                 text.text              = label;
                 text.font              = builtinFont;
-                text.fontSize          = 15;
+                text.fontSize          = 11;
                 text.fontStyle         = FontStyle.Bold;
                 text.color             = Color.white;
                 text.alignment         = TextAnchor.MiddleCenter;
@@ -419,7 +437,7 @@ namespace ProjectER.UI
                 textRt.offsetMax       = Vector2.zero;
 
                 LayoutElement le   = go.AddComponent<LayoutElement>();
-                le.preferredHeight = 36f;
+                le.preferredHeight = 22f;
             }
         }
 
@@ -453,7 +471,7 @@ namespace ProjectER.UI
             hlg.padding                = new RectOffset(4, 4, 4, 4);
             hlg.childForceExpandWidth  = false;
             hlg.childForceExpandHeight = true;
-            hlg.childControlWidth      = false;
+            hlg.childControlWidth      = true; // false면 LayoutElement.preferredWidth가 무시되어 버튼 너비가 적용되지 않음
             hlg.childControlHeight     = true;
 
             _specialMaterialButtonImages = new Image[SpecialMaterialDefs.Length];
@@ -486,7 +504,7 @@ namespace ProjectER.UI
                 Text text              = textGo.AddComponent<Text>();
                 text.text              = label;
                 text.font              = builtinFont;
-                text.fontSize          = 12;
+                text.fontSize          = 10;
                 text.fontStyle         = FontStyle.Bold;
                 text.color             = Color.white;
                 text.alignment         = TextAnchor.MiddleCenter;
@@ -498,8 +516,8 @@ namespace ProjectER.UI
                 textRt.offsetMax       = Vector2.zero;
 
                 LayoutElement le   = go.AddComponent<LayoutElement>();
-                le.preferredWidth  = label.Length > 1 ? 32f : 28f; // "VF"는 2글자
-                le.preferredHeight = 28f;
+                le.preferredWidth  = label.Length > 1 ? 26f : 20f; // "VF"는 2글자
+                le.preferredHeight = 20f;
             }
         }
 
@@ -592,7 +610,7 @@ namespace ProjectER.UI
             hlg.padding                 = new RectOffset(4, 4, 4, 4);
             hlg.childForceExpandWidth   = false;
             hlg.childForceExpandHeight  = true;
-            hlg.childControlWidth       = false;
+            hlg.childControlWidth       = true; // false면 LayoutElement.preferredWidth가 무시되어 버튼 너비가 적용되지 않음
             hlg.childControlHeight      = true;
 
             _statFilterButtonImages = new Image[StatFilterDefs.Length];
@@ -624,7 +642,7 @@ namespace ProjectER.UI
                 Text text              = textGo.AddComponent<Text>();
                 text.text              = label;
                 text.font              = builtinFont;
-                text.fontSize          = 13;
+                text.fontSize          = 10;
                 text.fontStyle         = FontStyle.Bold;
                 text.color             = Color.white;
                 text.alignment         = TextAnchor.MiddleCenter;
@@ -636,8 +654,8 @@ namespace ProjectER.UI
                 textRt.offsetMax       = Vector2.zero;
 
                 LayoutElement le   = go.AddComponent<LayoutElement>();
-                le.preferredWidth  = label.Length > 1 ? 32f : 28f; // "쿨" 등 2글자 여유
-                le.preferredHeight = 28f;
+                le.preferredWidth  = label.Length > 1 ? 26f : 20f; // "쿨" 등 2글자 여유
+                le.preferredHeight = 20f;
             }
         }
 

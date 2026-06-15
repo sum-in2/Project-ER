@@ -18,11 +18,13 @@
 - 팬킷 이미지를 ItemData.Icon에 자동 연결
 - 없어도 텍스트만으로 UI 동작함
 
-**3.** `ProjectER > Build Inventory Test UI`
-- Canvas + Player 오브젝트 자동 생성
-- 기존 오브젝트 남아있으면 먼저 삭제 후 재실행
+**3.** `ProjectER > Build LoadOut Panel Prefab`
+- LoadOut 패널 프리팹 생성/갱신
 
-**4.** Play
+**4.** `ProjectER > Build Network Scenes`
+- 00_ConnectScene / 01_LoginScene / 02_LobbyScene 자동 생성 (LoadOut 패널 포함)
+
+**5.** Play (00_ConnectScene부터 시작)
 
 ---
 
@@ -95,4 +97,5 @@
 | `Import BSER Items` | BSER JSON → ItemData / RecipeData SO 일괄 생성 |
 | `Link BSER Sprites` | 팬킷 이미지 → ItemData.Icon 자동 연결 |
 | `Link BSER Sprites (Force Relink)` | 기존 연결 무시하고 강제 재연결 |
-| `Build Inventory Test UI` | 인벤토리 + 크래프팅 테스트 씬 생성 |
+| `Build LoadOut Panel Prefab` | 인벤토리 + 크래프팅 LoadOut 패널 프리팹 생성 |
+| `Build Network Scenes` | 00_ConnectScene / 01_LoginScene / 02_LobbyScene 자동 생성 |

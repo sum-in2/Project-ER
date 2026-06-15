@@ -82,6 +82,9 @@ namespace ProjectER.UI
 
                 instance = Instantiate(prefab, _panelRoot); // ⚠️ GC 주의: 패널 최초 오픈 시에만 발생
                 _instanceMap[type] = instance;
+
+                if (instance.TryGetComponent(out IUIPanel newPanel))
+                    newPanel.SetCloseHandler(GoBack);
             }
 
             instance.SetActive(true);

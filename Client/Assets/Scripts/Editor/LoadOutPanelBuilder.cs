@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ProjectER.Crafting;
 using ProjectER.Data;
@@ -12,11 +11,11 @@ using Object = UnityEngine.Object;
 namespace ProjectER.Editor
 {
     /// <summary>
-    /// 인벤토리 + 크래프팅 테스트 UI 자동 생성 (1920×1080 풀스크린 3패널)
-    /// 메뉴: ProjectER > Build Inventory Test UI
+    /// LoadOut 패널(인벤토리 + 크래프팅 + 도감 + 목표 루트, 3패널) 프리팹 자동 생성
+    /// 메뉴: ProjectER > Build LoadOut Panel Prefab
     /// 실행 전 Import BSER Items 먼저 실행 필요
     /// </summary>
-    public static class InventoryTestUIBuilder
+    public static class LoadOutPanelBuilder
     {
         private static readonly Color BgColor        = new Color(0.09f, 0.09f, 0.09f, 1f);
         private static readonly Color PanelBg        = new Color(0.13f, 0.13f, 0.13f, 1f);
@@ -25,74 +24,21 @@ namespace ProjectER.Editor
         private static readonly Color EquipSlotColor = new Color(0.22f, 0.28f, 0.35f, 1f);
         private static readonly Color DividerColor   = new Color(0.06f, 0.06f, 0.06f, 1f);
 
-        private const float LeftPanelWidth  = 440f;
+        private const float LeftPanelWidth  = 596f;
         private const float RightPanelWidth = 380f;
+
+        // 아이템 슬롯 비율 — 27:16(108:64) 고정, 가로 길이는 이 비율로 자동 계산
+        // (정사각형 아이콘은 가운데 배치, 좌우 여백 발생)
+        private const float SlotAspectRatio = 108f / 64f;
+        private const float SlotHeight = 64f;
+        private const float SlotWidth  = SlotHeight * SlotAspectRatio;
+
+        // 도감 그리드 셀 — 가방/장비 슬롯과 동일한 비율, 더 작은 크기로 촘촘하게 배치
+        private const float GridCellHeight = 40f;
+        private const float GridCellWidth  = GridCellHeight * SlotAspectRatio;
 
         private const string GradeConfigPath = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
         private const string LoadOutPanelPrefabPath = "Assets/Prefabs/UI/LoadOutPanel.prefab";
-
-        [MenuItem("ProjectER/Build Inventory Test UI")]
-        public static void Build()
-        {
-            ItemGradeColorConfig gradeConfig = AssetDatabase.LoadAssetAtPath<ItemGradeColorConfig>(GradeConfigPath);
-            if (gradeConfig == null)
-                Debug.LogWarning("[InventoryTestUIBuilder] ItemGradeColorConfig 없음 — " +
-                                 "Create > ProjectER/Config/ItemGradeColor 로 생성 후 다시 실행하세요.");
-
-            // ── 플레이어 ────────────────────────────────────────────
-            GameObject      player    = new("Player");
-            InventorySystem inventory = player.AddComponent<InventorySystem>();
-            CraftingSystem  crafting  = player.AddComponent<CraftingSystem>();
-
-            // ── 캔버스 ──────────────────────────────────────────────
-            Canvas canvas = BuildCanvas();
-
-            // ── 루트 (전체 화면) ────────────────────────────────────
-            GameObject    root   = new("InventoryTestRoot");
-            root.transform.SetParent(canvas.transform, false);
-            root.AddComponent<Image>().color = BgColor;
-            RectTransform rootRt = root.GetComponent<RectTransform>();
-            rootRt.anchorMin     = Vector2.zero;
-            rootRt.anchorMax     = Vector2.one;
-            rootRt.offsetMin     = Vector2.zero;
-            rootRt.offsetMax     = Vector2.zero;
-
-            HorizontalLayoutGroup rootHL  = root.AddComponent<HorizontalLayoutGroup>();
-            rootHL.spacing                = 2f;
-            rootHL.padding                = new RectOffset(0, 0, 0, 0);
-            rootHL.childControlWidth      = true;
-            rootHL.childControlHeight     = true;
-            rootHL.childForceExpandWidth  = false;
-            rootHL.childForceExpandHeight = true;
-
-            // ── 좌측 패널 (인벤토리 + 장비 + 스탯) ─────────────────
-            (InventorySlotUI[] bagSlots, InventorySlotUI[] equipSlots, Transform statContent)
-                = BuildLeftPanel(root.transform);
-
-            // ── 중앙 패널 (아이템 브라우저) ─────────────────────────
-            (Transform itemButtonContainer, Transform filterContainer, KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
-                = BuildCenterPanel(root.transform);
-
-            // ── 우측 패널 (조합 + 목표 + 획득버튼) ──────────────────
-            (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel)
-                = BuildRightPanel(root.transform);
-
-            // ── 컴포넌트 부착 ────────────────────────────────────────
-            InventoryUI  inventoryUI = root.AddComponent<InventoryUI>();
-            LoadOutPanel testPanel   = root.AddComponent<LoadOutPanel>();
-
-            // ── 레퍼런스 연결 ────────────────────────────────────────
-            WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
-            WireTestPanel(testPanel, inventory, itemButtonContainer, statContent, filterContainer,
-                acquireButton, addRouteButton, targetPanel,
-                searchAdapter, specialMaterialContainer, statFilterContainer);
-            WireCraftingSystem(crafting, inventory);
-            WireCraftingUI(craftingUI, crafting, inventory, craftContent, gradeConfig);
-            WireGradeConfigToSlots(root, gradeConfig);
-
-            Debug.Log("[InventoryTestUIBuilder] 완료.");
-            Selection.activeGameObject = root;
-        }
 
         /// <summary>
         /// LobbyUIManager에 등록할 LoadOut 패널 프리팹 생성.
@@ -104,7 +50,7 @@ namespace ProjectER.Editor
         {
             ItemGradeColorConfig gradeConfig = AssetDatabase.LoadAssetAtPath<ItemGradeColorConfig>(GradeConfigPath);
             if (gradeConfig == null)
-                Debug.LogWarning("[InventoryTestUIBuilder] ItemGradeColorConfig 없음 — " +
+                Debug.LogWarning("[LoadOutPanelBuilder] ItemGradeColorConfig 없음 — " +
                                  "Create > ProjectER/Config/ItemGradeColor 로 생성 후 다시 실행하세요.");
 
             // ── 루트 (LobbyUIManager._panelRoot 하위에 풀스크린으로 배치됨) ──
@@ -140,15 +86,18 @@ namespace ProjectER.Editor
             (Transform craftContent, CraftingUI craftingUI, Button acquireButton, Button addRouteButton, TargetItemPanelUI targetPanel)
                 = BuildRightPanel(root.transform);
 
+            // ── 닫기 버튼 ────────────────────────────────────────────
+            Button closeButton = BuildCloseButton(root);
+
             // ── 컴포넌트 부착 ────────────────────────────────────────
             InventoryUI  inventoryUI = root.AddComponent<InventoryUI>();
             LoadOutPanel panel       = root.AddComponent<LoadOutPanel>();
 
             // ── 레퍼런스 연결 ────────────────────────────────────────
             WireInventoryUI(inventoryUI, inventory, bagSlots, equipSlots);
-            WireTestPanel(panel, inventory, itemButtonContainer, statContent, filterContainer,
+            WireLoadOutPanel(panel, inventory, itemButtonContainer, statContent, filterContainer,
                 acquireButton, addRouteButton, targetPanel,
-                searchAdapter, specialMaterialContainer, statFilterContainer);
+                searchAdapter, specialMaterialContainer, statFilterContainer, closeButton);
             WireCraftingSystem(crafting, inventory);
             WireCraftingUI(craftingUI, crafting, inventory, craftContent, gradeConfig);
             WireGradeConfigToSlots(root, gradeConfig);
@@ -158,7 +107,7 @@ namespace ProjectER.Editor
             PrefabUtility.SaveAsPrefabAsset(root, LoadOutPanelPrefabPath);
             Object.DestroyImmediate(root);
 
-            Debug.Log($"[InventoryTestUIBuilder] LoadOut 패널 프리팹 저장 완료: {LoadOutPanelPrefabPath}");
+            Debug.Log($"[LoadOutPanelBuilder] LoadOut 패널 프리팹 저장 완료: {LoadOutPanelPrefabPath}");
         }
 
         // ── 좌측 패널 ───────────────────────────────────────────────
@@ -177,9 +126,9 @@ namespace ProjectER.Editor
             vl.childForceExpandWidth  = true;
             vl.childForceExpandHeight = false;
 
-            // 가방 (5열 2행 — 셀 72px, 상단 타이틀 30px 포함)
+            // 가방 (5열 2행 — 셀 108x64, 상단 타이틀 30px 포함)
             GameObject bagSec          = CreateSection(panel.transform, "BagSection", SectionBg, "가방");
-            AddLayoutElement(bagSec, preferredHeight: 210f, flexibleHeight: 0f);
+            AddLayoutElement(bagSec, preferredHeight: 180f, flexibleHeight: 0f);
             GameObject bagGrid         = CreateBagGrid(bagSec.transform);
             InventorySlotUI[] bagSlots = new InventorySlotUI[10];
             for (int i = 0; i < 10; i++)
@@ -236,9 +185,9 @@ namespace ProjectER.Editor
             vl.childForceExpandWidth  = true;
             vl.childForceExpandHeight = false;
 
-            // 상단 필터 바 (2행: 이름검색+전설재료 | 스탯필터)
+            // 상단 필터 바 (2행: 이름검색+전설재료 | 스탯필터 — 행 높이 28px x2 + spacing4 + padding8 = 68px)
             GameObject filterBar = CreatePanel(panel.transform, "FilterBar", SectionBg);
-            AddLayoutElement(filterBar, preferredHeight: 84f, flexibleHeight: 0f);
+            AddLayoutElement(filterBar, preferredHeight: 68f, flexibleHeight: 0f);
 
             VerticalLayoutGroup filterBarVL   = filterBar.AddComponent<VerticalLayoutGroup>();
             filterBarVL.spacing               = 4f;
@@ -252,7 +201,7 @@ namespace ProjectER.Editor
             GameObject row1 = new("FilterRow1");
             row1.transform.SetParent(filterBar.transform, false);
             row1.AddComponent<RectTransform>();
-            AddLayoutElement(row1, preferredHeight: 36f);
+            AddLayoutElement(row1, preferredHeight: 28f);
             HorizontalLayoutGroup row1HL   = row1.AddComponent<HorizontalLayoutGroup>();
             row1HL.spacing                 = 4f;
             row1HL.childControlWidth       = true;
@@ -267,7 +216,7 @@ namespace ProjectER.Editor
             GameObject row2 = new("FilterRow2");
             row2.transform.SetParent(filterBar.transform, false);
             row2.AddComponent<RectTransform>();
-            AddLayoutElement(row2, preferredHeight: 36f);
+            AddLayoutElement(row2, preferredHeight: 28f);
             Transform statFilterContainer = row2.transform;
 
             CreateDivider(panel.transform);
@@ -283,8 +232,9 @@ namespace ProjectER.Editor
             mainHL.childForceExpandHeight  = true;
 
             // 장비 구분 필터 열 (런타임에 LoadOutPanel.BuildFilterButtons()가 채움)
+            // 버튼 1개 = 글자 1개(22px 높이), 열 너비는 그 폭에 맞춰 축소
             GameObject typeFilter = CreatePanel(mainArea.transform, "TypeFilter", SectionBg);
-            AddLayoutElement(typeFilter, preferredWidth: 60f, flexibleWidth: 0f);
+            AddLayoutElement(typeFilter, preferredWidth: 32f, flexibleWidth: 0f);
 
             // 아이템 그리드 (스크롤)
             GameObject gridArea = CreatePanel(mainArea.transform, "ItemGridArea", BgColor);
@@ -345,11 +295,11 @@ namespace ProjectER.Editor
         {
             // 특수 재료 필터 버튼 5개를 담을 컨테이너
             // 런타임에 LoadOutPanel.BuildSpecialMaterialButtons()가 버튼을 채움
-            // 예상 너비: 생(28)+운(28)+미(28)+포(28)+VF(32) + spacing*4 = 156px
+            // 예상 너비: 생(20)+운(20)+미(20)+포(20)+VF(26) + spacing*4 + padding*2 = 126px
             GameObject go = new("SpecialMaterialContainer");
             go.transform.SetParent(parent, false);
             go.AddComponent<RectTransform>();
-            AddLayoutElement(go, preferredWidth: 160f, flexibleWidth: 0f);
+            AddLayoutElement(go, preferredWidth: 126f, flexibleWidth: 0f);
             return go.transform;
         }
 
@@ -421,28 +371,6 @@ namespace ProjectER.Editor
             Button addRouteButton  = BuildActionButton(btnRow.transform, "AddRouteButton",  "루트 추가", new Color(0.18f, 0.28f, 0.45f));
 
             return (craftContent, craftingUI, acquireButton, addRouteButton, targetPanel);
-        }
-
-        // ── 캔버스 ──────────────────────────────────────────────────
-
-        private static Canvas BuildCanvas()
-        {
-            GameObject go         = new("Canvas");
-            Canvas     canvas     = go.AddComponent<Canvas>();
-            canvas.renderMode     = RenderMode.ScreenSpaceOverlay;
-            CanvasScaler scaler   = go.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode    = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            go.AddComponent<GraphicRaycaster>();
-
-            if (Object.FindObjectOfType<EventSystem>() == null)
-            {
-                GameObject esGo = new("EventSystem");
-                esGo.AddComponent<EventSystem>();
-                esGo.AddComponent<StandaloneInputModule>();
-            }
-
-            return canvas;
         }
 
         // ── 공용 헬퍼 ───────────────────────────────────────────────
@@ -518,7 +446,7 @@ namespace ProjectER.Editor
             GameObject   go   = new("BagGrid");
             go.transform.SetParent(parent, false);
             GridLayoutGroup grid = go.AddComponent<GridLayoutGroup>();
-            grid.cellSize        = new Vector2(72f, 72f);
+            grid.cellSize        = new Vector2(SlotWidth, SlotHeight);
             grid.spacing         = new Vector2(6f,  6f);
             grid.padding         = new RectOffset(8, 8, 30, 8);
             grid.constraint      = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -540,6 +468,7 @@ namespace ProjectER.Editor
             go.transform.SetParent(parent, false);
             Image borderImage   = go.AddComponent<Image>();
             borderImage.color   = Color.clear;
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(SlotWidth, SlotHeight);
 
             Button     btn = go.AddComponent<Button>();
             ColorBlock cb  = btn.colors;
@@ -559,6 +488,7 @@ namespace ProjectER.Editor
 
             Image         icon   = CreateChild<Image>(go.transform, "Icon");
             icon.enabled         = false;
+            icon.preserveAspect  = true; // 정사각형 아이콘을 108x64 슬롯 가운데에 유지 (좌우 여백 발생)
             RectTransform iconRt = icon.GetComponent<RectTransform>();
             iconRt.anchorMin     = new Vector2(0.1f, 0.1f);
             iconRt.anchorMax     = new Vector2(0.9f, 0.9f);
@@ -582,7 +512,11 @@ namespace ProjectER.Editor
             so.FindProperty("_iconImage").objectReferenceValue        = icon;
             so.FindProperty("_amountText").objectReferenceValue       = amount;
             so.FindProperty("_gradeBorderImage").objectReferenceValue = borderImage;
+            so.FindProperty("_isDraggable").boolValue                 = true;
             so.ApplyModifiedProperties();
+
+            // 드래그로 목표 루트 슬롯에 배치
+            go.AddComponent<ItemDragHandler>();
             return slotUI;
         }
 
@@ -595,14 +529,14 @@ namespace ProjectER.Editor
             h.childForceExpandHeight  = false;
             h.childForceExpandWidth   = false;
             h.childAlignment          = TextAnchor.MiddleLeft;
-            row.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 62f);
+            row.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, SlotHeight);
 
             Text lbl      = CreateChild<Text>(row.transform, "Label");
             lbl.text      = label;
             lbl.fontSize  = 12;
             lbl.color     = new Color(0.75f, 0.75f, 0.75f);
             lbl.alignment = TextAnchor.MiddleLeft;
-            lbl.GetComponent<RectTransform>().sizeDelta = new Vector2(36f, 62f);
+            lbl.GetComponent<RectTransform>().sizeDelta = new Vector2(36f, SlotHeight);
 
             return BuildSlot(row.transform, $"EquipSlot_{label}", bgColor);
         }
@@ -622,16 +556,16 @@ namespace ProjectER.Editor
             scrollRt.offsetMax     = Vector2.zero;
 
             // 아이템 버튼 — GridLayoutGroup
-            // 중앙 패널 실제 너비(~1096px) 기준 48px셀+4px간격 = 약 18열
+            // 가방/장비 슬롯과 동일한 27:16 비율의 작은 셀(GridCellWidth x GridCellHeight)로 촘촘하게 배치
             GameObject      contentGo = new("Content");
             contentGo.transform.SetParent(scrollGo.transform, false);
             contentGo.AddComponent<Image>().color = Color.clear;
             GridLayoutGroup grid       = contentGo.AddComponent<GridLayoutGroup>();
-            grid.cellSize              = new Vector2(48f, 48f);
+            grid.cellSize              = new Vector2(GridCellWidth, GridCellHeight);
             grid.spacing               = new Vector2(4f,  4f);
             grid.padding               = new RectOffset(6, 6, 6, 6);
             grid.constraint            = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount       = 18;
+            grid.constraintCount       = 12;
             ContentSizeFitter csf      = contentGo.AddComponent<ContentSizeFitter>();
             csf.verticalFit            = ContentSizeFitter.FitMode.PreferredSize;
             RectTransform contentRt    = contentGo.GetComponent<RectTransform>();
@@ -700,17 +634,18 @@ namespace ProjectER.Editor
             so.ApplyModifiedProperties();
         }
 
-        private static void WireTestPanel(LoadOutPanel panel, InventorySystem inventory,
+        private static void WireLoadOutPanel(LoadOutPanel panel, InventorySystem inventory,
             Transform buttonContainer, Transform statContainer, Transform filterContainer,
             Button acquireButton, Button addRouteButton, TargetItemPanelUI targetItemPanel,
-            KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer)
+            KoreanInputFieldAdapter searchAdapter, Transform specialMaterialContainer, Transform statFilterContainer,
+            Button closeButton)
         {
             // ItemDatabase에서 전체 아이템 로드 후 타입 → 등급 순서로 정렬
             const string dbPath = "Assets/ScriptableObjects/ItemDatabase.asset";
             ItemDatabase db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
             if (db == null)
             {
-                Debug.LogWarning($"[InventoryTestUIBuilder] ItemDatabase 없음: {dbPath} — Import BSER Items 먼저 실행하세요.");
+                Debug.LogWarning($"[LoadOutPanelBuilder] ItemDatabase 없음: {dbPath} — Import BSER Items 먼저 실행하세요.");
                 return;
             }
 
@@ -731,6 +666,7 @@ namespace ProjectER.Editor
             so.FindProperty("_acquireButton").objectReferenceValue              = acquireButton;
             so.FindProperty("_addRouteButton").objectReferenceValue             = addRouteButton;
             so.FindProperty("_targetItemPanel").objectReferenceValue            = targetItemPanel;
+            so.FindProperty("_closeButton").objectReferenceValue                = closeButton;
             so.FindProperty("_searchAdapter").objectReferenceValue              = searchAdapter;
             so.FindProperty("_specialMaterialContainer").objectReferenceValue   = specialMaterialContainer;
             so.FindProperty("_statFilterContainer").objectReferenceValue        = statFilterContainer;
@@ -740,7 +676,7 @@ namespace ProjectER.Editor
             if (recipeDb != null)
                 so.FindProperty("_recipeDatabase").objectReferenceValue = recipeDb;
             else
-                Debug.LogWarning($"[InventoryTestUIBuilder] RecipeDatabase 없음: {recipePath}");
+                Debug.LogWarning($"[LoadOutPanelBuilder] RecipeDatabase 없음: {recipePath}");
 
             SerializedProperty itemsProp = so.FindProperty("_acquisitionItems");
             itemsProp.arraySize = sorted.Count;
@@ -748,6 +684,46 @@ namespace ProjectER.Editor
                 itemsProp.GetArrayElementAtIndex(i).objectReferenceValue = sorted[i];
 
             so.ApplyModifiedProperties();
+        }
+
+        /// <summary>
+        /// 패널 우상단 닫기 버튼 — HorizontalLayoutGroup 영향을 받지 않도록 ignoreLayout 처리
+        /// </summary>
+        private static Button BuildCloseButton(GameObject root)
+        {
+            GameObject go = new("CloseButton");
+            go.transform.SetParent(root.transform, false);
+
+            Image bg = go.AddComponent<Image>();
+            bg.color = new Color(0.35f, 0.15f, 0.15f, 1f);
+
+            Button     btn = go.AddComponent<Button>();
+            ColorBlock cb  = btn.colors;
+            cb.normalColor      = Color.white;
+            cb.highlightedColor = new Color(0.55f, 0.20f, 0.20f);
+            cb.pressedColor     = new Color(0.20f, 0.08f, 0.08f);
+            btn.colors          = cb;
+
+            Text lbl      = CreateChild<Text>(go.transform, "Label");
+            lbl.text      = "X";
+            lbl.font      = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            lbl.fontSize  = 18;
+            lbl.fontStyle = FontStyle.Bold;
+            lbl.color     = Color.white;
+            lbl.alignment = TextAnchor.MiddleCenter;
+            StretchFill(lbl.GetComponent<RectTransform>(), 0f, 0f);
+
+            RectTransform rt    = go.GetComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(1f, 1f);
+            rt.anchorMax        = new Vector2(1f, 1f);
+            rt.pivot            = new Vector2(1f, 1f);
+            rt.sizeDelta        = new Vector2(36f, 36f);
+            rt.anchoredPosition = new Vector2(-8f, -8f);
+
+            LayoutElement le = go.AddComponent<LayoutElement>();
+            le.ignoreLayout  = true;
+
+            return btn;
         }
 
         private static Button BuildActionButton(Transform parent, string name, string label, Color bgColor)
@@ -811,7 +787,11 @@ namespace ProjectER.Editor
             so.FindProperty("_slotType").enumValueIndex          = (int)slotType;
             so.FindProperty("_bgImage").objectReferenceValue     = bg;
             so.FindProperty("_iconImage").objectReferenceValue   = icon;
+            so.FindProperty("_isDraggable").boolValue            = false; // 드롭 타겟 전용 — 우클릭으로 제거
             so.ApplyModifiedProperties();
+
+            // 드래그 핸들러는 부착해두되 IsDraggable=false라 OnBeginDrag에서 즉시 무시됨
+            go.AddComponent<ItemDragHandler>();
             return slotUI;
         }
 
@@ -842,7 +822,7 @@ namespace ProjectER.Editor
             if (db != null)
                 so.FindProperty("_recipeDatabase").objectReferenceValue = db;
             else
-                Debug.LogWarning($"[InventoryTestUIBuilder] RecipeDatabase 없음: {dbPath} — Import BSER Items 먼저 실행하세요.");
+                Debug.LogWarning($"[LoadOutPanelBuilder] RecipeDatabase 없음: {dbPath} — Import BSER Items 먼저 실행하세요.");
             so.ApplyModifiedProperties();
         }
 

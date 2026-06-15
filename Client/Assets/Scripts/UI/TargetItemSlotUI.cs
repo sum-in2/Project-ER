@@ -11,11 +11,12 @@ namespace ProjectER.UI
     /// 목표 아이템 슬롯 — 드래그로 아이템 설정, 우클릭으로 제거.
     /// 슬롯 타입에 맞는 부위 아이템만 수락한다.
     /// </summary>
-    public class TargetItemSlotUI : MonoBehaviour, IDropHandler, IPointerClickHandler
+    public class TargetItemSlotUI : MonoBehaviour, IItemDropTarget, IPointerClickHandler, IItemSlot
     {
         [SerializeField] private EquipmentSlotType _slotType;
         [SerializeField] private Image             _bgImage;
         [SerializeField] private Image             _iconImage;
+        [SerializeField] private bool              _isDraggable;
 
         private static readonly Color EmptyColor = new Color(0.20f, 0.20f, 0.20f);
 
@@ -32,8 +33,11 @@ namespace ProjectER.UI
         private ItemData _currentItem;
 
         // 슬롯 타입 (TargetItemPanelUI에서 읽음)
-        public EquipmentSlotType SlotType   => _slotType;
-        public ItemData          CurrentItem => _currentItem;
+        public EquipmentSlotType SlotType    => _slotType;
+
+        // ── IItemSlot ─────────────────────────────────────────────────
+        public ItemData CurrentItem => _currentItem;
+        public bool     IsDraggable => _isDraggable;
 
         // 아이템 변경 이벤트 (슬롯 타입, 새 아이템 — 제거 시 null)
         public event Action<EquipmentSlotType, ItemData> OnItemChanged;
@@ -43,19 +47,20 @@ namespace ProjectER.UI
             ApplyEmpty();
         }
 
-        // ── IDropHandler ──────────────────────────────────────────────
+        // ── IItemDropTarget ────────────────────────────────────────────
 
-        public void OnDrop(PointerEventData eventData)
+        public bool TryDropItem(IItemSlot source)
         {
-            ItemData dragged = ItemDragHandler.CurrentDraggedItem;
-            if (dragged == null) return;
+            ItemData dragged = source?.CurrentItem;
+            if (dragged == null) return false;
             if (!IsCompatible(dragged))
             {
                 Debug.Log($"[TargetItemSlotUI] {dragged.DisplayName}은 {_slotType} 슬롯에 맞지 않습니다.");
-                return;
+                return false;
             }
 
             ApplyItem(dragged);
+            return true;
         }
 
         // ── IPointerClickHandler ──────────────────────────────────────

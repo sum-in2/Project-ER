@@ -34,7 +34,7 @@ Project-ER/                           ← 모노레포 루트
 │   │   │   │   ├── BserItemImporter.cs
 │   │   │   │   ├── BserSpriteLinker.cs
 │   │   │   │   ├── BserCharacterSpriteLinker.cs ← 실험체 초상화(Full/Half/Mini) 자동 연결
-│   │   │   │   ├── InventoryTestUIBuilder.cs
+│   │   │   │   ├── LoadOutPanelBuilder.cs
 │   │   │   │   ├── NetworkSceneBuilder.cs    ← ConnectScene/LobbyScene 자동 생성
 │   │   │   │   └── PickSceneBuilder.cs       ← PickScene 자동 생성
 │   │   │   ├── Inventory/

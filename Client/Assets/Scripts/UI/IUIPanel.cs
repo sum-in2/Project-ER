@@ -1,3 +1,5 @@
+using System;
+
 namespace ProjectER.UI
 {
     /// <summary>
@@ -25,5 +27,10 @@ namespace ProjectER.UI
         /// 패널이 화면에서 사라지기 직전에 호출 (캐시 또는 파괴 직전)
         /// </summary>
         void OnClose();
+
+        /// <summary>
+        /// 패널 최초 생성 시 LobbyUIManager가 호출 — 닫기 버튼 등에서 호출할 콜백을 주입
+        /// </summary>
+        void SetCloseHandler(Action onCloseRequested);
     }
 }

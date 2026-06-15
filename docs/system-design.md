@@ -134,6 +134,28 @@ TargetItemSlotUI:
 - IDropHandler 구현 (드래그 드롭 수신 가능, 현재 버튼 방식 사용)
 ```
 
+### 드래그 앤 드롭 (아이템 슬롯)
+
+```
+IItemSlot       : CurrentItem(현재 아이템), IsDraggable(드래그 가능 여부)
+IItemDropTarget : TryDropItem(IItemSlot source) → 처리 성공 시 true
+
+ItemDragHandler (IBeginDragHandler/IDragHandler/IEndDragHandler):
+- OnBeginDrag : IsDraggable == true && CurrentItem != null 인 슬롯만 드래그 시작 (커서 추적용 비주얼 생성)
+- OnEndDrag   : 도착 지점 판정 후 처리
+  1. 마우스 포인터 아래(eventData.pointerCurrentRaycast)에 IItemDropTarget 구현 슬롯이 있는 경우
+     → 슬롯에 옮김: 해당 슬롯의 TryDropItem(source) 호출
+  2. 포인터 아래에 IItemDropTarget이 없는 경우(= 월드맵)
+     → 캐릭터 발 밑에 아이템 드랍 (TODO: 인게임 인벤토리 UI 구현 시 월드 아이템 스폰 연동)
+
+도착 지점 판정 기준: 마우스 포인터 위치가 슬롯(IItemDropTarget) 영역 안인지 여부
+- 슬롯 안  → 1번(슬롯에 옮김)
+- 슬롯 밖  → 2번(월드맵 드랍)
+
+현재 IItemDropTarget 구현: TargetItemSlotUI (도감 → 목표 루트 슬롯 배치)
+- 향후 InventorySlotUI(가방/장비)에도 적용해 가방 내 재배치·장착/해제 드래그 지원 예정 (TODO)
+```
+
 ### 크래프팅 시스템
 
 ```

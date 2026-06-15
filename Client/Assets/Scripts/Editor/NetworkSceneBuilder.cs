@@ -13,7 +13,7 @@ using UnityEngine.UI;
 namespace ProjectER.Editor
 {
     /// <summary>
-    /// ConnectScene / LobbyScene UI를 자동으로 생성하는 에디터 유틸.
+    /// 00_ConnectScene / 01_LoginScene / 02_LobbyScene UI를 자동으로 생성하는 에디터 유틸.
     /// 메뉴: ProjectER / Build Network Scenes
     /// </summary>
     public static class NetworkSceneBuilder
@@ -26,7 +26,7 @@ namespace ProjectER.Editor
             BuildConnectScene();
             BuildLoginScene();
             BuildLobbyScene();
-            EditorUtility.DisplayDialog("완료", "ConnectScene, LoginScene, LobbyScene 생성 완료.\nBuild Settings에서 씬 목록에 추가하세요.", "확인");
+            EditorUtility.DisplayDialog("완료", "00_ConnectScene, 01_LoginScene, 02_LobbyScene 생성 완료.\nBuild Settings에서 씬 목록에 추가하세요.", "확인");
         }
 
         // ── ConnectScene ──────────────────────────────────────────
@@ -69,7 +69,7 @@ namespace ProjectER.Editor
             so.FindProperty("_statusText").objectReferenceValue    = statusText.GetComponent<TMP_Text>();
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/ConnectScene.unity");
+            SaveScene(scene, "Assets/Scenes/00_ConnectScene.unity");
         }
 
         // ── LoginScene ────────────────────────────────────────────
@@ -111,7 +111,7 @@ namespace ProjectER.Editor
             so.FindProperty("_statusText").objectReferenceValue    = statusText.GetComponent<TMP_Text>();
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/LoginScene.unity");
+            SaveScene(scene, "Assets/Scenes/01_LoginScene.unity");
         }
 
         // ── LobbyScene ────────────────────────────────────────────
@@ -178,7 +178,7 @@ namespace ProjectER.Editor
             so.FindProperty("_lobbyUIManager").objectReferenceValue  = uiManager;
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/LobbyScene.unity");
+            SaveScene(scene, "Assets/Scenes/02_LobbyScene.unity");
         }
 
         // ── 공통 씬 오브젝트 ──────────────────────────────────────
@@ -228,7 +228,10 @@ namespace ProjectER.Editor
             GameObject obj = new(name);
             Canvas canvas = obj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            obj.AddComponent<CanvasScaler>();
+            CanvasScaler scaler = obj.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode         = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight  = 0.5f;
             obj.AddComponent<GraphicRaycaster>();
             return obj;
         }

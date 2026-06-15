@@ -11,17 +11,23 @@ namespace ProjectER.UI
     /// 슬롯 하나의 시각 표현 — 가방/장비 슬롯 공용
     /// 좌클릭: 장착, 우클릭: 버리기 (가방 슬롯 전용)
     /// </summary>
-    public class InventorySlotUI : MonoBehaviour, IPointerClickHandler
+    public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IItemSlot
     {
         [SerializeField] private Image                _iconImage;
         [SerializeField] private Text                 _amountText;
         [SerializeField] private Image                _gradeBorderImage;
         [SerializeField] private ItemGradeColorConfig _gradeConfig;
+        [SerializeField] private bool                 _isDraggable;
 
         private Button       _button;
         private int          _index;
         private Action<int>  _onClicked;
         private Action<int>  _onRightClicked;
+        private ItemData     _currentItem;
+
+        // ── IItemSlot ─────────────────────────────────────────────────
+        public ItemData CurrentItem => _currentItem;
+        public bool     IsDraggable => _isDraggable;
 
         private void Awake()
         {
@@ -51,6 +57,7 @@ namespace ProjectER.UI
         public void Refresh(InventorySlot slot)
         {
             bool hasItem = slot != null && !slot.IsEmpty;
+            _currentItem = hasItem ? slot.Item : null;
             _iconImage.enabled  = hasItem;
             _amountText.enabled = hasItem;
 
@@ -67,6 +74,7 @@ namespace ProjectER.UI
         public void RefreshEquipment(ItemData item)
         {
             bool hasItem        = item != null;
+            _currentItem        = item;
             _iconImage.enabled  = hasItem;
             _amountText.enabled = false;
 
