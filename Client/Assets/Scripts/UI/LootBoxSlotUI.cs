@@ -9,25 +9,20 @@ namespace ProjectER.UI
     /// 루트박스 4x4 그리드의 슬롯 1개.
     /// 드래그는 비활성, 클릭으로만 아이템을 취득한다.
     /// </summary>
-    public class LootBoxSlotUI : MonoBehaviour, IItemSlot
+    public class LootBoxSlotUI : BaseItemSlotUI
     {
-        [SerializeField] private Image                _iconImage;
-        [SerializeField] private Text                 _countText;
-        [SerializeField] private Image                _gradeBorderImage;
-        [SerializeField] private ItemGradeColorConfig _gradeConfig;
+        [SerializeField] private Image _iconImage;
+        [SerializeField] private Text  _countText;
+        [SerializeField] private Image _gradeBorderImage;
 
         private int         _slotIndex;
         private Action<int> _onClicked;
-        private ItemData    _item;
-
-        // ── IItemSlot ──────────────────────────────────────────────────
-        public ItemData CurrentItem => _item;
-        public bool     IsDraggable => false; // 루트박스 슬롯은 드래그 금지
+        private Button      _button;
 
         private void Awake()
         {
-            if (TryGetComponent(out Button btn))
-                btn.onClick.AddListener(HandleClick);
+            TryGetComponent(out _button);
+            _button?.onClick.AddListener(HandleClick);
         }
 
         private void OnEnable()  { }
@@ -35,8 +30,7 @@ namespace ProjectER.UI
 
         private void OnDestroy()
         {
-            if (TryGetComponent(out Button btn))
-                btn.onClick.RemoveListener(HandleClick);
+            _button?.onClick.RemoveListener(HandleClick);
         }
 
         public void Initialize(int index, Action<int> onClicked)
@@ -47,12 +41,12 @@ namespace ProjectER.UI
 
         public void Refresh(ItemData item, int count)
         {
-            _item = item;
+            _currentItem = item;
 
             bool hasItem = item != null && count > 0;
             _iconImage.enabled = hasItem;
             _countText.enabled = hasItem;
-            ApplyGradeBorder(hasItem ? item : null);
+            ApplyGradeColor(_gradeBorderImage, hasItem ? item : null);
 
             if (!hasItem) return;
 
@@ -80,20 +74,12 @@ namespace ProjectER.UI
 
         public void Clear()
         {
-            _item = null;
+            _currentItem = null;
             _iconImage.enabled = false;
             _countText.enabled = false;
             _iconImage.color   = Color.white;
             _countText.color   = Color.white;
-            ApplyGradeBorder(null);
-        }
-
-        private void ApplyGradeBorder(ItemData item)
-        {
-            if (_gradeBorderImage == null) return;
-            _gradeBorderImage.color = (item != null && _gradeConfig != null)
-                ? _gradeConfig.GetColor(item.ItemGrade)
-                : Color.clear;
+            ApplyGradeColor(_gradeBorderImage, null);
         }
 
         private void HandleClick() => _onClicked?.Invoke(_slotIndex);

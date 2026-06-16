@@ -46,18 +46,10 @@ namespace ProjectER.UI
         // 버튼 순서 + 삼각형 인디케이터 관리 — 루트 기반 정렬/표시에 사용
         private readonly List<(ItemData Item, Transform Button, TriangleIndicator Indicator)> _browserButtons = new();
 
+        [SerializeField] private ItemGradeColorConfig _gradeConfig;
+
         // 선택 강조색 — 등급색보다 밝게
         private static readonly Color SelectedHighlight = new Color(0.85f, 0.85f, 0.50f, 1f);
-
-        private static readonly Color[] GradeColors =
-        {
-            new Color(0.30f, 0.30f, 0.30f), // Common   — 일반
-            new Color(0.18f, 0.38f, 0.18f), // Uncommon — 고급
-            new Color(0.15f, 0.28f, 0.50f), // Rare     — 희귀
-            new Color(0.38f, 0.18f, 0.50f), // Epic     — 영웅
-            new Color(0.55f, 0.38f, 0.08f), // Legend   — 전설
-            new Color(0.55f, 0.15f, 0.15f), // Mythic   — 초월
-        };
 
         // 스탯 정의: (라벨, 값 추출 함수, 퍼센트 여부)
         private static readonly (string Label, Func<ItemData, float> Getter, bool IsPercent)[] StatDefs =
@@ -170,7 +162,7 @@ namespace ProjectER.UI
             go.transform.SetParent(parent, false);
 
             Image bg = go.AddComponent<Image>();
-            bg.color = GradeColors[(int)item.ItemGrade];
+            bg.color = _gradeConfig != null ? _gradeConfig.GetBackgroundColor(item.ItemGrade) : Color.gray;
 
             Button btn          = go.AddComponent<Button>();
             ColorBlock cb       = btn.colors;
@@ -233,7 +225,7 @@ namespace ProjectER.UI
         {
             // 이전 선택 버튼 색 복원
             if (_selectedButtonBg != null && _selectedItem != null)
-                _selectedButtonBg.color = GradeColors[(int)_selectedItem.ItemGrade];
+                _selectedButtonBg.color = _gradeConfig != null ? _gradeConfig.GetBackgroundColor(_selectedItem.ItemGrade) : Color.gray;
 
             _selectedItem     = item;
             _selectedButtonBg = buttonBg;

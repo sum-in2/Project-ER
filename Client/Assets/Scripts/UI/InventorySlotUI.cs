@@ -11,29 +11,25 @@ namespace ProjectER.UI
     /// 슬롯 하나의 시각 표현 — 가방/장비 슬롯 공용
     /// 좌클릭: 장착, 우클릭: 버리기 (가방 슬롯 전용)
     /// </summary>
-    public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IItemSlot
+    public class InventorySlotUI : BaseItemSlotUI, IPointerClickHandler
     {
-        [SerializeField] private Image                _iconImage;
-        [SerializeField] private Text                 _amountText;
-        [SerializeField] private Image                _gradeBorderImage;
-        [SerializeField] private ItemGradeColorConfig _gradeConfig;
-        [SerializeField] private bool                 _isDraggable;
+        [SerializeField] private Image _iconImage;
+        [SerializeField] private Text  _amountText;
+        [SerializeField] private Image _gradeBorderImage;
 
-        private Button       _button;
-        private int          _index;
-        private Action<int>  _onClicked;
-        private Action<int>  _onRightClicked;
-        private ItemData     _currentItem;
-
-        // ── IItemSlot ─────────────────────────────────────────────────
-        public ItemData CurrentItem => _currentItem;
-        public bool     IsDraggable => _isDraggable;
+        private Button      _button;
+        private int         _index;
+        private Action<int> _onClicked;
+        private Action<int> _onRightClicked;
 
         private void Awake()
         {
             TryGetComponent(out _button);
             _button?.onClick.AddListener(HandleClick);
         }
+
+        private void OnEnable()  { }
+        private void OnDisable() { }
 
         private void OnDestroy()
         {
@@ -57,11 +53,11 @@ namespace ProjectER.UI
         public void Refresh(InventorySlot slot)
         {
             bool hasItem = slot != null && !slot.IsEmpty;
-            _currentItem = hasItem ? slot.Item : null;
+            _currentItem        = hasItem ? slot.Item : null;
             _iconImage.enabled  = hasItem;
             _amountText.enabled = hasItem;
 
-            ApplyGradeBorder(hasItem ? slot.Item : null);
+            ApplyGradeColor(_gradeBorderImage, _currentItem);
 
             if (!hasItem) return;
 
@@ -73,28 +69,15 @@ namespace ProjectER.UI
         /// <summary>장비 슬롯 갱신 (수량 표시 없음)</summary>
         public void RefreshEquipment(ItemData item)
         {
-            bool hasItem        = item != null;
             _currentItem        = item;
+            bool hasItem        = item != null;
             _iconImage.enabled  = hasItem;
             _amountText.enabled = false;
 
-            ApplyGradeBorder(item);
+            ApplyGradeColor(_gradeBorderImage, item);
 
             if (hasItem)
                 _iconImage.sprite = item.Icon;
-        }
-
-        private void ApplyGradeBorder(ItemData item)
-        {
-            if (_gradeBorderImage == null) return;
-
-            if (item == null || _gradeConfig == null)
-            {
-                _gradeBorderImage.color = Color.clear;
-                return;
-            }
-
-            _gradeBorderImage.color = _gradeConfig.GetColor(item.ItemGrade);
         }
 
         private void HandleClick() => _onClicked?.Invoke(_index);

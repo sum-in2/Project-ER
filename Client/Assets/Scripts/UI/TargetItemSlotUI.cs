@@ -11,33 +11,16 @@ namespace ProjectER.UI
     /// 목표 아이템 슬롯 — 드래그로 아이템 설정, 우클릭으로 제거.
     /// 슬롯 타입에 맞는 부위 아이템만 수락한다.
     /// </summary>
-    public class TargetItemSlotUI : MonoBehaviour, IItemDropTarget, IPointerClickHandler, IItemSlot
+    public class TargetItemSlotUI : BaseItemSlotUI, IItemDropTarget, IPointerClickHandler
     {
         [SerializeField] private EquipmentSlotType _slotType;
         [SerializeField] private Image             _bgImage;
         [SerializeField] private Image             _iconImage;
-        [SerializeField] private bool              _isDraggable;
 
         private static readonly Color EmptyColor = new Color(0.20f, 0.20f, 0.20f);
 
-        private static readonly Color[] GradeColors =
-        {
-            new Color(0.30f, 0.30f, 0.30f), // Common   — 일반
-            new Color(0.18f, 0.38f, 0.18f), // Uncommon — 고급
-            new Color(0.15f, 0.28f, 0.50f), // Rare     — 희귀
-            new Color(0.38f, 0.18f, 0.50f), // Epic     — 영웅
-            new Color(0.55f, 0.38f, 0.08f), // Legend   — 전설
-            new Color(0.55f, 0.15f, 0.15f), // Mythic   — 초월
-        };
-
-        private ItemData _currentItem;
-
         // 슬롯 타입 (TargetItemPanelUI에서 읽음)
-        public EquipmentSlotType SlotType    => _slotType;
-
-        // ── IItemSlot ─────────────────────────────────────────────────
-        public ItemData CurrentItem => _currentItem;
-        public bool     IsDraggable => _isDraggable;
+        public EquipmentSlotType SlotType => _slotType;
 
         // 아이템 변경 이벤트 (슬롯 타입, 새 아이템 — 제거 시 null)
         public event Action<EquipmentSlotType, ItemData> OnItemChanged;
@@ -46,6 +29,10 @@ namespace ProjectER.UI
         {
             ApplyEmpty();
         }
+
+        private void OnEnable()  { }
+        private void OnDisable() { }
+        private void OnDestroy() { }
 
         // ── IItemDropTarget ────────────────────────────────────────────
 
@@ -73,14 +60,10 @@ namespace ProjectER.UI
 
         // ── 외부 API ──────────────────────────────────────────────────
 
-        /// <summary>
-        /// 외부(TargetItemPanelUI 등)에서 직접 아이템 설정
-        /// </summary>
+        /// <summary>외부(TargetItemPanelUI 등)에서 직접 아이템 설정</summary>
         public void SetItem(ItemData item) => ApplyItem(item);
 
-        /// <summary>
-        /// 외부에서 슬롯 초기화
-        /// </summary>
+        /// <summary>외부에서 슬롯 초기화</summary>
         public void ClearItem() => ApplyEmpty();
 
         // ── 내부 ─────────────────────────────────────────────────────
@@ -100,10 +83,12 @@ namespace ProjectER.UI
 
         private void ApplyItem(ItemData item)
         {
-            _currentItem          = item;
-            _bgImage.color        = GradeColors[(int)item.ItemGrade];
-            _iconImage.sprite     = item.Icon;
-            _iconImage.enabled    = item.Icon != null;
+            _currentItem       = item;
+            _bgImage.color     = _gradeConfig != null
+                ? _gradeConfig.GetBackgroundColor(item.ItemGrade)
+                : EmptyColor;
+            _iconImage.sprite  = item.Icon;
+            _iconImage.enabled = item.Icon != null;
             OnItemChanged?.Invoke(_slotType, item);
         }
 
