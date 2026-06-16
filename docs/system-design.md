@@ -51,6 +51,23 @@ CharacterBase (MonoBehaviour + IDamageable):
 상태 관리: enum CharacterState + StateMachine 구조 사용 (bool 플래그 남발 금지)
 ```
 
+### 아이템 슬롯 크기 표기 규칙
+
+```
+슬롯 가로:세로 비율 — 108:64 고정 (≈ 27:16)
+크기 지정 시 x(가로)만 명시하고 세로는 비율로 자동 계산:
+  x:108 → 108 × 64   (기준 슬롯 — 인벤토리/가방/장비)
+  x:67  → 67  × 40   (도감 그리드 셀)
+  x:50  → 50  × ≈30  (루트박스 팝업 등 소형 슬롯)
+
+코드 패턴:
+  private const float SlotAspectRatio = 108f / 64f;
+  private const float SlotWidth       = SlotX;
+  private const float SlotHeight      = SlotX / SlotAspectRatio;
+
+아이콘은 슬롯 내부 10% inset + preserveAspect = true (정사각형 아이콘, 좌우 여백 허용)
+```
+
 ### 인벤토리 & 아이템
 
 ```

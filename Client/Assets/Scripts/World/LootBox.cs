@@ -16,9 +16,11 @@ namespace ProjectER.World
     public class LootBox : MonoBehaviour, IInteractable
     {
         [SerializeField] private LootBoxUI _lootBoxUIPrefab;
+        [SerializeField] private float     _closeRange = 0.6f;
 
         private readonly List<SpawnEntry> _contents = new();
         private LootBoxUI                 _activeUI;
+        private PlayerController          _activeInteractor;
 
         private void Awake()
         {
@@ -30,13 +32,18 @@ namespace ProjectER.World
             obstacle.shape   = NavMeshObstacleShape.Box;
         }
 
-        private void OnEnable()
+        private void Update()
         {
+            if (_activeUI == null || !_activeUI.gameObject.activeSelf) return;
+            if (_activeInteractor == null) return;
+
+            float dist = Vector3.Distance(transform.position, _activeInteractor.transform.position);
+            if (dist > _closeRange)
+                _activeUI.Close();
         }
 
-        private void OnDisable()
-        {
-        }
+        private void OnEnable()  { }
+        private void OnDisable() { }
 
         private void OnDestroy()
         {
@@ -65,14 +72,12 @@ namespace ProjectER.World
             if (_activeUI == null)
                 _activeUI = Object.Instantiate(_lootBoxUIPrefab);
 
-            _activeUI.Open(_contents, inventory, OnAllItemsTaken, OnUIClosed);
+            _activeInteractor = interactor;
+            _activeUI.Open(_contents, inventory, OnAllItemsTaken);
         }
 
         // 모든 아이템이 취득되면 박스 제거
         private void OnAllItemsTaken() => Destroy(gameObject);
-
-        // 닫기만 한 경우 — 박스는 유지, UI 인스턴스는 재사용
-        private void OnUIClosed() { }
 
         // UI 프리팹 미연결 시 콘솔로 내용물 출력 (임시)
         private void LogContentsDebug(InventorySystem inventory)
