@@ -91,7 +91,9 @@ namespace ProjectER.Character
                 return;
             }
 
-            if (hit.collider.TryGetComponent<IInteractable>(out IInteractable interactable))
+            // GetComponentInParent: Collider가 자식 오브젝트에 있어도 부모의 IInteractable을 찾는다
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable != null)
             {
                 // 상호작용 대상이 사거리 밖이면 우선 대상 위치로 이동, 도착 후 자동으로 상호작용 실행
                 _pendingInteractable = interactable;

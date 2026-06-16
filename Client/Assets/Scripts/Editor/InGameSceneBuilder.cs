@@ -25,13 +25,23 @@ namespace ProjectER.Editor
         private const string ZoneSpawnPath     = "Assets/ScriptableObjects/ZoneSpawns/BSER";
         private const int    TargetAreaCode    = 10;
 
-        // 박스 클러스터(areaSpawnGroup 1001~1004) 4개를 배치할 위치 (Floor 50x50 기준)
+        // 서브존은 동일한 풀의 반복 정의이므로 대표로 1001을 사용
+        private const int RepresentativeSubZone = 1001;
+
+        // 4개 구역 중심 위치 (50×50 바닥 기준 4분할)
         private static readonly Vector2[] ZoneOffsets =
         {
-            new(-12f, -12f),
-            new(-12f,  12f),
-            new( 12f, -12f),
-            new( 12f,  12f),
+            new(-12f, -12f), new(-12f, 12f),
+            new( 12f, -12f), new( 12f, 12f),
+        };
+
+        // 구역별 식별 색상
+        private static readonly Color[] ZoneColors =
+        {
+            new(1.00f, 0.35f, 0.35f), // 빨강 (좌하)
+            new(0.35f, 0.90f, 0.35f), // 초록 (좌상)
+            new(0.35f, 0.55f, 1.00f), // 파랑 (우하)
+            new(1.00f, 0.90f, 0.20f), // 노랑 (우상)
         };
 
         [MenuItem("ProjectER/Build InGame Scene")]
@@ -136,25 +146,27 @@ namespace ProjectER.Editor
             GameObject existing = GameObject.Find("LootZones");
             if (existing != null) Object.DestroyImmediate(existing);
 
-            GameObject root = new("LootZones");
-            LootBox boxPrefab = GetOrCreateLootBoxPrefab();
+            GameObject root      = new("LootZones");
+            LootBox    boxPrefab = GetOrCreateLootBoxPrefab();
 
+            string        spawnPath = $"{ZoneSpawnPath}/Zone_{TargetAreaCode}_{RepresentativeSubZone}.asset";
+            ZoneSpawnData spawnData = AssetDatabase.LoadAssetAtPath<ZoneSpawnData>(spawnPath);
+            if (spawnData == null)
+                Debug.LogWarning($"[InGameSceneBuilder] {spawnPath} 없음 — 먼저 ProjectER > Import BSER Item Spawns 실행 필요");
+
+            // 4개 구역 × 박스 5개 (= 총 박스 20개)
             for (int i = 0; i < ZoneOffsets.Length; i++)
             {
-                int group = 1001 + i;
-                string path = $"{ZoneSpawnPath}/Zone_{TargetAreaCode}_{group}.asset";
-                ZoneSpawnData spawnData = AssetDatabase.LoadAssetAtPath<ZoneSpawnData>(path);
-                if (spawnData == null)
-                    Debug.LogWarning($"[InGameSceneBuilder] {path} 없음 — 먼저 ProjectER > Import BSER Item Spawns 실행 필요");
-
-                GameObject zoneObj = new($"LootZone_{group}");
+                Vector2    offset  = ZoneOffsets[i];
+                GameObject zoneObj = new($"LootZone_{TargetAreaCode}_{i + 1}");
                 zoneObj.transform.SetParent(root.transform);
-                zoneObj.transform.position = new Vector3(ZoneOffsets[i].x, 0f, ZoneOffsets[i].y);
+                zoneObj.transform.position = new Vector3(offset.x, 0f, offset.y);
 
-                LootZone zone = zoneObj.AddComponent<LootZone>();
-                SerializedObject so = new(zone);
+                LootZone         zone = zoneObj.AddComponent<LootZone>();
+                SerializedObject so   = new(zone);
                 so.FindProperty("_spawnData").objectReferenceValue = spawnData;
                 so.FindProperty("_boxPrefab").objectReferenceValue = boxPrefab;
+                so.FindProperty("_zoneColor").colorValue           = ZoneColors[i];
                 so.ApplyModifiedProperties();
             }
         }
