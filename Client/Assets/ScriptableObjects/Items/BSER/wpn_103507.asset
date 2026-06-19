@@ -18,7 +18,7 @@ MonoBehaviour:
   _id: 103507
   _displayName: "\uC8FD\uC74C\uC758\uBC1C\uAC78\uC74C"
   _description: 
-  _icon: {fileID: 0}
+  _icon: {fileID: 21300000, guid: 08769ec18ce516a4c9b34c84e6c16468, type: 3}
   _itemType: 3
   _weaponType: 3
   _itemGrade: 4
