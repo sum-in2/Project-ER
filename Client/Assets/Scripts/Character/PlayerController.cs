@@ -1,3 +1,4 @@
+using ProjectER.Character.State;
 using ProjectER.Combat;
 using ProjectER.Data;
 using ProjectER.Interaction;
@@ -10,6 +11,7 @@ namespace ProjectER.Character
     /// <summary>
     /// 플레이어가 조작하는 캐릭터.
     /// 우클릭 → Raycast 결과에 따라 공격(IDamageable) > 상호작용(IInteractable) > 이동(NavMesh) 순으로 분기.
+    /// 이동은 상태머신의 MoveState가 NavMeshAgent를 직접 구동한다.
     /// TODO: 액티브(Q/W/E/R)·무기(D)·전술(F)·패시브(T) 스킬 슬롯 연동은 추후 구현 예정.
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
@@ -29,6 +31,9 @@ namespace ProjectER.Character
         private NavMeshAgent _agent;
         private Camera _mainCamera;
 
+        // 이동 명령 시 목적지를 전달하기 위해 MoveState 인스턴스를 직접 보유
+        private MoveState _moveState;
+
         // 상호작용 대상으로 이동 중일 때, 도착 시 실행할 상호작용 정보
         private IInteractable _pendingInteractable;
         private Transform _pendingInteractTarget;
@@ -37,6 +42,14 @@ namespace ProjectER.Character
         {
             base.Awake();
             TryGetComponent(out _agent);
+
+            // 상태 등록 (이동을 담당하는 MoveState는 NavMeshAgent를 직접 구동)
+            _moveState = new MoveState(_agent, StateMachine);
+            StateMachine.RegisterState(new IdleState(_agent));
+            StateMachine.RegisterState(_moveState);
+            StateMachine.RegisterState(new DownedState(_agent));
+            StateMachine.RegisterState(new DeadState(_agent));
+            StateMachine.ChangeState(CharacterState.Idle);
         }
 
         private void Start()
@@ -67,12 +80,23 @@ namespace ProjectER.Character
             base.OnDestroy();
         }
 
-        private void Update()
+        protected override void Update()
         {
+            // 상태머신 Tick (MoveState 도착 판정 등)
+            base.Update();
+
+            // 빈사·사망 중에는 우클릭 입력(이동·공격·상호작용)을 받지 않는다
+            if (!CanAcceptInput()) return;
+
             if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
                 HandleRightClick();
 
             TryResolvePendingInteraction();
+        }
+
+        private bool CanAcceptInput()
+        {
+            return CurrentState != CharacterState.Downed && CurrentState != CharacterState.Dead;
         }
 
         private void HandleRightClick()
@@ -109,9 +133,9 @@ namespace ProjectER.Character
 
         private void MoveTo(Vector3 destination)
         {
-            // 이동 중 새 목적지가 들어오면 기존 경로를 즉시 버리고 새 경로로 전환
-            _agent.ResetPath();
-            _agent.SetDestination(destination);
+            // 목적지를 MoveState에 전달하고 이동 상태로 전환 (실제 NavMeshAgent 구동은 MoveState가 담당)
+            _moveState.SetDestination(destination);
+            StateMachine.ChangeState(CharacterState.Move);
         }
 
         private void TryResolvePendingInteraction()

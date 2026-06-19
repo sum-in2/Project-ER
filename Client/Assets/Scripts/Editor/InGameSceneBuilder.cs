@@ -1,6 +1,7 @@
 using ProjectER.Character;
 using ProjectER.Data;
 using ProjectER.Inventory;
+using ProjectER.UI;
 using ProjectER.World;
 using Unity.AI.Navigation;
 using UnityEditor;
@@ -21,9 +22,10 @@ namespace ProjectER.Editor
         private const string TestCharacterDataPath = "Assets/ScriptableObjects/Characters/BSER/Character_1.asset"; // Jackie (이동 테스트용)
         private const float  FloorScale             = 5f; // Plane 기본 10x10 → 50x50
 
-        private const string LootBoxPrefabPath = "Assets/Prefabs/Items/LootBox.prefab";
-        private const string ZoneSpawnPath     = "Assets/ScriptableObjects/ZoneSpawns/BSER";
-        private const int    TargetAreaCode    = 10;
+        private const string LootBoxPrefabPath   = "Assets/Prefabs/Items/LootBox.prefab";
+        private const string LootBoxUIPrefabPath = "Assets/Prefabs/UI/LootBoxUI.prefab";
+        private const string ZoneSpawnPath       = "Assets/ScriptableObjects/ZoneSpawns/BSER";
+        private const int    TargetAreaCode      = 10;
 
         // 서브존은 동일한 풀의 반복 정의이므로 대표로 1001을 사용
         private const int RepresentativeSubZone = 1001;
@@ -173,16 +175,44 @@ namespace ProjectER.Editor
 
         private static LootBox GetOrCreateLootBoxPrefab()
         {
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(LootBoxPrefabPath);
-            if (prefab != null) return prefab.GetComponent<LootBox>();
+            // 상호작용 시 열 LootBoxUI 프리팹 (먼저 Build LootBox UI Prefab 실행 필요)
+            LootBoxUI lootBoxUI = AssetDatabase.LoadAssetAtPath<LootBoxUI>(LootBoxUIPrefabPath);
+            if (lootBoxUI == null)
+                Debug.LogWarning($"[InGameSceneBuilder] {LootBoxUIPrefabPath} 없음 — " +
+                                 "먼저 ProjectER > Build LootBox UI Prefab 실행 필요. (UI 없이 콘솔 로그만 출력됨)");
 
-            GameObject root = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            root.name = "LootBox";
-            root.AddComponent<LootBox>();
+            GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(LootBoxPrefabPath);
+            bool isExisting = existingPrefab != null;
+
+            // 기존 프리팹은 참조 보강을 위해 임시 로드, 없으면 새로 생성
+            GameObject root = isExisting
+                ? PrefabUtility.LoadPrefabContents(LootBoxPrefabPath)
+                : GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+            if (!isExisting)
+            {
+                root.name = "LootBox";
+                root.AddComponent<LootBox>();
+            }
+
+            if (!root.TryGetComponent(out LootBox lootBox))
+                lootBox = root.AddComponent<LootBox>();
+
+            // _lootBoxUIPrefab 참조 보강 + 자동 닫힘 거리 설정
+            // (닫힘 거리가 상호작용 거리보다 작으면 UI가 열리자마자 닫히므로 넉넉하게)
+            SerializedObject so = new(lootBox);
+            so.FindProperty("_lootBoxUIPrefab").objectReferenceValue = lootBoxUI;
+            so.FindProperty("_closeRange").floatValue = 3f;
+            so.ApplyModifiedProperties();
 
             EnsureDirectory("Assets/Prefabs/Items");
             GameObject savedPrefab = PrefabUtility.SaveAsPrefabAsset(root, LootBoxPrefabPath);
-            Object.DestroyImmediate(root);
+
+            if (isExisting)
+                PrefabUtility.UnloadPrefabContents(root);
+            else
+                Object.DestroyImmediate(root);
+
             return savedPrefab.GetComponent<LootBox>();
         }
 

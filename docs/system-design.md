@@ -28,6 +28,21 @@ IInteractable  : void Interact(PlayerController interactor)
 3. 그 외             → 이동 (NavMeshAgent.SetDestination)
 ```
 
+### 게임 규칙 / 조작법
+
+```
+실험체: 액티브 스킬 1~4 + 패시브 1 (스킬 데이터는 CharacterData(SO)에서 관리 예정)
+
+키 바인딩 (기본값, 추후 리바인딩 지원):
+- 마우스 우클릭 : 컨텍스트별 (위 "우클릭 입력 처리 우선순위" 참조 — 이동/상호작용/공격)
+- Q/W/E/R       : 액티브 스킬 1~4
+- D             : 무기 스킬   F : 전술 스킬   T : 패시브   ` : 휴식
+
+설계 메모:
+- 조작법 하드코딩 금지 → New Input System의 Input Action Asset / 바인딩 오버라이드로 리바인딩 가능하게
+- 우클릭 분기는 Raycast 대상 타입(IInteractable/IDamageable/지형) 다형성으로 처리 (if/else 타입 분기 지양)
+```
+
 ### 이동 시스템 (Click-to-Move)
 
 ```
@@ -49,6 +64,43 @@ CharacterBase (MonoBehaviour + IDamageable):
 
 스탯: CharacterData(ScriptableObject)에서 읽어옴
 상태 관리: enum CharacterState + StateMachine 구조 사용 (bool 플래그 남발 금지)
+```
+
+### 상태머신 (CharacterState)
+
+```
+enum CharacterState: Idle, Move, Attack, Skill, Downed, Dead
+
+설계: State 패턴(다형 ICharacterState) + enum 식별자 하이브리드
+- 행동은 ICharacterState 구현체로 다형 분기 (if/else 타입 분기 금지)
+- enum은 조회·네트워크 동기화·Inspector 표시용 식별자
+- CharacterStateMachine(순수 C# 클래스): Current, OnStateChanged 이벤트,
+  RegisterState/ChangeState/Tick. CharacterBase가 소유하고 Update에서 Tick 위임
+- 이동(NavMeshAgent 구동)은 MoveState가 책임 (상태가 에이전트를 직접 제어 — 단일책임)
+
+구현 단계:
+- 1차(현재): Idle / Move / Downed / Dead
+- Attack / Skill 구체 상태는 전투·스킬 작업 때 추가 (enum에는 미리 포함, 개방/폐쇄)
+```
+
+### 빈사(Downed) / 부활 시스템
+
+```
+HP 0 도달 시 즉시 사망(Dead)이 아니라 빈사(Downed) 상태로 진입한다.
+빈사 → 부활 기믹으로 복귀 가능, 부활 실패/추가 처리 시 Dead 확정.
+
+전이:
+- TakeDamage로 HP <= 0  → Downed (Dead 아님)
+- Downed에서 부활 성공   → Idle (HP 일부 회복)
+- Downed에서 부활 실패/처형 → Dead (최종)
+
+빈사 상태 규칙:
+- 공격 불가 (Attack 상태 진입 차단)
+- 스탯 변경 적용 (예: 이동속도 감소 등 — 구체 수치 TODO)
+- 빈사 고유 스킬 사용 가능: 키 바인딩은 Q/W/E/R 그대로 유지하되,
+  평상시 스킬셋이 아닌 빈사 전용 스킬셋으로 교체 (스킬 슬롯 작업 때 연동, 현재 TODO)
+
+이동: 빈사 중 이동 허용 여부는 추후 결정 (ER 레퍼런스는 저속 이동 가능)
 ```
 
 ### 아이템 슬롯 크기 표기 규칙

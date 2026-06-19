@@ -16,7 +16,7 @@ namespace ProjectER.World
     public class LootBox : MonoBehaviour, IInteractable
     {
         [SerializeField] private LootBoxUI _lootBoxUIPrefab;
-        [SerializeField] private float     _closeRange = 0.6f;
+        [SerializeField] private float     _closeRange = 3f;
 
         private readonly List<SpawnEntry> _contents = new();
         private LootBoxUI                 _activeUI;

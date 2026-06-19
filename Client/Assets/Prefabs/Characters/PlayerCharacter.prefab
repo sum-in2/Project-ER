@@ -152,6 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Character.PlayerController
   _maxHp: 100
+  _reviveHpRatio: 0.3
   _characterData: {fileID: 11400000, guid: e8f6ccabd5d5ede4da4917f6ddedd32f, type: 2}
 --- !u!114 &478449088250738296
 MonoBehaviour:
