@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5683830679120518084}
   - component: {fileID: 4761212785205941000}
   - component: {fileID: 478449088250738296}
+  - component: {fileID: 7708746436880937812}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -166,3 +167,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 102a49685f32f504aa5f8fc0b3c85140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Inventory.InventorySystem
+--- !u!114 &7708746436880937812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2890630837669016156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f60c26dd4ba58ab49a9c0c72d7c43776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectER.Crafting.CraftingSystem
+  _inventorySystem: {fileID: 478449088250738296}
+  _recipeDatabase: {fileID: 11400000, guid: 6ec5dd81b69b27e44abf36ccdc693cfd, type: 2}

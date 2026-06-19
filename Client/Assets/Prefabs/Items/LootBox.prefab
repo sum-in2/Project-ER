@@ -126,4 +126,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectER.World.LootBox
   _lootBoxUIPrefab: {fileID: 3589369205194192310, guid: 1511d5b4e93e62a429734712de9f6377, type: 3}
-  _closeRange: 1.4
+  _closeRange: 3

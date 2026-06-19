@@ -64,6 +64,8 @@ namespace ProjectER.Editor
             // 풀스크린 오버레이 이미지
             Image overlay        = root.AddComponent<Image>();
             overlay.color        = OverlayColor;
+            // 레이캐스트 차단 해제 — 박스가 열려도 뒤쪽 HUD(조합칸 등) 클릭이 통과되도록
+            overlay.raycastTarget = false;
             RectTransform rootRt = root.GetComponent<RectTransform>();
             rootRt.anchorMin     = Vector2.zero;
             rootRt.anchorMax     = Vector2.one;

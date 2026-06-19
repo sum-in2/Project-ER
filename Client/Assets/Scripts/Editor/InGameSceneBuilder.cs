@@ -1,4 +1,5 @@
 using ProjectER.Character;
+using ProjectER.Crafting;
 using ProjectER.Data;
 using ProjectER.Inventory;
 using ProjectER.UI;
@@ -20,6 +21,7 @@ namespace ProjectER.Editor
         private const string ScenePath             = "Assets/Scenes/04_InGameScene.unity";
         private const string PlayerPrefabPath      = "Assets/Prefabs/Characters/PlayerCharacter.prefab";
         private const string TestCharacterDataPath = "Assets/ScriptableObjects/Characters/BSER/Character_1.asset"; // Jackie (이동 테스트용)
+        private const string RecipeDatabasePath    = "Assets/ScriptableObjects/RecipeDatabase.asset";
         private const float  FloorScale             = 5f; // Plane 기본 10x10 → 50x50
 
         private const string LootBoxPrefabPath   = "Assets/Prefabs/Items/LootBox.prefab";
@@ -118,8 +120,21 @@ namespace ProjectER.Editor
             }
 
             // 이전에 생성된 프리팹이라도 누락된 컴포넌트가 있으면 보강
-            if (!root.TryGetComponent<InventorySystem>(out _))
-                root.AddComponent<InventorySystem>();
+            if (!root.TryGetComponent(out InventorySystem inventory))
+                inventory = root.AddComponent<InventorySystem>();
+
+            // 조합 가능 아이템 표시용 CraftingSystem 보강 + 인벤토리/레시피DB 연결
+            if (!root.TryGetComponent(out CraftingSystem crafting))
+                crafting = root.AddComponent<CraftingSystem>();
+
+            RecipeDatabase recipeDatabase = AssetDatabase.LoadAssetAtPath<RecipeDatabase>(RecipeDatabasePath);
+            if (recipeDatabase == null)
+                Debug.LogWarning($"[InGameSceneBuilder] {RecipeDatabasePath} 없음 — 조합 가능 아이템 표시 비활성");
+
+            SerializedObject craftSo = new(crafting);
+            craftSo.FindProperty("_inventorySystem").objectReferenceValue = inventory;
+            craftSo.FindProperty("_recipeDatabase").objectReferenceValue = recipeDatabase;
+            craftSo.ApplyModifiedProperties();
 
             PlayerController controller = root.GetComponent<PlayerController>();
             CharacterData characterData = AssetDatabase.LoadAssetAtPath<CharacterData>(TestCharacterDataPath);

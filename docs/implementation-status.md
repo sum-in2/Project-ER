@@ -35,10 +35,10 @@
 | 캐릭터 베이스 | `Scripts/Character/CharacterBase.cs` | IDamageable + HP, 상태머신 소유. HP 0 → Downed(빈사), Revive() 부활, Die() 최종 사망. 스킬/공격은 TODO |
 | 상태머신 | `Scripts/Character/State/*.cs` | State 패턴 + enum 하이브리드. Idle/Move/Downed/Dead 구현. MoveState가 NavMeshAgent 직접 구동, 빈사 중 입력 차단. Attack/Skill 상태는 enum에만 (전투·스킬 작업 때 추가). 빈사 스탯/전용 스킬셋은 TODO |
 | 전투/스킬 인터페이스 | `Scripts/Combat/`, `Scripts/Interaction/`, `Scripts/Skill/` | 인터페이스 정의만 완료, 로직 구현 TODO |
-| 루트박스 (그레이박스) | `Scripts/World/LootBox.cs`, `LootZone.cs`, `Scripts/Data/SpawnEntry.cs`, `ZoneSpawnData.cs` | IInteractable. 스폰 그룹 1개를 5상자에 자체 알고리즘으로 분배, 상호작용 시 인벤토리 이전 후 파괴 |
+| 루트박스 (그레이박스) | `Scripts/World/LootBox.cs`, `LootZone.cs`, `Scripts/Data/SpawnEntry.cs`, `ZoneSpawnData.cs` | IInteractable. 스폰 그룹 1개를 5상자에 자체 알고리즘으로 분배. 상호작용 시 4x4 UI 열림 → 슬롯 클릭으로 개별 취득(가방 가득 시 취득 거부, 박스에 유지), 전부 취득 시 박스 파괴 |
 | 아이템 스폰 임포터 | `Scripts/Editor/BserItemSpawnImporter.cs` | ItemSpawn.json → areaCode 10 ZoneSpawnData 5종. Common(필드 산개) 미사용 |
 | 인게임 씬 빌더 | `Scripts/Editor/InGameSceneBuilder.cs`, `04_InGameScene.unity` | 바닥+NavMesh, 플레이어 프리팹, 루트박스 4구역, 카메라 자동 세팅 |
-| 인게임 테스트 HUD | `Scripts/UI/InGame/*.cs`, `Scripts/Editor/InGameHudBuilder.cs` | PlayerStatusHud(HP바+상태), CombatTestPanel(데미지/회복/빈사/부활/사망/아이템/스킬 스텁 버튼), InGameInventoryBar(하단 우측 10칸). CharacterBase에 OnHpChanged/OnStateChanged/Heal 추가. 빌더가 Player에 참조 연결 (메뉴 Build InGame HUD) |
+| 인게임 테스트 HUD | `Scripts/UI/InGame/*.cs`, `Scripts/Editor/InGameHudBuilder.cs` | PlayerStatusHud(HP바+상태), CombatTestPanel(데미지/회복/빈사/부활/사망/아이템/스킬 스텁 버튼), InGameInventoryBar(우하단 테두리 영역 5x2), CraftableItemBar(인벤토리 위 조합 5칸 — 제작 가능 레시피 결과물 표시, 인벤토리/열린 박스 변경 시 갱신, 클릭 시 TryCraft 실행. 열린 루트박스 내용물도 재료로 포함(IMaterialSource), 조합 시 소모 우선순위 인벤토리 > 박스. 표시 순서 정렬은 TODO). InGameSceneBuilder가 Player에 CraftingSystem 추가(InventorySystem+RecipeDatabase 연결). CharacterBase에 OnHpChanged/OnStateChanged/Heal 추가. 빌더가 Player에 참조 연결 (메뉴 Build InGame HUD) |
 
 ### 미구현 (다음 작업 대상)
 
@@ -53,6 +53,7 @@
 | 이동 동기화 | 네트워크 | MoveHandler GameRoom 연동, S2C_MoveSync 브로드캐스트 |
 | 전투 동기화 | 네트워크 | AttackHandler, S2C_TakeDamage/Die 패킷 |
 | GameRoom | 서버 | 틱 루프, 플레이어 위치 관리 |
+| 조합칸 표시 순서 정렬 | UI | 인게임 조합 5칸(CraftableItemBar) — 현재 레시피 DB순 표시. 표시 순서/우선순위 정렬 로직 (Refresh의 _recipeBuffer 정렬) |
 | 스탯 아이콘 | UI | 에셋 준비 후 StatDefs에 아이콘 슬롯 연결 |
 | 무기 세부 필터 | UI | 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 |
 | 픽 화면 - 채팅/스킨/루트 선택 | 핵심 | 채팅창, 스킨 목록(에셋 준비 후), 루트 선택 등 마무리(30초) 단계 → 시작 시 인게임 씬(04) 로딩 |

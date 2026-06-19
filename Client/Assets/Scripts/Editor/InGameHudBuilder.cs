@@ -1,4 +1,5 @@
 using ProjectER.Character;
+using ProjectER.Crafting;
 using ProjectER.Data;
 using ProjectER.Inventory;
 using ProjectER.UI;
@@ -26,9 +27,17 @@ namespace ProjectER.Editor
         private const string CanvasName = "InGameHudCanvas";
 
         private const int   BagSize    = 10;
+        private const int   Columns    = 5;  // 인벤토리 가로 5칸
+        private const int   InvRows    = 2;  // 인벤토리 2행
+        private const int   CraftCount = 5;  // 조합 가능 아이템 칸 수
         private const float SlotWidth  = 72f;
         private const float SlotAspect = 108f / 64f; // 슬롯 가로:세로 비율 (system-design 규칙)
         private static float SlotHeight => SlotWidth / SlotAspect;
+
+        private const float SlotGap     = 4f;
+        private const float RegionPad   = 8f;  // 테두리 내부 여백
+        private const float BorderThick = 3f;  // 테두리 두께
+        private const float SectionGap  = 6f;  // 조합칸과 인벤토리 영역 사이 간격
 
         private static Font _font;
 
@@ -44,6 +53,7 @@ namespace ProjectER.Editor
             GameObject playerObj = GameObject.Find("Player");
             CharacterBase player = playerObj != null ? playerObj.GetComponent<CharacterBase>() : null;
             InventorySystem inventory = playerObj != null ? playerObj.GetComponent<InventorySystem>() : null;
+            CraftingSystem crafting = playerObj != null ? playerObj.GetComponent<CraftingSystem>() : null;
             if (player == null || inventory == null)
                 Debug.LogWarning("[InGameHudBuilder] 씬에서 Player(CharacterBase/InventorySystem)를 찾지 못했습니다. 먼저 Build InGame Scene 실행 필요.");
 
@@ -52,7 +62,7 @@ namespace ProjectER.Editor
 
             BuildStatusHud(canvas.transform, player);
             BuildCombatTestPanel(canvas.transform, player, inventory, itemDatabase);
-            BuildInventoryBar(canvas.transform, inventory, gradeConfig);
+            BuildInventoryRegion(canvas.transform, inventory, crafting, gradeConfig);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -202,39 +212,81 @@ namespace ProjectER.Editor
             so.ApplyModifiedProperties();
         }
 
-        // ── 인벤토리 바 (우하단, 10칸) ────────────────────────────────
+        // ── 인벤토리 영역(우하단): 테두리 친 5x2 그리드 + 그 위 조합 5칸 ──
 
-        private static void BuildInventoryBar(Transform parent, InventorySystem inventory,
-            ItemGradeColorConfig gradeConfig)
+        private static void BuildInventoryRegion(Transform parent, InventorySystem inventory,
+            CraftingSystem crafting, ItemGradeColorConfig gradeConfig)
         {
-            RectTransform bar = NewRect("InventoryBar", parent);
-            SetAnchor(bar, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f),
-                new Vector2(-20f, 20f), new Vector2(10f, 10f));
+            // 그리드/영역 크기 계산
+            float gridW    = Columns * SlotWidth + (Columns - 1) * SlotGap;          // 인벤토리 5칸 폭
+            float invGridH = InvRows * SlotHeight + (InvRows - 1) * SlotGap;         // 2행 높이
+            float innerW   = gridW + RegionPad * 2f;
+            float innerH   = invGridH + RegionPad * 2f;
+            float regionW  = innerW + BorderThick * 2f;
+            float regionH  = innerH + BorderThick * 2f;
+            float craftH   = SlotHeight;
 
-            HorizontalLayoutGroup hlg = bar.gameObject.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 4f;
-            hlg.childControlWidth = true;
-            hlg.childControlHeight = true;
-            hlg.childForceExpandWidth = false;
-            hlg.childForceExpandHeight = false;
+            // ── 테두리 인벤토리 영역 (우하단) ───────────────────────────
+            RectTransform region = NewRect("InventoryRegion", parent);
+            SetAnchor(region, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f),
+                new Vector2(-20f, 20f), new Vector2(regionW, regionH));
+            AddImage(region, new Color(0.55f, 0.55f, 0.62f, 0.95f)); // 테두리 색
 
-            ContentSizeFitter csf = bar.gameObject.AddComponent<ContentSizeFitter>();
-            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            RectTransform inner = NewRect("Inner", region);
+            SetStretchOffset(inner, BorderThick);
+            AddImage(inner, new Color(0.10f, 0.10f, 0.12f, 0.92f)); // 내부 배경
 
-            InGameInventoryBar comp = bar.gameObject.AddComponent<InGameInventoryBar>();
+            RectTransform grid = NewRect("InventoryGrid", inner);
+            SetStretchOffset(grid, RegionPad);
+            GridLayoutGroup glg = grid.gameObject.AddComponent<GridLayoutGroup>();
+            glg.cellSize        = new Vector2(SlotWidth, SlotHeight);
+            glg.spacing         = new Vector2(SlotGap, SlotGap);
+            glg.constraint      = GridLayoutGroup.Constraint.FixedColumnCount;
+            glg.constraintCount = Columns;
+            glg.startCorner     = GridLayoutGroup.Corner.UpperLeft;
+            glg.startAxis       = GridLayoutGroup.Axis.Horizontal;
+            glg.childAlignment  = TextAnchor.MiddleCenter;
 
-            InventorySlotUI[] slots = new InventorySlotUI[BagSize];
+            InGameInventoryBar invBar = grid.gameObject.AddComponent<InGameInventoryBar>();
+            InventorySlotUI[] bagSlots = new InventorySlotUI[BagSize];
             for (int i = 0; i < BagSize; i++)
-                slots[i] = CreateInventorySlot(bar, i, gradeConfig);
+                bagSlots[i] = CreateInventorySlot(grid, i, gradeConfig);
 
-            SerializedObject so = new(comp);
-            so.FindProperty("_inventorySystem").objectReferenceValue = inventory;
-            SerializedProperty arr = so.FindProperty("_bagSlotUIs");
-            arr.arraySize = BagSize;
+            SerializedObject invSo = new(invBar);
+            invSo.FindProperty("_inventorySystem").objectReferenceValue = inventory;
+            SerializedProperty bagArr = invSo.FindProperty("_bagSlotUIs");
+            bagArr.arraySize = BagSize;
             for (int i = 0; i < BagSize; i++)
-                arr.GetArrayElementAtIndex(i).objectReferenceValue = slots[i];
-            so.ApplyModifiedProperties();
+                bagArr.GetArrayElementAtIndex(i).objectReferenceValue = bagSlots[i];
+            invSo.ApplyModifiedProperties();
+
+            // ── 조합 가능 아이템 5칸 (영역 바로 위, 그리드와 좌우 정렬) ──
+            RectTransform craftStrip = NewRect("CraftableStrip", parent);
+            SetAnchor(craftStrip, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f),
+                new Vector2(-(20f + BorderThick + RegionPad), 20f + regionH + SectionGap),
+                new Vector2(gridW, craftH));
+
+            HorizontalLayoutGroup chl = craftStrip.gameObject.AddComponent<HorizontalLayoutGroup>();
+            chl.spacing = SlotGap;
+            chl.childControlWidth = true;
+            chl.childControlHeight = true;
+            chl.childForceExpandWidth = false;
+            chl.childForceExpandHeight = false;
+            chl.childAlignment = TextAnchor.MiddleCenter;
+
+            CraftableItemBar craftBar = craftStrip.gameObject.AddComponent<CraftableItemBar>();
+            InventorySlotUI[] craftSlots = new InventorySlotUI[CraftCount];
+            for (int i = 0; i < CraftCount; i++)
+                craftSlots[i] = CreateInventorySlot(craftStrip, 100 + i, gradeConfig);
+
+            SerializedObject craftSo = new(craftBar);
+            craftSo.FindProperty("_craftingSystem").objectReferenceValue = crafting;
+            craftSo.FindProperty("_inventorySystem").objectReferenceValue = inventory;
+            SerializedProperty craftArr = craftSo.FindProperty("_slots");
+            craftArr.arraySize = CraftCount;
+            for (int i = 0; i < CraftCount; i++)
+                craftArr.GetArrayElementAtIndex(i).objectReferenceValue = craftSlots[i];
+            craftSo.ApplyModifiedProperties();
         }
 
         private static InventorySlotUI CreateInventorySlot(Transform parent, int index,
@@ -329,6 +381,15 @@ namespace ProjectER.Editor
             rt.anchorMax = Vector2.one;
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
+        }
+
+        // 부모에 꽉 채우되 사방으로 offset만큼 안쪽으로 들어간 RectTransform (테두리/여백용)
+        private static void SetStretchOffset(RectTransform rt, float offset)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = new Vector2(offset, offset);
+            rt.offsetMax = new Vector2(-offset, -offset);
         }
 
         private static Image AddImage(RectTransform rt, Color color)
