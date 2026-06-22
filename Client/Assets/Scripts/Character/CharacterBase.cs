@@ -69,9 +69,13 @@ namespace ProjectER.Character
             _currentHp = Mathf.Max(0f, _currentHp - amount);
             OnHpChanged?.Invoke(_currentHp, _maxHp);
 
+            // 전투 디버그 로그 (그레이박스 검증용 — 전투 시스템 안정화 후 제거 예정)
+            Debug.Log($"[전투] {name} 피해 {amount:0.#} → HP {_currentHp:0.#}/{_maxHp:0.#}", this);
+
             if (_currentHp <= 0f)
             {
                 // HP 0 도달 시 즉시 사망이 아니라 빈사로 진입 (부활 가능)
+                Debug.Log($"[전투] {name} 빈사(Downed) 진입", this);
                 StateMachine?.ChangeState(CharacterState.Downed);
             }
         }

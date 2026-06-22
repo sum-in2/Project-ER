@@ -24,6 +24,8 @@ namespace ProjectER.Editor
         private const string RecipeDatabasePath    = "Assets/ScriptableObjects/RecipeDatabase.asset";
         private const float  FloorScale             = 5f; // Plane 기본 10x10 → 50x50
 
+        private const string CombatDummyMaterialPath = "Assets/Materials/CombatDummy.mat";
+
         private const string LootBoxPrefabPath   = "Assets/Prefabs/Items/LootBox.prefab";
         private const string LootBoxUIPrefabPath = "Assets/Prefabs/UI/LootBoxUI.prefab";
         private const string ZoneSpawnPath       = "Assets/ScriptableObjects/ZoneSpawns/BSER";
@@ -55,12 +57,13 @@ namespace ProjectER.Editor
 
             BuildFloor();
             BuildPlayer(scene);
+            BuildCombatDummy();
             BuildLootZones();
             SetupCamera();
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            EditorUtility.DisplayDialog("완료", "04_InGameScene 그레이박스(바닥 + NavMesh + 플레이어 + 루트박스) 생성 완료.", "확인");
+            EditorUtility.DisplayDialog("완료", "04_InGameScene 그레이박스(바닥 + NavMesh + 플레이어 + 더미 + 루트박스) 생성 완료.", "확인");
         }
 
         private static UnityEngine.SceneManagement.Scene OpenScene()
@@ -154,6 +157,40 @@ namespace ProjectER.Editor
                 Object.DestroyImmediate(root);
 
             return savedPrefab;
+        }
+
+        // ── 전투 테스트 더미 ─────────────────────────────────────────
+
+        private static void BuildCombatDummy()
+        {
+            GameObject existing = GameObject.Find("CombatDummy");
+            if (existing != null) Object.DestroyImmediate(existing);
+
+            // 캡슐 프리미티브 = CapsuleCollider 포함 → 우클릭 Raycast로 잡힘
+            GameObject dummy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            dummy.name = "CombatDummy";
+            dummy.transform.position = new Vector3(4f, 1f, 0f); // 플레이어(0,1,0) 근처
+
+            Renderer renderer = dummy.GetComponent<Renderer>();
+            renderer.sharedMaterial = GetOrCreateDummyMaterial();
+
+            CombatDummy dummyComp = dummy.AddComponent<CombatDummy>();
+            SerializedObject so = new(dummyComp);
+            so.FindProperty("_renderer").objectReferenceValue = renderer;
+            so.ApplyModifiedProperties();
+        }
+
+        // URP Lit 빨강 머터리얼 (런타임에 CombatDummy가 _BaseColor를 MPB로 덮어씀)
+        private static Material GetOrCreateDummyMaterial()
+        {
+            Material existing = AssetDatabase.LoadAssetAtPath<Material>(CombatDummyMaterialPath);
+            if (existing != null) return existing;
+
+            EnsureDirectory("Assets/Materials");
+            Material mat = new(Shader.Find("Universal Render Pipeline/Lit"));
+            mat.SetColor("_BaseColor", Color.red);
+            AssetDatabase.CreateAsset(mat, CombatDummyMaterialPath);
+            return mat;
         }
 
         // ── 루트 박스 ────────────────────────────────────────────────
