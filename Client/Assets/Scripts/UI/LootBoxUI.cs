@@ -22,6 +22,14 @@ namespace ProjectER.UI
 
         [SerializeField] private LootBoxSlotUI[] _slots; // Inspector에서 16개 연결
 
+        // 루트 우선표기용 — 선택 루트(MatchSelectionData) + 레시피 트리(RecipeDatabase)
+        [SerializeField] private MatchSelectionData _matchSelection;
+        [SerializeField] private RecipeDatabase     _recipeDatabase;
+
+        // 선택 루트의 필요 아이템 ID 집합 (목표 장비 + 하위 재료). 루트 확정 후 1회 계산.
+        private HashSet<string> _routeNeeded;
+        private bool            _routeNeededBuilt;
+
         // 현재 열려 있는 박스 UI (동시에 하나만 열림 — 거리 이탈 시 자동 닫힘).
         // 조합 패널이 "열린 박스 내용물"을 조합 재료로 포함하기 위해 참조한다.
         public static LootBoxUI ActiveBox { get; private set; }
@@ -117,6 +125,7 @@ namespace ProjectER.UI
                     _items[i]  = contents[i].Item;
                     _counts[i] = contents[i].DropCount;
                     _slots[i].Refresh(_items[i], _counts[i]);
+                    MarkRouteSlot(i);
                 }
                 else
                 {
@@ -202,10 +211,37 @@ namespace ProjectER.UI
             for (int i = 0; i < SlotCount; i++)
             {
                 if (_items[i] != null)
+                {
                     _slots[i].Refresh(_items[i], _counts[i]);
+                    MarkRouteSlot(i);
+                }
                 else
+                {
                     _slots[i].Clear();
+                }
             }
+        }
+
+        // 슬롯 아이템이 선택 루트의 필요 재료면 삼각형 표시
+        private void MarkRouteSlot(int slotIndex)
+        {
+            HashSet<string> needed = GetRouteNeeded();
+            ItemData item = _items[slotIndex];
+            bool marked = needed != null && item != null && needed.Contains(item.Id);
+            _slots[slotIndex].SetRouteMarked(marked);
+        }
+
+        // 선택 루트의 필요 아이템 집합 (1회 계산 후 캐시). 루트 미선택이면 null.
+        private HashSet<string> GetRouteNeeded()
+        {
+            if (_routeNeededBuilt) return _routeNeeded;
+            _routeNeededBuilt = true;
+
+            SavedRoute route = _matchSelection != null ? _matchSelection.SelectedRoute : null;
+            if (route != null && _recipeDatabase != null)
+                _routeNeeded = RouteSorter.CollectAllNeededItemIds(route, _recipeDatabase);
+
+            return _routeNeeded;
         }
 
         /// <summary>

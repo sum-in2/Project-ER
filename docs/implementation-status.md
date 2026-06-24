@@ -31,7 +31,8 @@
 | 패킷 정의 | `Server/ProjectER.Core/Packets/`, `Scripts/Network/Protocol/` | C2S/S2C 양쪽 동기화. 클라 `Scripts/Network/`(NetworkClient/MiniMsgPack/Serializer/Dispatcher) |
 | 접속/로비 씬 | `Scripts/Scene/`, `Scripts/UI/Lobby*.cs` | Connect/Lobby Controller, LobbyUIManager(패널 전환) |
 | 캐릭터 선택 씬 (1차) | `Scripts/UI/Pick/*.cs`, `PickSceneController.cs`, `PickSceneBuilder.cs` | 필터/정렬/검색 + 5열 그리드, 선택 초상화/플레이어 슬롯 3칸/서버 동기화 타이머. 채팅/스킨/멀티 연동 보류 |
-| 루트 선택 (픽 2단계, 선택만) | `Scripts/UI/Pick/RouteSelectPanelUI.cs`, `RouteEntrySlotUI.cs`, `Scripts/Data/SavedRoute.cs`, `ISavedRouteSource.cs`, `StubSavedRouteSource.cs`, `MatchSelectionData.cs` | 확인 버튼(시작 버튼 좌측) → 그리드 비활성 + 좌측 오버레이로 저장 루트 목록 표시 → 단일 선택. 저장 루트는 현재 StubSavedRouteSource(ItemDatabase 완성장비 더미). 선택 실험체+루트는 MatchSelectionData(SO 캐리어)에 기록해 인게임으로 전달. 루트 생성 UI·계정 DB 영속화·서버 전송(C2S_SelectRoute)·인게임 우선표기는 TODO. PickSceneBuilder가 패널/버튼/캐리어 에셋 자동 생성 |
+| 루트 선택 (픽 2단계, 선택만) | `Scripts/UI/Pick/RouteSelectPanelUI.cs`, `RouteEntrySlotUI.cs`, `Scripts/Data/SavedRoute.cs`, `ISavedRouteSource.cs`, `StubSavedRouteSource.cs`, `MatchSelectionData.cs` | 확인 버튼(시작 버튼 좌측) → 그리드 비활성 + 좌측 오버레이로 저장 루트 목록 표시 → 단일 선택. 저장 루트는 현재 StubSavedRouteSource(ItemDatabase 완성장비 더미). 선택 실험체+루트는 MatchSelectionData(SO 캐리어)에 기록해 인게임으로 전달. 루트 생성 UI·계정 DB 영속화·서버 전송(C2S_SelectRoute)은 TODO. PickSceneBuilder가 패널/버튼/캐리어 에셋 자동 생성 |
+| 루트 인게임 우선표기 | `Scripts/UI/RouteSorter.cs`(SavedRoute 오버로드), `LootBoxUI.cs`/`LootBoxSlotUI.cs`, `Scripts/UI/InGame/CraftableItemBar.cs` | MatchSelectionData의 선택 루트 → RouteSorter.CollectAllNeededItemIds(목표 장비+하위 재료 재귀)로 필요 ID 집합 산출. 루트박스 4x4: 필요 재료 슬롯 좌상단 노란 삼각형(런타임 생성). 조합칸 5칸: 루트 관련 레시피 2패스 우선 채움(기존 "조합칸 정렬" TODO 일부 흡수). LootBoxUIBuilder/InGameHudBuilder가 RecipeDatabase·MatchSelectionData 연결 |
 | 이동 (그레이박스) | `Scripts/Character/PlayerController.cs` | NavMesh 클릭투무브, 우클릭 시 ResetPath 후 재설정 + accel/angularSpeed 튜닝 |
 | 캐릭터 베이스 | `Scripts/Character/CharacterBase.cs` | IDamageable + HP, 상태머신 소유. HP 0 → Downed(빈사), Revive() 부활, Die() 최종 사망. 스킬/공격은 TODO |
 | 상태머신 | `Scripts/Character/State/*.cs` | State 패턴 + enum 하이브리드. Idle/Move/Downed/Dead 구현. MoveState가 NavMeshAgent 직접 구동, 빈사 중 입력 차단. Attack/Skill 상태는 enum에만 (전투·스킬 작업 때 추가). 빈사 스탯/전용 스킬셋은 TODO |
@@ -57,11 +58,10 @@
 | 이동 동기화 | 네트워크 | MoveHandler GameRoom 연동, S2C_MoveSync 브로드캐스트 |
 | 전투 동기화 | 네트워크 | AttackHandler, S2C_TakeDamage/Die 패킷 |
 | GameRoom | 서버 | 틱 루프, 플레이어 위치 관리 |
-| 조합칸 표시 순서 정렬 | UI | 인게임 조합 5칸(CraftableItemBar) — 현재 레시피 DB순 표시. 표시 순서/우선순위 정렬 로직 (Refresh의 _recipeBuffer 정렬) |
+| 조합칸 표시 순서 정렬 (잔여) | UI | 루트 우선 정렬은 구현됨(위 "루트 인게임 우선표기"). 잔여: 루트 외 일반 정렬 기준(등급/부위 등) 추가 |
 | 스탯 아이콘 | UI | 에셋 준비 후 StatDefs에 아이콘 슬롯 연결 |
 | 무기 세부 필터 | UI | 캐릭터 선택 시 해당 캐릭터 무기군으로 표시 |
 | 픽 화면 - 채팅/스킨 + 루트 생성/영속화 | 핵심 | 채팅창, 스킨 목록(에셋 준비 후). 루트는 선택 UI만 구현됨(위 표) — 루트 생성 UI, 계정 DB 영속화(해시 외래키), 서버 전송(C2S_SelectRoute)은 미구현. 2단계(30초) 타이머/서버 트리거로 인게임(04) 로딩 연동도 TODO |
-| 루트 인게임 우선표기 | 핵심 | 선택 루트의 필요 재료(RouteSorter.CollectAllNeededItemIds)를 루트박스 4x4·조합칸(CraftableItemBar)에서 우선 정렬/삼각형 표기. MatchSelectionData에서 루트 읽어 적용. 기존 "조합칸 표시 순서 정렬" TODO와 통합 |
 | 픽 화면 - 멀티플레이어 연동 | 핵심 | 매칭된 다른 플레이어 정보를 플레이어 슬롯 2/3에 표시 (현재 로컬 1인만 슬롯 0에 표시) |
 | 몬스터 AI | 선택 | 순찰 → 어그로 → 추격 |
 | 미니맵 | 선택 | - |

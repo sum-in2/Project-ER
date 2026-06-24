@@ -21,8 +21,10 @@ namespace ProjectER.Editor
     public static class InGameHudBuilder
     {
         private const string ScenePath        = "Assets/Scenes/04_InGameScene.unity";
-        private const string GradeConfigPath  = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
-        private const string ItemDatabasePath = "Assets/ScriptableObjects/ItemDatabase.asset";
+        private const string GradeConfigPath    = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+        private const string ItemDatabasePath   = "Assets/ScriptableObjects/ItemDatabase.asset";
+        private const string RecipeDatabasePath = "Assets/ScriptableObjects/RecipeDatabase.asset";
+        private const string MatchSelectionPath = "Assets/ScriptableObjects/MatchSelectionData.asset";
 
         private const string CanvasName = "InGameHudCanvas";
 
@@ -282,6 +284,10 @@ namespace ProjectER.Editor
             SerializedObject craftSo = new(craftBar);
             craftSo.FindProperty("_craftingSystem").objectReferenceValue = crafting;
             craftSo.FindProperty("_inventorySystem").objectReferenceValue = inventory;
+            craftSo.FindProperty("_recipeDatabase").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<RecipeDatabase>(RecipeDatabasePath);
+            craftSo.FindProperty("_matchSelection").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<MatchSelectionData>(MatchSelectionPath);
             SerializedProperty craftArr = craftSo.FindProperty("_slots");
             craftArr.arraySize = CraftCount;
             for (int i = 0; i < CraftCount; i++)

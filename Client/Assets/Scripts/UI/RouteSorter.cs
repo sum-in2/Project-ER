@@ -26,6 +26,27 @@ namespace ProjectER.UI
         }
 
         /// <summary>
+        /// 저장 루트(SavedRoute)에서 목표 장비 자신 + 필요한 모든 재료 ID를 재귀 수집한다.
+        /// 인게임 루트박스/조합칸의 우선표기에 사용. route 또는 db가 null이면 빈 셋 반환.
+        /// 목표 장비 자신도 포함하므로(완성 장비가 박스에 드랍될 수 있음), 도감용과 달리 대상 ID도 넣는다.
+        /// </summary>
+        public static HashSet<string> CollectAllNeededItemIds(SavedRoute route, RecipeDatabase db)
+        {
+            // ⚠️ GC 주의: HashSet 할당 — 루트 확정 시 1회 호출
+            HashSet<string> result = new HashSet<string>();
+            if (route == null || db == null) return result;
+
+            foreach (ItemData target in route.Items)
+            {
+                if (target == null) continue;
+                result.Add(target.Id);            // 목표 장비 자신
+                CollectIngredients(target.Id, result, db); // 하위 재료 재귀
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// itemId의 레시피 트리에 targetMaterialId가 포함되어 있으면 true.
         /// visited로 순환 참조를 방지한다.
         /// </summary>

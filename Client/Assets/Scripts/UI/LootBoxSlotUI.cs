@@ -19,10 +19,14 @@ namespace ProjectER.UI
         private Action<int> _onClicked;
         private Button      _button;
 
+        // 루트 필요 재료 표시용 삼각형 (도감과 동일 패턴) — 런타임 생성, 기본 숨김
+        private TriangleIndicator _routeIndicator;
+
         private void Awake()
         {
             TryGetComponent(out _button);
             _button?.onClick.AddListener(HandleClick);
+            CreateRouteIndicator();
         }
 
         private void OnEnable()  { }
@@ -80,6 +84,32 @@ namespace ProjectER.UI
             _iconImage.color   = Color.white;
             _countText.color   = Color.white;
             ApplyGradeColor(_gradeBorderImage, null);
+            SetRouteMarked(false);
+        }
+
+        /// <summary>이 슬롯 아이템이 선택 루트의 필요 재료인지 표시(좌상단 노란 삼각형).</summary>
+        public void SetRouteMarked(bool marked)
+        {
+            if (_routeIndicator != null)
+                _routeIndicator.enabled = marked;
+        }
+
+        private void CreateRouteIndicator()
+        {
+            GameObject go = new("RouteIndicator");
+            go.transform.SetParent(transform, false);
+
+            _routeIndicator = go.AddComponent<TriangleIndicator>();
+            _routeIndicator.color         = Color.yellow;
+            _routeIndicator.raycastTarget = false;
+            _routeIndicator.enabled       = false;
+
+            RectTransform rt    = go.GetComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0f, 1f);
+            rt.anchorMax        = new Vector2(0f, 1f);
+            rt.pivot            = new Vector2(0f, 1f);
+            rt.sizeDelta        = new Vector2(16f, 16f);
+            rt.anchoredPosition = Vector2.zero;
         }
 
         private void HandleClick() => _onClicked?.Invoke(_slotIndex);

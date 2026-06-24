@@ -13,8 +13,10 @@ namespace ProjectER.Editor
     /// </summary>
     public static class LootBoxUIBuilder
     {
-        private const string PrefabPath      = "Assets/Prefabs/UI/LootBoxUI.prefab";
-        private const string GradeConfigPath = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+        private const string PrefabPath        = "Assets/Prefabs/UI/LootBoxUI.prefab";
+        private const string GradeConfigPath   = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+        private const string RecipeDatabasePath = "Assets/ScriptableObjects/RecipeDatabase.asset";
+        private const string MatchSelectionPath = "Assets/ScriptableObjects/MatchSelectionData.asset";
 
         // 슬롯 비율 — 108:64 고정 (LoadOutPanelBuilder와 동일)
         // 크기 지정 시 x(가로)만 정의하고 y = x * (64/108) 으로 자동 계산
@@ -134,6 +136,11 @@ namespace ProjectER.Editor
             slotsProp.arraySize = SlotCount;
             for (int i = 0; i < SlotCount; i++)
                 slotsProp.GetArrayElementAtIndex(i).objectReferenceValue = slots[i];
+            // 루트 우선표기 — 레시피 트리 + 선택 루트 캐리어 연결 (없으면 표기만 비활성, 무해)
+            so.FindProperty("_recipeDatabase").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<RecipeDatabase>(RecipeDatabasePath);
+            so.FindProperty("_matchSelection").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<MatchSelectionData>(MatchSelectionPath);
             // _takeAllButton / _closeButton / _titleText 은 인게임 UI 구성 시 연결
             so.ApplyModifiedProperties();
 
