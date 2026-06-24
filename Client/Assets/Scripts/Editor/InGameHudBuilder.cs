@@ -63,6 +63,7 @@ namespace ProjectER.Editor
             ItemDatabase itemDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabase>(ItemDatabasePath);
 
             BuildStatusHud(canvas.transform, player);
+            BuildTargetRouteHud(canvas.transform, gradeConfig);
             BuildCombatTestPanel(canvas.transform, player, inventory, itemDatabase);
             BuildInventoryRegion(canvas.transform, inventory, crafting, gradeConfig);
 
@@ -156,6 +157,24 @@ namespace ProjectER.Editor
             so.FindProperty("_hpText").objectReferenceValue = hpText;
             so.FindProperty("_stateText").objectReferenceValue = stateText;
             so.ApplyModifiedProperties();
+        }
+
+        // ── 목표 아이템 HUD (우상단, 상태 HUD 아래) ───────────────────
+
+        private static void BuildTargetRouteHud(Transform parent, ItemGradeColorConfig gradeConfig)
+        {
+            // 슬롯 5칸(67.5 x 40, 컴포넌트가 자체 생성) + 간격을 수용하는 폭
+            const float slotW = 40f * (108f / 64f);
+            float width  = slotW * 5f + SlotGap * 4f;
+
+            RectTransform panel = NewRect("TargetRouteHud", parent);
+            // 상태 HUD(y -20, 높이 64) 아래에 배치
+            SetAnchor(panel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-20f, -92f), new Vector2(width, 40f));
+
+            TargetRouteHud hud = panel.gameObject.AddComponent<TargetRouteHud>();
+            MatchSelectionData matchSelection = AssetDatabase.LoadAssetAtPath<MatchSelectionData>(MatchSelectionPath);
+            hud.Editor_SetReferences(matchSelection, gradeConfig);
         }
 
         // ── 전투/아이템/스킬 테스트 버튼 (좌상단) ─────────────────────
