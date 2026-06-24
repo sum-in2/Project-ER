@@ -68,6 +68,32 @@ namespace ProjectER.UI
             return false;
         }
 
+        /// <summary>
+        /// item을 만드는 데 필요한 "기초 재료"(레시피가 없는 잎 아이템)를 수량과 함께 재귀 집계한다.
+        /// result에 ItemData → 누적 수량을 더한다(multiplier = 상위 레시피에서의 필요 수량 곱).
+        /// 잎 판정: RecipeDatabase에 결과 레시피가 없는 아이템.
+        /// </summary>
+        public static void CollectBaseMaterials(ItemData item, RecipeDatabase db,
+            Dictionary<ItemData, int> result, int multiplier = 1)
+        {
+            if (item == null || db == null || result == null) return;
+
+            RecipeData recipe = db.GetByResultId(item.Id);
+            if (recipe == null)
+            {
+                // 잎(기초 재료) — 수량 누적
+                result.TryGetValue(item, out int prev);
+                result[item] = prev + multiplier;
+                return;
+            }
+
+            foreach (ItemIngredient ingredient in recipe.Ingredients)
+            {
+                if (ingredient.Item == null) continue;
+                CollectBaseMaterials(ingredient.Item, db, result, multiplier * ingredient.Amount);
+            }
+        }
+
         private static void CollectIngredients(string itemId, HashSet<string> result, RecipeDatabase db)
         {
             RecipeData recipe = db.GetByResultId(itemId);

@@ -37,7 +37,8 @@ namespace ProjectER.Data
                 candidates[t] = new List<ItemData>();
                 foreach (ItemData item in _itemDatabase.GetByType(EquipmentTypes[t]))
                 {
-                    if (item != null && item.IsCompletedItem)
+                    // 더미 루트는 영웅(Epic) 등급 완성 장비만으로 구성
+                    if (item != null && item.IsCompletedItem && item.ItemGrade == ItemGrade.Epic)
                         candidates[t].Add(item);
                 }
             }
