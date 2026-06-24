@@ -41,6 +41,7 @@
 @docs/system-design.md
 @docs/project-structure.md
 @docs/implementation-status.md
+@docs/combat-damage-formula.md
 
 ---
 

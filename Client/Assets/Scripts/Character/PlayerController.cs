@@ -2,6 +2,7 @@ using ProjectER.Character.State;
 using ProjectER.Combat;
 using ProjectER.Data;
 using ProjectER.Interaction;
+using ProjectER.Inventory;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -34,6 +35,9 @@ namespace ProjectER.Character
         private NavMeshAgent _agent;
         private Camera _mainCamera;
 
+        // 장착 장비 보너스 합산용 (같은 GameObject의 InventorySystem). 없으면 기본 스탯만 사용.
+        private InventorySystem _inventory;
+
         // 이동 명령 시 목적지를 전달하기 위해 MoveState 인스턴스를 직접 보유
         private MoveState _moveState;
 
@@ -52,10 +56,12 @@ namespace ProjectER.Character
         {
             base.Awake();
             TryGetComponent(out _agent);
+            TryGetComponent(out _inventory); // 없을 수 있음 (장비 없는 캐릭터)
 
             // 상태 등록 (이동을 담당하는 MoveState는 NavMeshAgent를 직접 구동)
             _moveState = new MoveState(_agent, StateMachine);
-            _attackState = new AttackState(_agent, StateMachine, transform);
+            // 데미지 계산기는 상태 없는 순수 객체 → 1개 생성해 AttackState에 주입(DI)
+            _attackState = new AttackState(_agent, StateMachine, transform, new DamageCalculator());
             StateMachine.RegisterState(new IdleState(_agent));
             StateMachine.RegisterState(_moveState);
             StateMachine.RegisterState(_attackState);
@@ -72,23 +78,45 @@ namespace ProjectER.Character
             _agent.acceleration = InstantAcceleration;
             _agent.angularSpeed = InstantAngularSpeed;
 
-            if (_characterData == null) return;
-            _agent.speed = _characterData.MoveSpeed;
-            _agent.stoppingDistance = _characterData.StoppingDistance;
+            if (_characterData != null)
+                _agent.stoppingDistance = _characterData.StoppingDistance;
 
-            // 공격 스탯 주입 (데미지는 현재 공격력 고정, 간격 = 1 / 공격속도)
-            float attackInterval = _characterData.AttackSpeed > 0f ? 1f / _characterData.AttackSpeed : 1f;
-            _attackState.Configure(_characterData.AttackPower, _attackRange, attackInterval);
+            // 기본 스탯 + 장착 장비를 합산해 최종 전투 스탯을 적용
+            ApplyCombatStats();
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
+            // 장비 변경 시 전투 스탯 재계산 (로컬 컴포넌트 이벤트 → OnEnable/OnDisable 쌍)
+            if (_inventory != null)
+                _inventory.OnEquipmentChanged += HandleEquipmentChanged;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
+            if (_inventory != null)
+                _inventory.OnEquipmentChanged -= HandleEquipmentChanged;
+        }
+
+        private void HandleEquipmentChanged(EquipmentSlotType slotType, ItemData item) => ApplyCombatStats();
+
+        // 기본 스탯(CharacterData) + 장착 장비(InventorySystem)를 합산해 이동·공격·생명 스탯에 반영한다.
+        private void ApplyCombatStats()
+        {
+            CombatStats stats = CombatStatsBuilder.Build(_characterData, _inventory);
+
+            if (_agent != null && stats.MoveSpeed > 0f)
+                _agent.speed = stats.MoveSpeed;
+
+            _attackState.Configure(
+                stats.AttackPower,
+                stats.CriticalStrikeChance,
+                _attackRange,
+                stats.AttackInterval);
+
+            ApplyVitalStats(stats.MaxHp, stats.Defense);
         }
 
         protected override void OnDestroy()

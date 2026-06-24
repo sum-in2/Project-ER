@@ -21,7 +21,13 @@
 - [ ] **Skill 상태 추가** — 상태머신에 Skill 구체 상태 구현 (현재 enum에만 존재)
 - [~] **전투 시스템** — 기본 공격/피격/사망 루프는 닫힘(공격력 고정 데미지 → TakeDamage → 빈사/사망).
   남은 작업:
-  - [ ] 데미지 계산기(IDamageCalculator) — 방어력/치명타/증폭 공식 분리 (ER 공식 기반, 서버 검증과 동일 공식)
+  - [x] 데미지 계산기(IDamageCalculator) — 방어력/치명타/증폭 공식 분리 (ER 공식 기반).
+    `Scripts/Combat/`: CombatConstants/CombatMath/IDamageProfile(Basic·Skill)/DamageModifiers/DamageCalculator,
+    방어자 방어력은 ICombatStats(CharacterBase 구현). AttackState가 평타 프로파일로 계산.
+    증폭/고정추가/모드/방관/치피는 미보유 스탯 → 중립(0/1)로 시작. 서버 측 동일 공식 재계산은 전투 동기화 때 TODO
+  - [x] 런타임 전투 스탯 집계 — 기본 스탯(CharacterData) + 장착 장비(InventorySystem) 합산.
+    `Scripts/Combat/CombatStats.cs`, `CombatStatsBuilder.cs`. PlayerController가 Start·OnEquipmentChanged에
+    Build→적용, CharacterBase.ApplyVitalStats로 최대체력·방어력 반영. 치명타 확률은 0~1 비율(장비에서만 획득)
   - [ ] 사거리 이탈 시 자동 추격 (현재 Idle 복귀 후 재클릭)
   - [ ] 대상 사망 시 공격 중단 (현재 TakeDamage가 no-op 처리)
   - [ ] 빈사 스탯 변경 적용 (이동속도 감소 등)

@@ -10,9 +10,12 @@ namespace ProjectER.Character
     /// 상태머신(CharacterStateMachine)을 소유하며, 구체 상태 등록·초기 상태 지정은 자식이 담당한다.
     /// TODO: CharacterData(SO) 스탯 연동.
     /// </summary>
-    public abstract class CharacterBase : MonoBehaviour, IDamageable
+    public abstract class CharacterBase : MonoBehaviour, IDamageable, ICombatStats
     {
         [SerializeField] private float _maxHp = 100f;
+
+        // 방어자 측 방어력 (데미지 계산기가 ICombatStats로 읽어감). 추후 장비 보너스 합산 연동.
+        [SerializeField] private float _defense;
 
         // 부활 시 회복할 HP 비율 (0~1). 빈사 → 부활 기믹에서 사용.
         [SerializeField, Range(0f, 1f)] private float _reviveHpRatio = 0.3f;
@@ -21,6 +24,7 @@ namespace ProjectER.Character
 
         public float MaxHp => _maxHp;
         public float CurrentHp => _currentHp;
+        public float Defense => _defense;
 
         // HP 변경 이벤트 (현재 HP, 최대 HP) — HUD 등 구독용
         public event Action<float, float> OnHpChanged;
@@ -78,6 +82,24 @@ namespace ProjectER.Character
                 Debug.Log($"[전투] {name} 빈사(Downed) 진입", this);
                 StateMachine?.ChangeState(CharacterState.Downed);
             }
+        }
+
+        /// <summary>
+        /// 최종 전투 스탯(장비 합산 포함)에서 생명 관련 스탯을 반영한다.
+        /// 최대 체력 변동 시 풀피였다면 풀피를 유지하고, 아니면 현재 HP를 새 최대치로 클램프한다.
+        /// 방어력은 ICombatStats.Defense로 노출되어 데미지 계산기가 사용한다.
+        /// </summary>
+        public virtual void ApplyVitalStats(float maxHp, float defense)
+        {
+            if (maxHp > 0f)
+            {
+                bool wasFull = Mathf.Approximately(_currentHp, _maxHp);
+                _maxHp = maxHp;
+                _currentHp = wasFull ? _maxHp : Mathf.Min(_currentHp, _maxHp);
+            }
+
+            _defense = defense;
+            OnHpChanged?.Invoke(_currentHp, _maxHp);
         }
 
         /// <summary>

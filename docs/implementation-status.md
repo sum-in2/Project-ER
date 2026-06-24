@@ -35,6 +35,8 @@
 | 캐릭터 베이스 | `Scripts/Character/CharacterBase.cs` | IDamageable + HP, 상태머신 소유. HP 0 → Downed(빈사), Revive() 부활, Die() 최종 사망. 스킬/공격은 TODO |
 | 상태머신 | `Scripts/Character/State/*.cs` | State 패턴 + enum 하이브리드. Idle/Move/Downed/Dead 구현. MoveState가 NavMeshAgent 직접 구동, 빈사 중 입력 차단. Attack/Skill 상태는 enum에만 (전투·스킬 작업 때 추가). 빈사 스탯/전용 스킬셋은 TODO |
 | 전투/스킬 인터페이스 | `Scripts/Combat/`, `Scripts/Interaction/`, `Scripts/Skill/` | 인터페이스 정의만 완료, 로직 구현 TODO |
+| 데미지 계산기 | `Scripts/Combat/DamageCalculator.cs` 외 | ER 평타 공식(combat-damage-formula.md). CombatConstants/CombatMath/IDamageProfile(Basic·Skill struct)/DamageModifiers. 방어력/치명타 반영, 순수 함수·GC 없음(제네릭). 방어자 방어력=ICombatStats(CharacterBase). 증폭/고정추가/모드/방관/치피는 미보유 스탯 → 중립. AttackState가 평타에 연동(간격마다 즉시 타격) |
+| 런타임 전투 스탯 집계 | `Scripts/Combat/CombatStats.cs`, `CombatStatsBuilder.cs` | 기본 스탯(CharacterData) + 장착 장비(InventorySystem) 합산 → 최종 CombatStats(불변 struct). 공속=기본×(1+공속비율합), AttackSpeedLimit 클램프. PlayerController가 Start·OnEquipmentChanged에서 Build→적용(이동속도/공격력/치명타/공격간격), CharacterBase.ApplyVitalStats로 최대체력·방어력 반영. 치명타 확률은 0~1 비율(BSER 원본 스케일). 무기군 사거리·세부 스탯(쿨감/생흡 등 소비)은 미연동 |
 | 루트박스 (그레이박스) | `Scripts/World/LootBox.cs`, `LootZone.cs`, `Scripts/Data/SpawnEntry.cs`, `ZoneSpawnData.cs` | IInteractable. 스폰 그룹 1개를 5상자에 자체 알고리즘으로 분배. 상호작용 시 4x4 UI 열림 → 슬롯 클릭으로 개별 취득(가방 가득 시 취득 거부, 박스에 유지), 전부 취득 시 박스 파괴 |
 | 아이템 스폰 임포터 | `Scripts/Editor/BserItemSpawnImporter.cs` | ItemSpawn.json → areaCode 10 ZoneSpawnData 5종. Common(필드 산개) 미사용 |
 | 인게임 씬 빌더 | `Scripts/Editor/InGameSceneBuilder.cs`, `04_InGameScene.unity` | 바닥+NavMesh, 플레이어 프리팹, 루트박스 4구역, 카메라 자동 세팅 |
@@ -46,7 +48,8 @@
 |---|---|---|
 | Attack/Skill 상태 | 핵심 | 상태머신에 Attack/Skill 구체 상태 추가 (현재 enum에만 존재) |
 | 스킬 슬롯 | 핵심 | Q/W/E/R(액티브)·D(무기)·F(전술)·T(패시브) 인터페이스 연동. 빈사 시 전용 스킬셋 교체 포함 |
-| 전투 시스템 | 핵심 | 기본 공격/피격/사망 로직 (공격 판정, 데미지 계산). 빈사 스탯 변경 적용 포함 |
+| 전투 시스템 | 핵심 | 기본 공격/피격/사망 로직 (공격 판정, 데미지 계산). 빈사 스탯 변경 적용 포함. 데미지 판정 시점은 코드(상태머신)가 소유 — 애니메이션 이벤트로 데미지 트리거 금지(서버 검증 원칙·공속핵 방지) |
+| 공격 모션 / 타격 타이밍 | 핵심 | AttackState에 모션 연동. 공격 한 사이클 = 1/공격속도 → Animator.speed로 모션 재생속도 스케일. 클립 비율 기준 hitTimeRatio(전조→타격→후딜)로 타격 프레임에 데미지 1회 적용(현재는 간격마다 즉시 타격). 타격 후 후딜 이동 캔슬(어택땅) 여지 확보. 이동속도는 공격 모션과 무관(Locomotion Blend Tree). 클립 에셋 준비 후 작업 |
 | 필드 아이템 줍기 (Common 구역) | 선택 | ItemSpawn.json areaSpawnGroup -1 데이터 기반 필드 산개 아이템, 별도 줍기 인터랙션 |
 | 아이템 월드 드랍 | 핵심 | ItemDragHandler.OnEndDrag에서 슬롯(IItemDropTarget) 밖에 드롭 시 캐릭터 발 밑에 아이템 스폰 — 인게임 인벤토리 UI 구현 시 연동 |
 | 가방 슬롯 간 드래그 이동 | 선택 | InventorySlotUI에 IItemDropTarget 적용 — 가방 재배치, 가방↔장비 드래그 장착/해제 |
