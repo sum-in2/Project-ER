@@ -25,7 +25,7 @@ namespace ProjectER.Editor
         private const string ItemDatabasePath       = "Assets/ScriptableObjects/ItemDatabase.asset";
         private const string GradeConfigPath        = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
         private const string MatchSelectionPath     = "Assets/ScriptableObjects/MatchSelectionData.asset";
-        private const string ScenePath              = "Assets/Scenes/03_PickScene.unity";
+        private const string ScenePath              = "Assets/00_Scenes/03_PickScene.unity";
         private const int    PlayerSlotCount        = 3;
 
         // CharacterFilterPanelUI.RoleOrder 와 동일한 순서
@@ -644,7 +644,7 @@ namespace ProjectER.Editor
 
         private static void SaveScene(UnityEngine.SceneManagement.Scene scene, string path)
         {
-            System.IO.Directory.CreateDirectory("Assets/Scenes");
+            System.IO.Directory.CreateDirectory("Assets/00_Scenes");
             EditorSceneManager.SaveScene(scene, path);
             Debug.Log($"[PickSceneBuilder] 저장 완료: {path}");
         }

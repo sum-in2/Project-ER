@@ -20,7 +20,7 @@ namespace ProjectER.Editor
     /// </summary>
     public static class InGameHudBuilder
     {
-        private const string ScenePath        = "Assets/Scenes/04_InGameScene.unity";
+        private const string ScenePath        = "Assets/00_Scenes/04_InGameScene.unity";
         private const string GradeConfigPath    = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
         private const string ItemDatabasePath   = "Assets/ScriptableObjects/ItemDatabase.asset";
         private const string RecipeDatabasePath = "Assets/ScriptableObjects/RecipeDatabase.asset";

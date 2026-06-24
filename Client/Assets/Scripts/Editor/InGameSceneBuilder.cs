@@ -18,7 +18,7 @@ namespace ProjectER.Editor
     /// </summary>
     public static class InGameSceneBuilder
     {
-        private const string ScenePath             = "Assets/Scenes/04_InGameScene.unity";
+        private const string ScenePath             = "Assets/00_Scenes/04_InGameScene.unity";
         private const string PlayerPrefabPath      = "Assets/Prefabs/Characters/PlayerCharacter.prefab";
         private const string TestCharacterDataPath = "Assets/ScriptableObjects/Characters/BSER/Character_1.asset"; // Jackie (이동 테스트용)
         private const string RecipeDatabasePath    = "Assets/ScriptableObjects/RecipeDatabase.asset";

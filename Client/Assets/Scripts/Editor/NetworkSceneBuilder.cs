@@ -69,7 +69,7 @@ namespace ProjectER.Editor
             so.FindProperty("_statusText").objectReferenceValue    = statusText.GetComponent<TMP_Text>();
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/00_ConnectScene.unity");
+            SaveScene(scene, "Assets/00_Scenes/00_ConnectScene.unity");
         }
 
         // ── LoginScene ────────────────────────────────────────────
@@ -111,7 +111,7 @@ namespace ProjectER.Editor
             so.FindProperty("_statusText").objectReferenceValue    = statusText.GetComponent<TMP_Text>();
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/01_LoginScene.unity");
+            SaveScene(scene, "Assets/00_Scenes/01_LoginScene.unity");
         }
 
         // ── LobbyScene ────────────────────────────────────────────
@@ -178,7 +178,7 @@ namespace ProjectER.Editor
             so.FindProperty("_lobbyUIManager").objectReferenceValue  = uiManager;
             so.ApplyModifiedProperties();
 
-            SaveScene(scene, "Assets/Scenes/02_LobbyScene.unity");
+            SaveScene(scene, "Assets/00_Scenes/02_LobbyScene.unity");
         }
 
         // ── 공통 씬 오브젝트 ──────────────────────────────────────
@@ -339,7 +339,7 @@ namespace ProjectER.Editor
 
         private static void SaveScene(UnityEngine.SceneManagement.Scene scene, string path)
         {
-            System.IO.Directory.CreateDirectory("Assets/Scenes");
+            System.IO.Directory.CreateDirectory("Assets/00_Scenes");
             EditorSceneManager.SaveScene(scene, path);
             Debug.Log($"[NetworkSceneBuilder] 저장 완료: {path}");
         }
