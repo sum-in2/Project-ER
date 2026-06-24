@@ -22,6 +22,9 @@ namespace ProjectER.Editor
         private const string SlotPrefabPath         = "Assets/Prefabs/UI/CharacterSelectSlot.prefab";
         private const string UIDefaultMaterialPath  = "Assets/Art/Materials/UI_Default.mat";
         private const string CharacterDatabasePath  = "Assets/ScriptableObjects/CharacterDatabase.asset";
+        private const string ItemDatabasePath       = "Assets/ScriptableObjects/ItemDatabase.asset";
+        private const string GradeConfigPath        = "Assets/ScriptableObjects/ItemGradeColorConfig.asset";
+        private const string MatchSelectionPath     = "Assets/ScriptableObjects/MatchSelectionData.asset";
         private const string ScenePath              = "Assets/Scenes/03_PickScene.unity";
         private const int    PlayerSlotCount        = 3;
 
@@ -228,6 +231,12 @@ namespace ProjectER.Editor
             Stretch(chatLabel);
             chatLabel.GetComponent<TMP_Text>().color = new Color(1f, 1f, 1f, 0.4f);
 
+            // ── 좌측 오버레이: 루트 선택 패널 (확인 시 표시, 초기 숨김) ──
+            ItemGradeColorConfig gradeConfig = AssetDatabase.LoadAssetAtPath<ItemGradeColorConfig>(GradeConfigPath);
+            if (gradeConfig == null)
+                Debug.LogWarning($"[PickSceneBuilder] ItemGradeColorConfig 없음: {GradeConfigPath}");
+            RouteSelectPanelUI routePanel = BuildRoutePanel(leftPanel.transform, gradeConfig);
+
             // ── 우측: 타이머 ───────────────────────────────────
             GameObject timerPanel = CreatePanel(rightPanel.transform, "TimerPanel", Color.clear);
             AddLayoutElement(timerPanel, preferredHeight: 64, flexibleHeight: 0);
@@ -273,9 +282,16 @@ namespace ProjectER.Editor
             for (int i = 0; i < PlayerSlotCount; i++)
                 playerSlots[i] = BuildPlayerSlot(playerSlotsRow.transform, $"PlayerSlot_{i}");
 
-            // ── 우측: 테스트 버튼 (인게임 씬 즉시 진입) ─────────
-            GameObject testInGameButton = CreateButton(rightPanel.transform, "TestInGameButton", "테스트: 인게임 진입");
-            AddLayoutElement(testInGameButton, preferredHeight: 40, flexibleHeight: 0);
+            // ── 우측: 액션 버튼 행 [확인][테스트:인게임 진입] ─────
+            GameObject actionRow = CreatePanel(rightPanel.transform, "ActionButtons", Color.clear);
+            AddLayoutElement(actionRow, preferredHeight: 40, flexibleHeight: 0);
+            HorizontalLayoutGroup actionLayout = actionRow.AddComponent<HorizontalLayoutGroup>();
+            actionLayout.spacing = 8;
+            actionLayout.childForceExpandWidth  = true;
+            actionLayout.childForceExpandHeight = true;
+
+            GameObject confirmButton    = CreateButton(actionRow.transform, "ConfirmButton", "확인");
+            GameObject testInGameButton = CreateButton(actionRow.transform, "TestInGameButton", "테스트: 인게임 진입");
 
             // ── 컴포넌트 연결 ──────────────────────────────────
             CharacterFilterPanelUI filterPanel = leftPanel.AddComponent<CharacterFilterPanelUI>();
@@ -322,6 +338,18 @@ namespace ProjectER.Editor
             playerSlotsProp.arraySize = playerSlots.Length;
             for (int i = 0; i < playerSlots.Length; i++)
                 playerSlotsProp.GetArrayElementAtIndex(i).objectReferenceValue = playerSlots[i];
+
+            // 루트 선택 단계 배선
+            ItemDatabase itemDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabase>(ItemDatabasePath);
+            if (itemDatabase == null)
+                Debug.LogWarning($"[PickSceneBuilder] ItemDatabase 없음: {ItemDatabasePath}");
+            MatchSelectionData matchSelection = LoadOrCreateMatchSelection();
+
+            controllerSo.FindProperty("_confirmButton").objectReferenceValue       = confirmButton.GetComponent<Button>();
+            controllerSo.FindProperty("_characterGridScroll").objectReferenceValue = gridScrollGo;
+            controllerSo.FindProperty("_routePanel").objectReferenceValue          = routePanel;
+            controllerSo.FindProperty("_itemDatabase").objectReferenceValue        = itemDatabase;
+            controllerSo.FindProperty("_matchSelection").objectReferenceValue      = matchSelection;
             controllerSo.ApplyModifiedProperties();
 
             // 저장 전 레이아웃을 강제로 재계산 → FilterBar/CharacterGridScroll 등의
@@ -366,6 +394,77 @@ namespace ProjectER.Editor
             so.ApplyModifiedProperties();
 
             return slot;
+        }
+
+        // ── 루트 선택 패널 (좌측 그리드 위 오버레이) ───────────────
+        private static RouteSelectPanelUI BuildRoutePanel(Transform parent, ItemGradeColorConfig gradeConfig)
+        {
+            GameObject panelGo = CreatePanel(parent, "RouteSelectPanel", new Color(0.07f, 0.07f, 0.09f, 1f));
+            // 좌측 VerticalLayoutGroup에서 제외하고 좌측 패널 전체를 덮도록 스트레치
+            LayoutElement ignore = panelGo.AddComponent<LayoutElement>();
+            ignore.ignoreLayout = true;
+            Stretch(panelGo);
+
+            GameObject title = CreateText(panelGo.transform, "Title", "루트 선택", 22, TextAlignmentOptions.Center);
+            RectTransform titleRt = title.GetComponent<RectTransform>();
+            titleRt.anchorMin = new Vector2(0f, 0.92f);
+            titleRt.anchorMax = new Vector2(1f, 1f);
+            titleRt.offsetMin = Vector2.zero;
+            titleRt.offsetMax = Vector2.zero;
+
+            GameObject scrollGo = CreatePanel(panelGo.transform, "RouteScroll", new Color(0.05f, 0.05f, 0.05f, 0.6f));
+            RectTransform scrollRt = scrollGo.GetComponent<RectTransform>();
+            scrollRt.anchorMin = new Vector2(0f, 0f);
+            scrollRt.anchorMax = new Vector2(1f, 0.92f);
+            scrollRt.offsetMin = new Vector2(8f, 8f);
+            scrollRt.offsetMax = new Vector2(-8f, -8f);
+            ScrollRect scroll = scrollGo.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.vertical   = true;
+
+            GameObject viewport = CreatePanel(scrollGo.transform, "Viewport", Color.clear);
+            Stretch(viewport);
+            viewport.AddComponent<RectMask2D>();
+
+            GameObject content = NewUIObject("Content", viewport.transform);
+            RectTransform contentRt = content.GetComponent<RectTransform>();
+            contentRt.anchorMin = new Vector2(0f, 1f);
+            contentRt.anchorMax = new Vector2(1f, 1f);
+            contentRt.pivot     = new Vector2(0.5f, 1f);
+            contentRt.sizeDelta = Vector2.zero;
+
+            VerticalLayoutGroup vlg = content.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 6;
+            vlg.padding = new RectOffset(8, 8, 8, 8);
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth      = true;
+            vlg.childControlHeight     = true;
+
+            ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scroll.viewport = viewport.GetComponent<RectTransform>();
+            scroll.content  = contentRt;
+
+            RouteSelectPanelUI panel = panelGo.AddComponent<RouteSelectPanelUI>();
+            panel.Editor_SetReferences(contentRt, gradeConfig);
+
+            panelGo.SetActive(false); // 확인 버튼 클릭 시 컨트롤러가 표시
+            return panel;
+        }
+
+        private static MatchSelectionData LoadOrCreateMatchSelection()
+        {
+            MatchSelectionData asset = AssetDatabase.LoadAssetAtPath<MatchSelectionData>(MatchSelectionPath);
+            if (asset != null) return asset;
+
+            asset = ScriptableObject.CreateInstance<MatchSelectionData>();
+            System.IO.Directory.CreateDirectory("Assets/ScriptableObjects");
+            AssetDatabase.CreateAsset(asset, MatchSelectionPath);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[PickSceneBuilder] MatchSelectionData 생성: {MatchSelectionPath}");
+            return asset;
         }
 
         // ── 공통 씬 오브젝트 ─────────────────────────────────────
