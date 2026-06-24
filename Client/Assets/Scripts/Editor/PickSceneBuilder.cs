@@ -43,6 +43,45 @@ namespace ProjectER.Editor
             EditorUtility.DisplayDialog("완료", "03_PickScene 생성 완료.\nBuild Settings 씬 목록에 자동으로 추가되었습니다.", "확인");
         }
 
+        // ── 슬롯 프리팹 참조만 재연결 (전체 빌드 없이) ──────────────
+        // Build Pick Scene 후 _slotPrefab이 {fileID:0}으로 풀렸을 때 1클릭으로 복구.
+        [MenuItem("ProjectER/Rewire Pick Scene Slot Prefab")]
+        public static void RewireSlotPrefab()
+        {
+            UnityEngine.SceneManagement.Scene scene = EditorSceneManager.GetActiveScene();
+            if (scene.path != ScenePath)
+                scene = EditorSceneManager.OpenScene(ScenePath);
+
+            CharacterGridUI grid = Object.FindFirstObjectByType<CharacterGridUI>();
+            if (grid == null)
+            {
+                Debug.LogError("[PickSceneBuilder] 씬에서 CharacterGridUI를 찾지 못했습니다. 먼저 Build Pick Scene 실행 필요.");
+                return;
+            }
+
+            CharacterSelectSlotUI slotPrefab = LoadSlotPrefab();
+            if (slotPrefab == null)
+            {
+                Debug.LogError($"[PickSceneBuilder] 슬롯 프리팹 로드 실패: {SlotPrefabPath}");
+                return;
+            }
+
+            SerializedObject so = new(grid);
+            so.FindProperty("_slotPrefab").objectReferenceValue = slotPrefab;
+            so.ApplyModifiedProperties();
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[PickSceneBuilder] _slotPrefab 재연결 완료.");
+        }
+
+        // 슬롯 프리팹을 경로에서 로드해 컴포넌트를 반환 (없으면 null)
+        private static CharacterSelectSlotUI LoadSlotPrefab()
+        {
+            GameObject go = AssetDatabase.LoadAssetAtPath<GameObject>(SlotPrefabPath);
+            return go != null ? go.GetComponent<CharacterSelectSlotUI>() : null;
+        }
+
         // ── 캐릭터 그리드 채우기 (기존 씬의 사용자 조정 크기 반영) ──
         [MenuItem("ProjectER/Populate Pick Scene Character Grid")]
         public static void PopulateCharacterGrid()
@@ -311,8 +350,13 @@ namespace ProjectER.Editor
             CharacterGridUI characterGrid = leftPanel.AddComponent<CharacterGridUI>();
             SerializedObject gridSo = new(characterGrid);
             gridSo.FindProperty("_characterDatabase").objectReferenceValue = characterDatabase;
-            gridSo.FindProperty("_slotPrefab").objectReferenceValue        = slotPrefab;
-            gridSo.FindProperty("_gridContent").objectReferenceValue       = gridContent;
+            // 슬롯 프리팹은 전달받은 참조 대신 경로에서 새로 로드해 할당
+            // ({fileID:0} 직렬화 방지 — 막 생성한 에셋 참조가 씬 저장 시 null로 떨어지던 반복 버그)
+            CharacterSelectSlotUI freshSlotPrefab = LoadSlotPrefab() ?? slotPrefab;
+            if (freshSlotPrefab == null)
+                Debug.LogError($"[PickSceneBuilder] 슬롯 프리팹 로드 실패 — _slotPrefab 미연결: {SlotPrefabPath}");
+            gridSo.FindProperty("_slotPrefab").objectReferenceValue  = freshSlotPrefab;
+            gridSo.FindProperty("_gridContent").objectReferenceValue = gridContent;
             gridSo.ApplyModifiedProperties();
 
             SelectedCharacterPanelUI selectedPanelUI = selectedPanel.AddComponent<SelectedCharacterPanelUI>();
