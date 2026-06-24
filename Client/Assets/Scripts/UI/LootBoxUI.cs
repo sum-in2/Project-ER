@@ -124,18 +124,21 @@ namespace ProjectER.UI
                 {
                     _items[i]  = contents[i].Item;
                     _counts[i] = contents[i].DropCount;
-                    _slots[i].Refresh(_items[i], _counts[i]);
-                    MarkRouteSlot(i);
                 }
                 else
                 {
                     _items[i]  = null;
                     _counts[i] = 0;
-                    _slots[i].Clear();
                 }
             }
 
+            // 루트 필요 아이템을 앞으로 정렬
+            SortRouteFirst();
+
+            // 슬롯 표기는 활성화 이후에 — LootBoxSlotUI.Awake에서 삼각형 인디케이터가 생성되므로
+            // SetActive(true) 전에 SetRouteMarked를 호출하면 인디케이터가 없어 표기가 누락된다.
             gameObject.SetActive(true);
+            RefreshAllSlots();
 
             // 활성 박스 등록 → 조합 패널이 이 박스 내용물을 재료로 포함
             ActiveBox = this;
@@ -208,6 +211,12 @@ namespace ProjectER.UI
                 _counts[i] = 0;
             }
 
+            RefreshAllSlots();
+        }
+
+        // 전체 슬롯을 현재 상태(_items/_counts)로 다시 그리고 루트 표기까지 적용한다.
+        private void RefreshAllSlots()
+        {
             for (int i = 0; i < SlotCount; i++)
             {
                 if (_items[i] != null)
@@ -219,6 +228,35 @@ namespace ProjectER.UI
                 {
                     _slots[i].Clear();
                 }
+            }
+        }
+
+        // 루트 필요 아이템을 앞 슬롯으로 모은다(2패스 안정 정렬, 나머지는 원래 순서 유지).
+        private void SortRouteFirst()
+        {
+            HashSet<string> needed = GetRouteNeeded();
+            if (needed == null) return;
+
+            // ⚠️ GC 주의: 임시 배열 할당 — 박스 오픈 시에만 호출되므로 허용
+            ItemData[] items  = new ItemData[SlotCount];
+            int[]      counts = new int[SlotCount];
+            int w = 0;
+
+            for (int r = 0; r < SlotCount; r++)
+                if (_items[r] != null && needed.Contains(_items[r].Id))
+                {
+                    items[w] = _items[r]; counts[w] = _counts[r]; w++;
+                }
+            for (int r = 0; r < SlotCount; r++)
+                if (_items[r] != null && !needed.Contains(_items[r].Id))
+                {
+                    items[w] = _items[r]; counts[w] = _counts[r]; w++;
+                }
+
+            for (int i = 0; i < SlotCount; i++)
+            {
+                _items[i]  = items[i];
+                _counts[i] = counts[i];
             }
         }
 

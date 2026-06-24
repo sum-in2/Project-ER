@@ -37,6 +37,10 @@ namespace ProjectER.UI.InGame
 
         private void OnEnable()
         {
+            // 빌더가 인벤토리를 연결하지 못한 경우 대비한 런타임 폴백 (조작 중인 플레이어 인벤토리)
+            if (_inventory == null)
+                _inventory = FindFirstObjectByType<InventorySystem>();
+
             if (_inventory != null)
                 _inventory.OnBagSlotChanged += HandleInventoryChanged;
             Refresh();
